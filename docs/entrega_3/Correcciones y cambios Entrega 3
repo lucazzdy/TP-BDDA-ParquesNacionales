@@ -1,5 +1,7 @@
 Primeras Correcciones Entrega 3
 
+Fecha 12/06/2026
+
 Correcciones Profe
 
 .ubicación de parque que sea atributo compuesto o entidad con atributos
@@ -9,8 +11,8 @@ Correcciones Profe
 Correcciones Realizadas
 
 .Ubicacion de parque como atributo multivaluado con los atributos Provincia, calle, nro y codigo Postal
-.titulo, especialidad, tipo concecion, tipo parque, tipo visitante como entidad con atributos propios
-.Atributo fecha y estdo en l entidd compra
+.titulo, especialidad, tipo concesion, tipo parque, tipo visitante como entidad con atributos propios
+.Atributo fecha y estado en l entidd compra
 .Atributos estado en las entidades pago y pago canon
-
+.Agregado atributo fecha en Pago y en la relacion hace tour
 
