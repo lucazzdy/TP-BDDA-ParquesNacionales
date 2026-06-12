@@ -1,0 +1,16 @@
+Primeras Correcciones
+
+Correcciones Profe
+
+.ubicación de parque que sea atributo compuesto o entidad con atributos
+.titulo de los guías que sea entidad débil o multivaluada
+.atributo fecha en compra
+
+Correcciones Realizadas
+
+.Ubicacion de parque como atributo multivaluado con los atributos Provincia, calle, nro y codigo Postal
+.titulo, especialidad, tipo concecion, tipo parque, tipo visitante como entidad con atributos propios
+.Atributo fecha y estdo en l entidd compra
+.Atributos estado en las entidades pago y pago canon
+
+
