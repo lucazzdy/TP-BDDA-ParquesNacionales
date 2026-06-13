@@ -26,3 +26,7 @@ BEGIN
 	EXEC('CREATE SCHEMA Ventas')
 END
 
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'Concesiones')
+BEGIN
+	EXEC('CREATE SCHEMA Concesiones')
+END
