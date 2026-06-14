@@ -11,9 +11,9 @@ BEGIN
 	EXEC('CREATE SCHEMA Personal')
 END
 
-IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'Actividad')
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'Actividades')
 BEGIN
-	EXEC('CREATE SCHEMA Actividad')
+	EXEC('CREATE SCHEMA Actividades')
 END
 
 IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'Gestion')
