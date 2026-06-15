@@ -74,9 +74,9 @@ go
 CREATE TABLE Actividades.Guia (
         idGuia INT IDENTITY(1,1) NOT NULL,
         fecha DATE NULL,
-        idEspecialidad INT NOT NULL,
+        codEspecialidad INT NOT NULL,
         CONSTRAINT PK_Guia PRIMARY KEY (idGuia),
-        CONSTRAINT FK_Guia_Especialidad FOREIGN KEY (idEspecialidad) REFERENCES Actividades.Especialidad(codEspecialidad),
+        CONSTRAINT FK_Guia_Especialidad FOREIGN KEY (codEspecialidad) REFERENCES Actividades.Especialidad(codEspecialidad),
     );
 
 -- Datos de los titulos de los guias
