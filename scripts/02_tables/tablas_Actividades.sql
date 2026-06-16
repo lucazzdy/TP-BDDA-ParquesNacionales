@@ -1,3 +1,16 @@
+/* 
+    Script generado el 15/06/26
+
+Grupo n°7
+Integrantes:    - Acuña, Lucas Daniel
+                - Alesina, Alan
+                - Gutierrez, Lucas Leone
+                - Zambrana, Mijael
+
+Descripción del Script: Este script genera los stored procedures ABM 
+                        para el esquema de Actividades y sus tablas.
+*/
+
 USE GestionParquesNacionales;
 GO
 
