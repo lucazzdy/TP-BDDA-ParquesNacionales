@@ -1,5 +1,5 @@
 /* 
-    Script generado el 15/06/26
+    Script generado el 14/06/26
 
 Grupo n°7
 Integrantes:    - Acuña, Lucas Daniel
@@ -7,8 +7,7 @@ Integrantes:    - Acuña, Lucas Daniel
                 - Gutierrez, Lucas Leone
                 - Zambrana, Mijael
 
-Descripción del Script: Este script genera los stored procedures ABM 
-                        para el esquema de Actividades y sus tablas.
+Descripción del Script: Este script genera todas las tablas del esquema Actividades
 */
 
 USE GestionParquesNacionales;
