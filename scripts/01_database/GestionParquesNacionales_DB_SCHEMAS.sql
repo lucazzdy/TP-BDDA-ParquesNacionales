@@ -1,3 +1,15 @@
+/* 
+    Script generado el 13/06/26
+
+Grupo n°7
+Integrantes:    - Acuña, Lucas Daniel
+                - Alesina, Alan
+                - Gutierrez, Lucas Leone
+                - Zambrana, Mijael
+
+Descripción del Script: Este script crea la base de datos y los esquemas 
+						Personal, Actividades, Gestion, Ventas y Concesiones
+*/
 
 IF DB_ID('GestionParquesNacionales') IS NULL
 	CREATE DATABASE GestionParquesNacionales COLLATE Latin1_GENERAL_CI_AS
