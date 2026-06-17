@@ -43,8 +43,8 @@ go
 CREATE TABLE Actividades.Actividad (
         idActividad INT IDENTITY(1,1) NOT NULL,
         nombre VARCHAR(100) NOT NULL UNIQUE,
-        costo DECIMAL(8,2) NULL,
-        duracion DECIMAL(3,1) NULL,
+        costo DECIMAL(8,2) NULL CHECK(costo >= 0),
+        duracion DECIMAL(3,1) NULL CHECK(Duracion > 0), 
         idTipoActividad INT NOT NULL,
         CONSTRAINT PK_Actividad PRIMARY KEY (idActividad),
         -- FK al tipo de Actividad
