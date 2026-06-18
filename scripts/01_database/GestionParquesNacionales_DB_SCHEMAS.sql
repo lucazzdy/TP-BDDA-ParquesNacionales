@@ -42,3 +42,63 @@ IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'Concesiones')
 BEGIN
 	EXEC('CREATE SCHEMA Concesiones')
 END
+
+=========================================================
+CONFIGURACIÓN FÍSICA PROPUESTA (ENTREGA 4)
+=========================================================
+
+Esta configuración no se ejecuta debido a que requiere
+la existencia física de los discos configurados para el
+entorno productivo.
+
+Distribución propuesta:
+
+Datos MDF/NDF:
+D:\SQLData\
+
+Logs:
+F:\SQLLogs\
+
+Backups:
+E:\SQLBackups\
+
+TempDB:
+G:\TempDB\
+
+Script propuesto:
+
+CREATE DATABASE TP_BDA_ParquesNacionales
+ON PRIMARY
+(
+    NAME = TP_BDA_ParquesNacionales_Data,
+    FILENAME = 'D:\SQLData\TP_BDA_ParquesNacionales.mdf',
+    SIZE = 100GB,
+    MAXSIZE = 200GB,
+    FILEGROWTH = 10GB
+),
+FILEGROUP FG_ExtraData
+(
+    NAME = TP_BDA_ParquesNacionales_Extra,
+    FILENAME = 'D:\SQLData\TP_BDA_ParquesNacionales_Extra.ndf',
+    SIZE = 50GB,
+    MAXSIZE = 100GB,
+    FILEGROWTH = 10GB
+)
+LOG ON
+(
+    NAME = TP_BDA_ParquesNacionales_Log,
+    FILENAME = 'F:\SQLLogs\TP_BDA_ParquesNacionales.ldf',
+    SIZE = 30GB,
+    MAXSIZE = 60GB,
+    FILEGROWTH = 5GB
+);
+
+Ejemplo de Backup:
+
+BACKUP DATABASE TP_BDA_ParquesNacionales
+TO DISK = 'E:\SQLBackups\BackupCompleto.bak';
+
+=========================================================
+FIN DEL SCRIPT
+=========================================================
+*/
