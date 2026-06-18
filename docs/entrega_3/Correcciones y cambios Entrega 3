@@ -16,3 +16,13 @@ Correcciones Realizadas
 .Atributos estado en las entidades pago y pago canon
 .Agregado atributo fecha en Pago y en la relacion hace tour
 
+Fecha 17/06/2026
+
+Cambios Realizados
+
+.Agregado de atributos PuntoVenta y NumeroFactura en la entidad Venta, para mejorar la trazabilidad.
+.Agregado de entidad debil itemVenta relacionado con Venta, permitiendo que multiples item se agrupen de forma ordenada en el ticket.
+.Agregado de entidad FormaPago relacionado con Pago, para poder registrar las formas de pago disponibles
+.Agregado de la entidad debil PreciosParque relacionado con Parque y tipo de Visitante, de esta forma cada parque tiene sus propios precios y se tener un historial.
+.Correcion de cardinalidad Entre TipoDeVisitante y Visitante (1 - N a N - 1).
+.Cambio de relacion de Ticket Factura, ahora se relaciona con venta y no con pago
