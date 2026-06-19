@@ -19,9 +19,14 @@ go
 
 
 -- Insert solo con descripcion opcional
-CREATE OR ALTER PROCEDURE Actividades.TipoActividad_Alta @descripcion VARCHAR(200) = ''
+CREATE OR ALTER PROCEDURE Actividades.TipoActividad_Alta @descripcion VARCHAR(200) = NULL
 AS
 BEGIN
+    IF @descripcion IS NOT NULL AND LEN(@descripcion) > 199
+    BEGIN
+        ;THROW 50100, 'La descripcion no puede superar los 200 caracteres',1
+    END
+
 	INSERT INTO Actividades.TipoActividad(descripcion)
 	VALUES (@descripcion)
 END
@@ -30,7 +35,7 @@ go
 -- Modificar la descripcion del tipo de actividad segun idTipoActividad
 CREATE OR ALTER PROCEDURE Actividades.TipoActividad_Modificar
         @idTipoActividad INT,
-        @descripcion VARCHAR(200) = ''
+        @descripcion VARCHAR(200) = NULL
 AS
 BEGIN
     DECLARE @errorMsg VARCHAR(100)
@@ -42,8 +47,13 @@ BEGIN
         WHERE idTipoActividad = @idTipoActividad
         )
     BEGIN
-        SET @errorMsg = 'No existe un Tipo de Actividad con id: ' + @idTipoActividad
+        SET @errorMsg = 'No existe un Tipo de Actividad con id: ' + CAST(@idTipoActividad AS VARCHAR)
         ;THROW 50200, @errorMsg,1
+    END
+
+    IF @descripcion IS NOT NULL AND LEN(@descripcion) > 199
+    BEGIN
+        ;THROW 50201, 'La descripcion no puede superar los 200 caracteres',2
     END
 
     UPDATE Actividades.TipoActividad
@@ -65,7 +75,7 @@ BEGIN
         WHERE idTipoActividad = @idTipoActividad
         )
     BEGIN
-        SET @errorMsg = 'No existe un Tipo de Actividad con id: ' + @idTipoActividad
+        SET @errorMsg = 'No existe un Tipo de Actividad con id: ' + CAST(@idTipoActividad AS VARCHAR)
         ;THROW 50300, @errorMsg,1
     END
     DELETE FROM Actividades.TipoActividad
@@ -100,16 +110,21 @@ BEGIN
         ;THROW 51101, 'El nombre no puede estar vacio!',2
     END
 
+    -- Chequeo que la duracion a INSERTAR no sea NULL
+    IF @duracion IS NULL
+    BEGIN
+        ;THROW 51102, 'La duracion es un campo obligatorio',3
+    END
     -- Chequeo que la duracion a INSERTAR sea mayor a 0
     IF @duracion <= 0
     BEGIN
-        ;THROW 51102, 'El tiempo de duracion debe ser mayor a 0',3
+        ;THROW 51103, 'El tiempo de duracion debe ser mayor a 0',4
     END
 
     -- Chqueo que el costo a INSERTAR sea 0 (gratis) o mas
     IF @costo < 0
     BEGIN
-        ;THROW 51103, 'El costo debe ser mayor o igual a 0',4
+        ;THROW 51104, 'El costo debe ser mayor o igual a 0',5
     END
 
     -- Chequeo que la idTipoActividad a INSERTAR exista en tabla Actividad.TipoActividad
@@ -119,8 +134,8 @@ BEGIN
         WHERE idTipoActividad = @idTipoActividad
         )
     BEGIN
-        SET @errorMsg = 'No existe un tipo de actividad con id: ' + @idTipoActividad
-        ;THROW 51104, @errorMsg, 5
+        SET @errorMsg = 'No existe un tipo de actividad con id: ' + CAST(@idTipoActividad AS VARCHAR)
+        ;THROW 51105, @errorMsg, 6
     END
 
     INSERT INTO Actividades.Actividad(nombre, costo, duracion, idTipoActividad)
@@ -146,7 +161,7 @@ BEGIN
         WHERE idActividad = @idActividad
         )
     BEGIN
-        SET @errorMsg = 'No existe la Actividad con id: ' + @idActividad
+        SET @errorMsg = 'No existe la Actividad con id: ' + CAST(@idActividad AS VARCHAR)
         ;THROW 51200, @errorMsg,1
     END
 
@@ -183,7 +198,7 @@ BEGIN
         WHERE TipoActividad.idTipoActividad = @idTipoActividad
         )
     BEGIN
-        SET @errorMsg = 'No existe el tipo de Actividad con id: ' + @idTipoActividad
+        SET @errorMsg = 'No existe el tipo de Actividad con id: ' + CAST(@idTipoActividad AS VARCHAR)
         ;THROW 51205, @errorMsg, 6
     END
 
@@ -211,7 +226,7 @@ BEGIN
         WHERE idActividad = @idActividad
         )
     BEGIN
-        SET @errorMsg = 'No existe la Actividad con id: ' + @idActividad
+        SET @errorMsg = 'No existe la Actividad con id: ' + CAST(@idActividad AS VARCHAR)
         ;THROW 51300, @errorMsg,1
     END
     
@@ -257,7 +272,7 @@ BEGIN
         WHERE codEspecialidad = @codEspecialidad
         )
     BEGIN
-        SET @errorMsg = 'No existe la Especialidad con codigo: ' + @codEspecialidad
+        SET @errorMsg = 'No existe la Especialidad con codigo: ' + CAST(@codEspecialidad AS VARCHAR)
         ;THROW 52200, @errorMsg,1
     END
 
@@ -281,7 +296,7 @@ BEGIN
         WHERE codEspecialidad = @codEspecialidad
         )
     BEGIN
-        SET @errorMsg = 'No existe la Especialidad con codigo: ' + @codEspecialidad
+        SET @errorMsg = 'No existe la Especialidad con codigo: ' + CAST(@codEspecialidad AS VARCHAR)
         ;THROW 52300, @errorMsg,1
     END
     DELETE FROM Actividades.Especialidad
@@ -307,7 +322,7 @@ BEGIN
         WHERE codEspecialidad = @codEspecialidad
         )
     BEGIN
-        SET @errorMsg = 'No existe la Especialidad con codigo: ' + @codEspecialidad
+        SET @errorMsg = 'No existe la Especialidad con codigo: ' + CAST(@codEspecialidad AS VARCHAR)
         ;THROW 53100, @errorMsg,1
     END
 
@@ -336,7 +351,7 @@ BEGIN
         WHERE idGuia = @idGuia
         )
     BEGIN
-        SET @errorMsg = 'No existe el Guia con id: ' + @idGuia
+        SET @errorMsg = 'No existe el Guia con id: ' + CAST(@idGuia AS VARCHAR)
         ;THROW 53200, @errorMsg,1
     END
 
@@ -347,7 +362,7 @@ BEGIN
         WHERE codEspecialidad = @codEspecialidad
         )
     BEGIN
-        SET @errorMsg = 'No existe la Especialidad con codigo: ' + @codEspecialidad
+        SET @errorMsg = 'No existe la Especialidad con codigo: ' + CAST(@codEspecialidad AS VARCHAR)
         ;THROW 53201, @errorMsg,2
     END
     
@@ -372,7 +387,7 @@ BEGIN
         WHERE idGuia = @idGuia
         )
     BEGIN
-        SET @errorMsg = 'No existe el Guia con id: ' + @idGuia
+        SET @errorMsg = 'No existe el Guia con id: ' + CAST(@idGuia AS VARCHAR)
         ;THROW 53300, @errorMsg,1
     END
 
@@ -401,7 +416,7 @@ BEGIN
         WHERE idGuia = @idGuia
         )
     BEGIN
-        SET @errorMsg = 'No existe el Guia con id: ' + @idGuia
+        SET @errorMsg = 'No existe el Guia con id: ' + CAST(@idGuia AS VARCHAR)
         ;THROW 54100, @errorMsg,1
     END
 
@@ -433,7 +448,7 @@ BEGIN
         WHERE codTitulo = @codTitulo
     )
     BEGIN
-        SET @errorMsg = 'No existe titulo con codigo: ' + @codTitulo
+        SET @errorMsg = 'No existe titulo con codigo: ' + CAST(@codTitulo AS VARCHAR)
         ;THROW 54200, @errorMsg,1
     END
 
@@ -450,7 +465,7 @@ BEGIN
         WHERE idGuia = @idGuia
         )
     BEGIN
-        SET @errorMsg = 'No existe el Guia con id: ' + @idGuia
+        SET @errorMsg = 'No existe el Guia con id: ' + CAST(@idGuia AS VARCHAR)
         ;THROW 54202, @errorMsg,3
     END
 
@@ -476,7 +491,7 @@ BEGIN
         WHERE codTitulo = @codTitulo
     )
     BEGIN
-        SET @errorMsg = 'No existe titulo con codigo: ' + @codTitulo
+        SET @errorMsg = 'No existe titulo con codigo: ' + CAST(@codTitulo AS VARCHAR)
         ;THROW 54300, @errorMsg,1
     END
 
@@ -506,7 +521,7 @@ BEGIN
         WHERE idActividad = @idActividad
     )
     BEGIN
-        SET @errorMsg = 'No existe actividad con id: ' + @idActividad
+        SET @errorMsg = 'No existe actividad con id: ' + CAST(@idActividad AS VARCHAR)
         ;THROW 55100, @errorMsg,1
     END
 
@@ -517,7 +532,7 @@ BEGIN
         WHERE idGuia = @idGuia
     )
     BEGIN
-        SET @errorMsg = 'No existe guia con id: ' + @idGuia
+        SET @errorMsg = 'No existe guia con id: ' + CAST(@idGuia AS VARCHAR)
         ;THROW 55101, @errorMsg,2
     END
 
@@ -561,7 +576,7 @@ BEGIN
                    WHERE idGuia = @idGuiaFinal
                    )
     BEGIN
-        SET @errorMsg = 'No existe un guia con id: ' + @idGuiaFinal
+        SET @errorMsg = 'No existe un guia con id: ' + CAST(@idGuiaFinal AS VARCHAR)
         ;THROW 55201,@errorMsg,2
     END
 
@@ -573,7 +588,7 @@ BEGIN
                    WHERE idActividad = @idActividadFinal
                    )
     BEGIN
-        SET @errorMsg = 'No existe una actividad con id: ' + @idActividadFinal
+        SET @errorMsg = 'No existe una actividad con id: ' + CAST(@idActividadFinal AS VARCHAR)
         ;THROW 55202,@errorMsg,3
     END
 

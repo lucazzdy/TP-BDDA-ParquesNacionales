@@ -115,6 +115,7 @@ CREATE TABLE Actividades.Tour (
         fechaInicio DATE NOT NULL,
         fechaDesde DATE NULL,
         
+        CONSTRAINT PK_Tour PRIMARY KEY (idActividad, idGuia, fechaInicio),
         CONSTRAINT FK_Tour_Actividad FOREIGN KEY (idActividad) REFERENCES Actividades.Actividad(idActividad),
         CONSTRAINT FK_Tour_Guia FOREIGN KEY (idGuia) REFERENCES Actividades.Guia(idGuia)
     );
