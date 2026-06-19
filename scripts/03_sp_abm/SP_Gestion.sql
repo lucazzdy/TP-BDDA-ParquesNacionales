@@ -1,7 +1,7 @@
 /* 
     Universidad Nacional de La Matanza
     Materia: Bases de Datos Aplicada (3641)
-    Fecha: 18/06/26
+    Fecha: 19/06/26
 
     Grupo n°7
     Integrantes:    - Acuña, Lucas Daniel
@@ -9,32 +9,33 @@
                     - Gutierrez, Lucas Leone
                     - Zambrana, Mijael
 
-    Descripción del Script: Stored procedures ABM del esquema Gestion (TipoParque y Parque).
+    Descripción del Script: Stored procedures ABM del esquema Gestion.
 */
 
 USE GestionParquesNacionales;
 GO
 
--- ALTA TIPO PARQUE
+/*=========================================================
+ALTA TIPO PARQUE
+=========================================================*/
 
 CREATE OR ALTER PROCEDURE Gestion.tipoParque_Alta
     @nombre VARCHAR(50),
     @descripcion VARCHAR(200) = NULL
 AS
 BEGIN
-    DECLARE @errorMsg VARCHAR(200);
+    DECLARE @errorMsg VARCHAR(500) = '';
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
 
     IF @nombre IS NULL OR LTRIM(RTRIM(@nombre)) = ''
-    BEGIN
-        RAISERROR('El nombre del tipo de parque es obligatorio.', 16, 1);
-        RETURN;
-    END
+        SET @errorMsg = @errorMsg + '- El nombre del tipo de parque es obligatorio.' + @saltoLinea;
 
-    IF EXISTS (SELECT 1 FROM Gestion.tipoParque WHERE nombre = @nombre)
+    IF @nombre IS NOT NULL AND EXISTS (SELECT 1 FROM Gestion.tipoParque WHERE nombre = @nombre)
+        SET @errorMsg = @errorMsg + '- Ya existe un tipo de parque con el nombre: ' + @nombre + '.' + @saltoLinea;
+
+    IF LEN(@errorMsg) > 0
     BEGIN
-        SET @errorMsg = 'Ya existe un tipo de parque con el nombre: ' + @nombre;
-        RAISERROR(@errorMsg, 16, 1);
-        RETURN;
+        ;THROW 50101, @errorMsg, 1;
     END
 
     INSERT INTO Gestion.tipoParque (nombre, descripcion)
@@ -42,8 +43,9 @@ BEGIN
 END
 GO
 
-
---  MODIFICAR TIPO PARQUE
+/*=========================================================
+MODIFICAR TIPO PARQUE
+=========================================================*/
 
 CREATE OR ALTER PROCEDURE Gestion.tipoParque_Modificar
     @idTipoParque INT,
@@ -51,28 +53,24 @@ CREATE OR ALTER PROCEDURE Gestion.tipoParque_Modificar
     @descripcion VARCHAR(200) = NULL
 AS
 BEGIN
-    DECLARE @errorMsg VARCHAR(200);
+    DECLARE @errorMsg VARCHAR(500) = '';
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
 
     IF NOT EXISTS (SELECT 1 FROM Gestion.tipoParque WHERE idTipoParque = @idTipoParque)
-    BEGIN
-        SET @errorMsg = 'No existe un tipo de parque con id: ' + CAST(@idTipoParque AS VARCHAR(10));
-        RAISERROR(@errorMsg, 16, 1);
-        RETURN;
-    END
+        SET @errorMsg = @errorMsg + '- No existe un tipo de parque con id: ' + CAST(@idTipoParque AS VARCHAR(10)) + '.' + @saltoLinea;
 
     IF @nombre IS NOT NULL AND LTRIM(RTRIM(@nombre)) = ''
-    BEGIN
-        RAISERROR('El nombre no puede estar vacio.', 16, 1);
-        RETURN;
-    END
+        SET @errorMsg = @errorMsg + '- El nombre no puede estar vacio.' + @saltoLinea;
 
-    IF @nombre IS NOT NULL 
-       AND EXISTS (SELECT 1 FROM Gestion.tipoParque 
-                   WHERE nombre = @nombre AND idTipoParque <> @idTipoParque)
+    IF @nombre IS NOT NULL AND EXISTS (
+        SELECT 1 FROM Gestion.tipoParque 
+        WHERE nombre = @nombre AND idTipoParque <> @idTipoParque
+    )
+        SET @errorMsg = @errorMsg + '- Ya existe otro tipo de parque con el nombre: ' + @nombre + '.' + @saltoLinea;
+
+    IF LEN(@errorMsg) > 0
     BEGIN
-        SET @errorMsg = 'Ya existe otro tipo de parque con el nombre: ' + @nombre;
-        RAISERROR(@errorMsg, 16, 1);
-        RETURN;
+        ;THROW 50102, @errorMsg, 1;
     END
 
     UPDATE Gestion.tipoParque
@@ -82,27 +80,26 @@ BEGIN
 END
 GO
 
-
 /*=========================================================
 BAJA TIPO PARQUE
 =========================================================*/
+
 CREATE OR ALTER PROCEDURE Gestion.tipoParque_Baja
     @idTipoParque INT
 AS
 BEGIN
-    DECLARE @errorMsg VARCHAR(200);
+    DECLARE @errorMsg VARCHAR(500) = '';
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
 
     IF NOT EXISTS (SELECT 1 FROM Gestion.tipoParque WHERE idTipoParque = @idTipoParque)
-    BEGIN
-        SET @errorMsg = 'No existe un tipo de parque con id: ' + CAST(@idTipoParque AS VARCHAR(10));
-        RAISERROR(@errorMsg, 16, 1);
-        RETURN;
-    END
+        SET @errorMsg = @errorMsg + '- No existe un tipo de parque con id: ' + CAST(@idTipoParque AS VARCHAR(10)) + '.' + @saltoLinea;
 
     IF EXISTS (SELECT 1 FROM Gestion.parque WHERE idTipoParque = @idTipoParque)
+        SET @errorMsg = @errorMsg + '- No se puede eliminar: existen parques asociados a este tipo.' + @saltoLinea;
+
+    IF LEN(@errorMsg) > 0
     BEGIN
-        RAISERROR('No se puede eliminar: existen parques asociados a este tipo.', 16, 1);
-        RETURN;
+        ;THROW 50103, @errorMsg, 1;
     END
 
     DELETE FROM Gestion.tipoParque
@@ -110,10 +107,10 @@ BEGIN
 END
 GO
 
-
 /*=========================================================
 ALTA PARQUE
 =========================================================*/
+
 CREATE OR ALTER PROCEDURE Gestion.parque_Alta
     @nombre VARCHAR(100),
     @superficie DECIMAL(12, 2),
@@ -124,38 +121,27 @@ CREATE OR ALTER PROCEDURE Gestion.parque_Alta
     @nro VARCHAR(10) = NULL
 AS
 BEGIN
-    DECLARE @errorMsg VARCHAR(200);
+    DECLARE @errorMsg VARCHAR(500) = '';
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
 
     IF @nombre IS NULL OR LTRIM(RTRIM(@nombre)) = ''
-    BEGIN
-        RAISERROR('El nombre del parque es obligatorio.', 16, 1);
-        RETURN;
-    END
+        SET @errorMsg = @errorMsg + '- El nombre del parque es obligatorio.' + @saltoLinea;
 
     IF @provincia IS NULL OR LTRIM(RTRIM(@provincia)) = ''
-    BEGIN
-        RAISERROR('La provincia es obligatoria.', 16, 1);
-        RETURN;
-    END
+        SET @errorMsg = @errorMsg + '- La provincia es obligatoria.' + @saltoLinea;
 
     IF @superficie IS NULL OR @superficie <= 0
-    BEGIN
-        RAISERROR('La superficie debe ser mayor a 0.', 16, 1);
-        RETURN;
-    END
+        SET @errorMsg = @errorMsg + '- La superficie debe ser mayor a 0.' + @saltoLinea;
 
-    IF EXISTS (SELECT 1 FROM Gestion.parque WHERE nombre = @nombre)
-    BEGIN
-        SET @errorMsg = 'Ya existe un parque con el nombre: ' + @nombre;
-        RAISERROR(@errorMsg, 16, 1);
-        RETURN;
-    END
+    IF @nombre IS NOT NULL AND EXISTS (SELECT 1 FROM Gestion.parque WHERE nombre = @nombre)
+        SET @errorMsg = @errorMsg + '- Ya existe un parque con el nombre: ' + @nombre + '.' + @saltoLinea;
 
     IF NOT EXISTS (SELECT 1 FROM Gestion.tipoParque WHERE idTipoParque = @idTipoParque)
+        SET @errorMsg = @errorMsg + '- No existe un tipo de parque con id: ' + CAST(@idTipoParque AS VARCHAR(10)) + '.' + @saltoLinea;
+
+    IF LEN(@errorMsg) > 0
     BEGIN
-        SET @errorMsg = 'No existe un tipo de parque con id: ' + CAST(@idTipoParque AS VARCHAR(10));
-        RAISERROR(@errorMsg, 16, 1);
-        RETURN;
+        ;THROW 50104, @errorMsg, 1;
     END
 
     INSERT INTO Gestion.parque (nombre, superficie, idTipoParque, provincia, codigoPostal, calle, nro)
@@ -163,8 +149,9 @@ BEGIN
 END
 GO
 
-
--- MODIFICAR PARQUE
+/*=========================================================
+MODIFICAR PARQUE
+=========================================================*/
 
 CREATE OR ALTER PROCEDURE Gestion.parque_Modificar
     @idParque INT,
@@ -177,42 +164,30 @@ CREATE OR ALTER PROCEDURE Gestion.parque_Modificar
     @nro VARCHAR(10) = NULL
 AS
 BEGIN
-    DECLARE @errorMsg VARCHAR(200);
+    DECLARE @errorMsg VARCHAR(500) = '';
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
 
     IF NOT EXISTS (SELECT 1 FROM Gestion.parque WHERE idParque = @idParque)
-    BEGIN
-        SET @errorMsg = 'No existe un parque con id: ' + CAST(@idParque AS VARCHAR(10));
-        RAISERROR(@errorMsg, 16, 1);
-        RETURN;
-    END
+        SET @errorMsg = @errorMsg + '- No existe un parque con id: ' + CAST(@idParque AS VARCHAR(10)) + '.' + @saltoLinea;
 
     IF @nombre IS NOT NULL AND LTRIM(RTRIM(@nombre)) = ''
-    BEGIN
-        RAISERROR('El nombre no puede estar vacio.', 16, 1);
-        RETURN;
-    END
+        SET @errorMsg = @errorMsg + '- El nombre no puede estar vacio.' + @saltoLinea;
 
-    IF @nombre IS NOT NULL 
-       AND EXISTS (SELECT 1 FROM Gestion.parque 
-                   WHERE nombre = @nombre AND idParque <> @idParque)
-    BEGIN
-        SET @errorMsg = 'Ya existe otro parque con el nombre: ' + @nombre;
-        RAISERROR(@errorMsg, 16, 1);
-        RETURN;
-    END
+    IF @nombre IS NOT NULL AND EXISTS (
+        SELECT 1 FROM Gestion.parque 
+        WHERE nombre = @nombre AND idParque <> @idParque
+    )
+        SET @errorMsg = @errorMsg + '- Ya existe otro parque con el nombre: ' + @nombre + '.' + @saltoLinea;
 
     IF @superficie IS NOT NULL AND @superficie <= 0
-    BEGIN
-        RAISERROR('La superficie debe ser mayor a 0.', 16, 1);
-        RETURN;
-    END
+        SET @errorMsg = @errorMsg + '- La superficie debe ser mayor a 0.' + @saltoLinea;
 
-    IF @idTipoParque IS NOT NULL 
-       AND NOT EXISTS (SELECT 1 FROM Gestion.tipoParque WHERE idTipoParque = @idTipoParque)
+    IF @idTipoParque IS NOT NULL AND NOT EXISTS (SELECT 1 FROM Gestion.tipoParque WHERE idTipoParque = @idTipoParque)
+        SET @errorMsg = @errorMsg + '- No existe un tipo de parque con id: ' + CAST(@idTipoParque AS VARCHAR(10)) + '.' + @saltoLinea;
+
+    IF LEN(@errorMsg) > 0
     BEGIN
-        SET @errorMsg = 'No existe un tipo de parque con id: ' + CAST(@idTipoParque AS VARCHAR(10));
-        RAISERROR(@errorMsg, 16, 1);
-        RETURN;
+        ;THROW 50105, @errorMsg, 1;
     END
 
     UPDATE Gestion.parque
@@ -227,26 +202,26 @@ BEGIN
 END
 GO
 
-
--- BAJA PARQUE
+/*=========================================================
+BAJA PARQUE
+=========================================================*/
 
 CREATE OR ALTER PROCEDURE Gestion.parque_Baja
     @idParque INT
 AS
 BEGIN
-    DECLARE @errorMsg VARCHAR(200);
+    DECLARE @errorMsg VARCHAR(500) = '';
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
 
     IF NOT EXISTS (SELECT 1 FROM Gestion.parque WHERE idParque = @idParque)
-    BEGIN
-        SET @errorMsg = 'No existe un parque con id: ' + CAST(@idParque AS VARCHAR(10));
-        RAISERROR(@errorMsg, 16, 1);
-        RETURN;
-    END
+        SET @errorMsg = @errorMsg + '- No existe un parque con id: ' + CAST(@idParque AS VARCHAR(10)) + '.' + @saltoLinea;
 
     IF EXISTS (SELECT 1 FROM Concesiones.concesion WHERE idParque = @idParque)
+        SET @errorMsg = @errorMsg + '- No se puede eliminar: el parque tiene concesiones asociadas.' + @saltoLinea;
+
+    IF LEN(@errorMsg) > 0
     BEGIN
-        RAISERROR('No se puede eliminar: el parque tiene concesiones asociadas.', 16, 1);
-        RETURN;
+        ;THROW 50106, @errorMsg, 1;
     END
 
     DELETE FROM Gestion.parque
