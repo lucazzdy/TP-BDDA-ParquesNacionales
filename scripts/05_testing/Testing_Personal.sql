@@ -1,6 +1,8 @@
 USE GestionParquesNacionales;
 GO
 
+/*
+
 /*=========================================================
 TEST 1 - ALTA CORRECTA
 =========================================================*/
@@ -191,3 +193,5 @@ INNER JOIN Personal.HistorialGuardaparque H
     ON G.Legajo = H.Legajo
 ORDER BY G.Legajo, H.FechaIngreso;
 GO
+
+*/
