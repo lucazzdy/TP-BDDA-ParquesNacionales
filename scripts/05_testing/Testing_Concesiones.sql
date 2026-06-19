@@ -331,3 +331,20 @@ SELECT * FROM Concesiones.pagoCanon;
 
 -- ERROR: id no existe -> "No existe un pago de canon con id: 999"
 EXEC Concesiones.pagoCanon_Baja @idPagoCanon = 999;
+
+
+
+-- ERROR: multiples validaciones falladas juntas
+EXEC Concesiones.concesion_Alta 
+    @idEmpresa = 999,
+    @idParque = 999,
+    @idTipoConcesion = 999,
+    @fechaInicio = '2026-01-01',
+    @fechaFin = '2025-01-01',
+    @montoCanonMensual = -500;
+-- ESPERADO: error con 5 mensajes acumulados:
+-- - No existe una empresa con id: 999.
+-- - No existe un parque con id: 999.
+-- - No existe un tipo de concesion con id: 999.
+-- - La fecha de fin debe ser posterior a la fecha de inicio.
+-- - El monto del canon mensual debe ser mayor a 0.

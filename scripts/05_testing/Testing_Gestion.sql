@@ -157,3 +157,17 @@ SELECT * FROM Gestion.parque;
 EXEC Gestion.parque_Baja @idParque = 999;
 
 -- ERROR: parque con concesiones asociadas -> se prueba desde Testing_Concesiones
+
+
+
+-- ERROR: multiples validaciones falladas juntas
+EXEC Gestion.parque_Alta 
+    @nombre = '',
+    @superficie = -100,
+    @idTipoParque = 999,
+    @provincia = '';
+-- ESPERADO: error con 4 mensajes acumulados:
+-- - El nombre del parque es obligatorio.
+-- - La provincia es obligatoria.
+-- - La superficie debe ser mayor a 0.
+-- - No existe un tipo de parque con id: 999.
