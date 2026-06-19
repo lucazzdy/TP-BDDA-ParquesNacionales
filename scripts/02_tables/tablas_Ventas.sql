@@ -26,7 +26,7 @@ GO
 
 -- CREACION DE TABLAS
 
-IF OBJECT_ID('Ventas.TipoVisitante', 'U') IS NOT NULL
+IF OBJECT_ID('Ventas.TipoVisitante', 'U') IS NULL
 BEGIN
     CREATE TABLE Ventas.TipoVisitante(
         IDTipoVisitante INT IDENTITY(1,1),
@@ -36,7 +36,7 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID('Ventas.Visitante', 'U') IS NOT NULL
+IF OBJECT_ID('Ventas.Visitante', 'U') IS NULL
 BEGIN
     CREATE TABLE Ventas.Visitante(
         IDVisitante INT IDENTITY(1,1),
@@ -49,7 +49,7 @@ END
 GO
 
 
-IF OBJECT_ID('Ventas.FormaPago', 'U') IS NOT NULL
+IF OBJECT_ID('Ventas.FormaPago', 'U') IS NULL
 BEGIN
     CREATE TABLE Ventas.FormaPago(
         IDFormaPago INT IDENTITY(1,1),
@@ -59,7 +59,7 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID('Ventas.PreciosParque', 'U') IS NOT NULL
+IF OBJECT_ID('Ventas.PreciosParque', 'U') IS NULL
 BEGIN
     CREATE TABLE Ventas.PreciosParque(
         IDParque INT NOT NULL,
@@ -73,7 +73,7 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID('Ventas.Venta', 'U') IS NOT NULL
+IF OBJECT_ID('Ventas.Venta', 'U') IS NULL
 BEGIN
     CREATE TABLE Ventas.Venta(
         IDVenta INT IDENTITY(1,1),
@@ -88,7 +88,7 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID('Ventas.ItemVenta', 'U') IS NOT NULL
+IF OBJECT_ID('Ventas.ItemVenta', 'U') IS NULL
 BEGIN
     CREATE TABLE Ventas.ItemVenta(
         IDVenta INT NOT NULL,
@@ -102,7 +102,7 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID('Ventas.Pago', 'U') IS NOT NULL
+IF OBJECT_ID('Ventas.Pago', 'U') IS NULL
 BEGIN
     CREATE TABLE Ventas.Pago(
         IDPago INT IDENTITY(1,1),
