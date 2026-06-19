@@ -26,3 +26,10 @@ Cambios Realizados
 .Agregado de la entidad debil PreciosParque relacionado con Parque y tipo de Visitante, de esta forma cada parque tiene sus propios precios y se tener un historial.
 .Correcion de cardinalidad Entre TipoDeVisitante y Visitante (1 - N a N - 1).
 .Cambio de relacion de Ticket Factura, ahora se relaciona con venta y no con pago
+
+Fecha 18/06/2026
+
+Cambios Realizados
+
+.Se agregan de atributos Nombre, Apellido, FechaNacimiento, TipoDocumento, NumeroDocumento y se elimina el campo Descripcion en visitante, con el proposito de mejorar la identificacion y diferenciacion de los visitantes.
+.Se elimino el atributo estado en la relacion compra, porque este ya se encuentra en pago.
