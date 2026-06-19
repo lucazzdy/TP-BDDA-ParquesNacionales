@@ -11,6 +11,9 @@ Descripción del Script: Este script crea la base de datos y los esquemas
 						Personal, Actividades, Gestion, Ventas y Concesiones
 */
 
+USE master;
+GO
+
 IF DB_ID('GestionParquesNacionales') IS NULL
 	CREATE DATABASE GestionParquesNacionales COLLATE Latin1_GENERAL_CI_AS
 go
@@ -43,7 +46,7 @@ BEGIN
 	EXEC('CREATE SCHEMA Concesiones')
 END
 
-=========================================================
+/*=========================================================
 CONFIGURACIÓN FÍSICA PROPUESTA (ENTREGA 4)
 =========================================================
 
@@ -100,5 +103,4 @@ TO DISK = 'E:\SQLBackups\BackupCompleto.bak';
 
 =========================================================
 FIN DEL SCRIPT
-=========================================================
-*/
+=======================================================*/
