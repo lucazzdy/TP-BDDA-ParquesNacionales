@@ -29,7 +29,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5400, @errorMsg, 1;
+        ;THROW 50400, @errorMsg, 1;
     END
 
 
@@ -52,7 +52,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5401, @errorMsg, 1;
+        ;THROW 50401, @errorMsg, 1;
     END
 
     UPDATE Ventas.TipoVisitante 
@@ -86,7 +86,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5402, @errorMsg, 1;
+        ;THROW 50402, @errorMsg, 1;
     END
 
     --Si pasa todo, borro el tipo de visitante
@@ -133,7 +133,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5403, @errorMsg, 1;
+        ;THROW 50403, @errorMsg, 1;
     END
 
     INSERT INTO Ventas.Visitante (IDTipoVisitante, Nombre, Apellido, FechaNacimiento, TipoDocumento, NumeroDocumento)
@@ -183,7 +183,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5403, @errorMsg, 1;
+        ;THROW 50404, @errorMsg, 1;
     END
 
     UPDATE Ventas.Visitante 
@@ -216,7 +216,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5404, @errorMsg, 1;
+        ;THROW 50405, @errorMsg, 1;
     END
 
     DELETE FROM Ventas.Visitante 
@@ -242,7 +242,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5404, @errorMsg, 1;
+        ;THROW 50406, @errorMsg, 1;
     END
 
     INSERT INTO Ventas.FormaPago (Descripcion) 
@@ -273,7 +273,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5405, @errorMsg, 1;
+        ;THROW 50407, @errorMsg, 1;
     END
 
     UPDATE Ventas.FormaPago
@@ -304,7 +304,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5405, @errorMsg, 1;
+        ;THROW 50408, @errorMsg, 1;
     END
 
     DELETE FROM Ventas.FormaPago 
@@ -322,18 +322,19 @@ CREATE OR ALTER PROCEDURE Ventas.PreciosParque_Alta
 AS
 BEGIN
     DECLARE @errorMsg VARCHAR(200) = '';
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
 
     -- Valio existencia del parque
     IF NOT EXISTS (SELECT 1 FROM Gestion.Parque WHERE idParque = @idParque)
-        SET @errorMsg = @errorMsg + '- El ID de Parque especificado no existe. ';
+        SET @errorMsg = @errorMsg + '- El ID de Parque especificado no existe.' + @saltoLinea;
 
     -- Valido existencia del tipo de visitante
     IF NOT EXISTS (SELECT 1 FROM Ventas.TipoVisitante WHERE IDTipoVisitante = @idTipoVisitante)
-        SET @errorMsg = @errorMsg + '- El ID de Tipo de Visitante no existe. ';
+        SET @errorMsg = @errorMsg + '- El ID de Tipo de Visitante no existe.' + @saltoLinea;
 
     -- Valido que el precio no sea nulo ni negativo
     IF @precio IS NULL OR @precio < 0
-        SET @errorMsg = @errorMsg + '- El precio debe ser un valor mayor o igual a cero. ';
+        SET @errorMsg = @errorMsg + '- El precio debe ser un valor mayor o igual a cero.' + @saltoLinea;
 
     -- Valido que no exista un precio con la misma clave primaria exacta (Mismo Parque, Tipo y Fecha). Basicamente que no exista un repetido
     IF EXISTS (SELECT 1 FROM Ventas.PreciosParque WHERE IDParque = @idParque AND IDTipoVisitante = @idTipoVisitante AND FechaDesde = @fechaDesde)
@@ -341,7 +342,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5406, @errorMsg, 1;
+        ;THROW 50409, @errorMsg, 1;
     END
 
     INSERT INTO Ventas.PreciosParque (IDParque, IDTipoVisitante, FechaDesde, Precio)
@@ -359,18 +360,19 @@ CREATE OR ALTER PROCEDURE Ventas.PreciosParque_Modificar
 AS
 BEGIN
     DECLARE @errorMsg VARCHAR(200) = '';
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
 
     -- Valido que exista el registro histórico exacto que se quiere modificar
     IF NOT EXISTS (SELECT 1 FROM Ventas.PreciosParque WHERE IDParque = @idParque AND IDTipoVisitante = @idTipoVisitante AND FechaDesde = @fechaDesde)
-        SET @errorMsg = @errorMsg + '- No existe una tarifa registrada que coincida con el Parque, Tipo de Visitante y Fecha especificados. ';
+        SET @errorMsg = @errorMsg + '- No existe una tarifa registrada que coincida con el Parque, Tipo de Visitante y Fecha especificados.' + @saltoLinea;
 
     -- Valido el nuevo precio
     IF @nuevoPrecio IS NOT NULL AND @nuevoPrecio < 0
-        SET @errorMsg = @errorMsg + '- El nuevo precio debe ser un valor mayor o igual a cero. ';
+        SET @errorMsg = @errorMsg + '- El nuevo precio debe ser un valor mayor o igual a cero.' + @saltoLinea;
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5407, @errorMsg, 1;
+        ;THROW 50410, @errorMsg, 1;
     END
 
     UPDATE Ventas.PreciosParque
@@ -403,7 +405,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5408, @errorMsg, 1;
+        ;THROW 50411, @errorMsg, 1;
     END
 
     DELETE FROM Ventas.PreciosParque
@@ -444,7 +446,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5409, @errorMsg, 1;
+        ;THROW 50412, @errorMsg, 1;
     END
 
     INSERT INTO Ventas.Venta (IDParque, NumeroFactura, PuntoVenta, Total)
@@ -486,7 +488,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5410, @errorMsg, 1;
+        ;THROW 50413, @errorMsg, 1;
     END
 
     UPDATE Ventas.Venta
@@ -524,7 +526,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5411, @errorMsg, 1;
+        ;THROW 50414, @errorMsg, 1;
     END
 
     DELETE FROM Ventas.Venta 
@@ -566,7 +568,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5412, @errorMsg, 1;
+        ;THROW 50415, @errorMsg, 1;
     END
 
     INSERT INTO Ventas.ItemVenta (IDVenta, IDItemVenta, TipoItem, Cantidad, PrecioUnitario)
@@ -589,7 +591,7 @@ BEGIN
 
     -- Valdo que exista el idItemVenta de la clave compuesta (idVenta + idItemVenta)
     IF NOT EXISTS (SELECT 1 FROM Ventas.ItemVenta WHERE IDVenta = @idVenta AND IDItemVenta = @idItemVenta)
-        SET @errorMsg = @errorMsg + '- No existe la línea de detalle que intenta modificar para la venta especificada.' + @saltoLinea;
+        SET @errorMsg = @errorMsg + '- No existe el item de venta que intenta modificar para la venta ingresada.' + @saltoLinea;
 
     -- Validar el dominio del tipo de ítem
     IF @tipoItem IS NOT NULL AND @tipoItem NOT IN ('Entrada', 'Actividad')
@@ -603,7 +605,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5412, @errorMsg, 1;
+        ;THROW 50416, @errorMsg, 1;
     END
 
     UPDATE Ventas.ItemVenta
@@ -628,7 +630,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5413, @errorMsg, 1;
+        ;THROW 50417, @errorMsg, 1;
     END
 
     DELETE FROM Ventas.ItemVenta
@@ -663,7 +665,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5414, @errorMsg, 1;
+        ;THROW 50418, @errorMsg, 1;
     END
 
     IF @fecha IS NULL 
@@ -708,7 +710,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5415, @errorMsg, 1;
+        ;THROW 50419, @errorMsg, 1;
     END
 
     UPDATE Ventas.Pago
@@ -734,7 +736,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5416, @errorMsg, 1;
+        ;THROW 50420, @errorMsg, 1;
     END
 
     DELETE FROM Ventas.Pago 
@@ -783,7 +785,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5417, @errorMsg, 1;
+        ;THROW 50421, @errorMsg, 1;
     END
 
     -- Asignar fecha por defecto si viene nula
@@ -835,7 +837,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5418, @errorMsg, 1;
+        ;THROW 50422, @errorMsg, 1;
     END
 
     UPDATE Ventas.Entrada
@@ -871,7 +873,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5419, @errorMsg, 1;
+        ;THROW 50423, @errorMsg, 1;
     END
 
     DELETE FROM Ventas.Entrada 
@@ -902,7 +904,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5420, @errorMsg, 1;
+        ;THROW 50424, @errorMsg, 1;
     END
 
     INSERT INTO Ventas.EntradaActividad (CodigoEntrada, IDActividad)
@@ -935,7 +937,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5421, @errorMsg, 1;
+        ;THROW 50425, @errorMsg, 1;
     END
 
     UPDATE Ventas.EntradaActividad
@@ -959,7 +961,7 @@ BEGIN
 
     IF LEN(@errorMsg) > 0
     BEGIN
-        ;THROW 5422, @errorMsg, 1;
+        ;THROW 50426, @errorMsg, 1;
     END
 
     DELETE FROM Ventas.EntradaActividad
