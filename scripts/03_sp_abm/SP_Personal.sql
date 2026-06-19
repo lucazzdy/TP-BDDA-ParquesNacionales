@@ -169,6 +169,18 @@ BEGIN
         RETURN;
     END;
 
+    IF EXISTS
+    (
+        SELECT 1
+        FROM Personal.GuardaParques
+        WHERE Legajo = @Legajo
+          AND Estado = 'INACTIVO'
+    )
+    BEGIN
+        RAISERROR('El guardaparque ya se encuentra inactivo.',16,1);
+        RETURN;
+    END;
+
     UPDATE Personal.GuardaParques
     SET Estado = 'INACTIVO'
     WHERE Legajo = @Legajo;
@@ -699,6 +711,17 @@ CREATE OR ALTER PROCEDURE Personal.BajaHabilitacion
 )
 AS
 BEGIN
+
+    IF NOT EXISTS
+    (
+        SELECT 1
+        FROM Personal.Habilitaciones
+        WHERE IDHabilitaciones = @IDHabilitacion
+    )
+    BEGIN
+        RAISERROR('La habilitación no existe.',16,1);
+        RETURN;
+    END;
 
     IF EXISTS
     (
