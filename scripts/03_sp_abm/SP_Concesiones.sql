@@ -16,7 +16,7 @@ GO
 
 -- ALTA TIPO CONCESION
 
-CREATE OR ALTER PROCEDURE Concesiones.TipoConcesion_Alta
+CREATE OR ALTER PROCEDURE Concesiones.tipoConcesion_Alta
     @descripcion VARCHAR(100)
 AS
 BEGIN
@@ -28,14 +28,14 @@ BEGIN
         RETURN;
     END
 
-    IF EXISTS (SELECT 1 FROM Concesiones.TipoConcesion WHERE descripcion = @descripcion)
+    IF EXISTS (SELECT 1 FROM Concesiones.tipoConcesion WHERE descripcion = @descripcion)
     BEGIN
         SET @errorMsg = 'Ya existe un tipo de concesion con la descripcion: ' + @descripcion;
         RAISERROR(@errorMsg, 16, 1);
         RETURN;
     END
 
-    INSERT INTO Concesiones.TipoConcesion (descripcion)
+    INSERT INTO Concesiones.tipoConcesion (descripcion)
     VALUES (@descripcion);
 END
 GO
@@ -44,14 +44,14 @@ GO
 
 -- MODIFICAR TIPO CONCESION
 
-CREATE OR ALTER PROCEDURE Concesiones.TipoConcesion_Modificar
+CREATE OR ALTER PROCEDURE Concesiones.tipoConcesion_Modificar
     @idTipoConcesion INT,
     @descripcion VARCHAR(100)
 AS
 BEGIN
     DECLARE @errorMsg VARCHAR(200);
 
-    IF NOT EXISTS (SELECT 1 FROM Concesiones.TipoConcesion WHERE idTipoConcesion = @idTipoConcesion)
+    IF NOT EXISTS (SELECT 1 FROM Concesiones.tipoConcesion WHERE idTipoConcesion = @idTipoConcesion)
     BEGIN
         SET @errorMsg = 'No existe un tipo de concesion con id: ' + CAST(@idTipoConcesion AS VARCHAR(10));
         RAISERROR(@errorMsg, 16, 1);
@@ -64,7 +64,7 @@ BEGIN
         RETURN;
     END
 
-    IF EXISTS (SELECT 1 FROM Concesiones.TipoConcesion 
+    IF EXISTS (SELECT 1 FROM Concesiones.tipoConcesion 
                WHERE descripcion = @descripcion AND idTipoConcesion <> @idTipoConcesion)
     BEGIN
         SET @errorMsg = 'Ya existe otro tipo de concesion con la descripcion: ' + @descripcion;
@@ -72,7 +72,7 @@ BEGIN
         RETURN;
     END
 
-    UPDATE Concesiones.TipoConcesion
+    UPDATE Concesiones.tipoConcesion
     SET descripcion = @descripcion
     WHERE idTipoConcesion = @idTipoConcesion;
 END
@@ -82,26 +82,26 @@ GO
 
 -- BAJA TIPO CONCESION
 
-CREATE OR ALTER PROCEDURE Concesiones.TipoConcesion_Baja
+CREATE OR ALTER PROCEDURE Concesiones.tipoConcesion_Baja
     @idTipoConcesion INT
 AS
 BEGIN
     DECLARE @errorMsg VARCHAR(200);
 
-    IF NOT EXISTS (SELECT 1 FROM Concesiones.TipoConcesion WHERE idTipoConcesion = @idTipoConcesion)
+    IF NOT EXISTS (SELECT 1 FROM Concesiones.tipoConcesion WHERE idTipoConcesion = @idTipoConcesion)
     BEGIN
         SET @errorMsg = 'No existe un tipo de concesion con id: ' + CAST(@idTipoConcesion AS VARCHAR(10));
         RAISERROR(@errorMsg, 16, 1);
         RETURN;
     END
 
-    IF EXISTS (SELECT 1 FROM Concesiones.Concesion WHERE idTipoConcesion = @idTipoConcesion)
+    IF EXISTS (SELECT 1 FROM Concesiones.concesion WHERE idTipoConcesion = @idTipoConcesion)
     BEGIN
         RAISERROR('No se puede eliminar: existen concesiones asociadas a este tipo.', 16, 1);
         RETURN;
     END
 
-    DELETE FROM Concesiones.TipoConcesion
+    DELETE FROM Concesiones.tipoConcesion
     WHERE idTipoConcesion = @idTipoConcesion;
 END
 GO
@@ -110,7 +110,7 @@ GO
 
 -- ALTA EMPRESA
 
-CREATE OR ALTER PROCEDURE Concesiones.Empresa_Alta
+CREATE OR ALTER PROCEDURE Concesiones.empresa_Alta
     @nombre VARCHAR(100)
 AS
 BEGIN
@@ -122,14 +122,14 @@ BEGIN
         RETURN;
     END
 
-    IF EXISTS (SELECT 1 FROM Concesiones.Empresa WHERE nombre = @nombre)
+    IF EXISTS (SELECT 1 FROM Concesiones.empresa WHERE nombre = @nombre)
     BEGIN
         SET @errorMsg = 'Ya existe una empresa con el nombre: ' + @nombre;
         RAISERROR(@errorMsg, 16, 1);
         RETURN;
     END
 
-    INSERT INTO Concesiones.Empresa (nombre)
+    INSERT INTO Concesiones.empresa (nombre)
     VALUES (@nombre);
 END
 GO
@@ -138,14 +138,14 @@ GO
 
 -- MODIFICAR EMPRESA
 
-CREATE OR ALTER PROCEDURE Concesiones.Empresa_Modificar
+CREATE OR ALTER PROCEDURE Concesiones.empresa_Modificar
     @idEmpresa INT,
     @nombre VARCHAR(100)
 AS
 BEGIN
     DECLARE @errorMsg VARCHAR(200);
 
-    IF NOT EXISTS (SELECT 1 FROM Concesiones.Empresa WHERE idEmpresa = @idEmpresa)
+    IF NOT EXISTS (SELECT 1 FROM Concesiones.empresa WHERE idEmpresa = @idEmpresa)
     BEGIN
         SET @errorMsg = 'No existe una empresa con id: ' + CAST(@idEmpresa AS VARCHAR(10));
         RAISERROR(@errorMsg, 16, 1);
@@ -158,7 +158,7 @@ BEGIN
         RETURN;
     END
 
-    IF EXISTS (SELECT 1 FROM Concesiones.Empresa 
+    IF EXISTS (SELECT 1 FROM Concesiones.empresa 
                WHERE nombre = @nombre AND idEmpresa <> @idEmpresa)
     BEGIN
         SET @errorMsg = 'Ya existe otra empresa con el nombre: ' + @nombre;
@@ -166,7 +166,7 @@ BEGIN
         RETURN;
     END
 
-    UPDATE Concesiones.Empresa
+    UPDATE Concesiones.empresa
     SET nombre = @nombre
     WHERE idEmpresa = @idEmpresa;
 END
@@ -176,26 +176,26 @@ GO
 
 -- BAJA EMPRESA
 
-CREATE OR ALTER PROCEDURE Concesiones.Empresa_Baja
+CREATE OR ALTER PROCEDURE Concesiones.empresa_Baja
     @idEmpresa INT
 AS
 BEGIN
     DECLARE @errorMsg VARCHAR(200);
 
-    IF NOT EXISTS (SELECT 1 FROM Concesiones.Empresa WHERE idEmpresa = @idEmpresa)
+    IF NOT EXISTS (SELECT 1 FROM Concesiones.empresa WHERE idEmpresa = @idEmpresa)
     BEGIN
         SET @errorMsg = 'No existe una empresa con id: ' + CAST(@idEmpresa AS VARCHAR(10));
         RAISERROR(@errorMsg, 16, 1);
         RETURN;
     END
 
-    IF EXISTS (SELECT 1 FROM Concesiones.Concesion WHERE idEmpresa = @idEmpresa)
+    IF EXISTS (SELECT 1 FROM Concesiones.concesion WHERE idEmpresa = @idEmpresa)
     BEGIN
         RAISERROR('No se puede eliminar: la empresa tiene concesiones asociadas.', 16, 1);
         RETURN;
     END
 
-    DELETE FROM Concesiones.Empresa
+    DELETE FROM Concesiones.empresa
     WHERE idEmpresa = @idEmpresa;
 END
 GO
@@ -204,7 +204,7 @@ GO
 -- ALTA CONCESION
 
 
-CREATE OR ALTER PROCEDURE Concesiones.Concesion_Alta
+CREATE OR ALTER PROCEDURE Concesiones.concesion_Alta
     @idEmpresa INT,
     @idParque INT,
     @idTipoConcesion INT,
@@ -215,21 +215,21 @@ AS
 BEGIN
     DECLARE @errorMsg VARCHAR(200);
 
-    IF NOT EXISTS (SELECT 1 FROM Concesiones.Empresa WHERE idEmpresa = @idEmpresa)
+    IF NOT EXISTS (SELECT 1 FROM Concesiones.empresa WHERE idEmpresa = @idEmpresa)
     BEGIN
         SET @errorMsg = 'No existe una empresa con id: ' + CAST(@idEmpresa AS VARCHAR(10));
         RAISERROR(@errorMsg, 16, 1);
         RETURN;
     END
 
-    IF NOT EXISTS (SELECT 1 FROM Gestion.Parque WHERE idParque = @idParque)
+    IF NOT EXISTS (SELECT 1 FROM Gestion.parque WHERE idParque = @idParque)
     BEGIN
         SET @errorMsg = 'No existe un parque con id: ' + CAST(@idParque AS VARCHAR(10));
         RAISERROR(@errorMsg, 16, 1);
         RETURN;
     END
 
-    IF NOT EXISTS (SELECT 1 FROM Concesiones.TipoConcesion WHERE idTipoConcesion = @idTipoConcesion)
+    IF NOT EXISTS (SELECT 1 FROM Concesiones.tipoConcesion WHERE idTipoConcesion = @idTipoConcesion)
     BEGIN
         SET @errorMsg = 'No existe un tipo de concesion con id: ' + CAST(@idTipoConcesion AS VARCHAR(10));
         RAISERROR(@errorMsg, 16, 1);
@@ -254,7 +254,7 @@ BEGIN
         RETURN;
     END
 
-    INSERT INTO Concesiones.Concesion (idEmpresa, idParque, idTipoConcesion, fechaInicio, fechaFin, montoCanonMensual)
+    INSERT INTO Concesiones.concesion (idEmpresa, idParque, idTipoConcesion, fechaInicio, fechaFin, montoCanonMensual)
     VALUES (@idEmpresa, @idParque, @idTipoConcesion, @fechaInicio, @fechaFin, @montoCanonMensual);
 END
 GO
@@ -263,7 +263,7 @@ GO
 
 -- MODIFICAR CONCESION
 
-CREATE OR ALTER PROCEDURE Concesiones.Concesion_Modificar
+CREATE OR ALTER PROCEDURE Concesiones.concesion_Modificar
     @idConcesion INT,
     @idEmpresa INT = NULL,
     @idParque INT = NULL,
@@ -276,7 +276,7 @@ BEGIN
     DECLARE @errorMsg VARCHAR(200);
     DECLARE @fechaInicioFinal DATE, @fechaFinFinal DATE;
 
-    IF NOT EXISTS (SELECT 1 FROM Concesiones.Concesion WHERE idConcesion = @idConcesion)
+    IF NOT EXISTS (SELECT 1 FROM Concesiones.concesion WHERE idConcesion = @idConcesion)
     BEGIN
         SET @errorMsg = 'No existe una concesion con id: ' + CAST(@idConcesion AS VARCHAR(10));
         RAISERROR(@errorMsg, 16, 1);
@@ -284,7 +284,7 @@ BEGIN
     END
 
     IF @idEmpresa IS NOT NULL 
-       AND NOT EXISTS (SELECT 1 FROM Concesiones.Empresa WHERE idEmpresa = @idEmpresa)
+       AND NOT EXISTS (SELECT 1 FROM Concesiones.empresa WHERE idEmpresa = @idEmpresa)
     BEGIN
         SET @errorMsg = 'No existe una empresa con id: ' + CAST(@idEmpresa AS VARCHAR(10));
         RAISERROR(@errorMsg, 16, 1);
@@ -292,7 +292,7 @@ BEGIN
     END
 
     IF @idParque IS NOT NULL 
-       AND NOT EXISTS (SELECT 1 FROM Gestion.Parque WHERE idParque = @idParque)
+       AND NOT EXISTS (SELECT 1 FROM Gestion.parque WHERE idParque = @idParque)
     BEGIN
         SET @errorMsg = 'No existe un parque con id: ' + CAST(@idParque AS VARCHAR(10));
         RAISERROR(@errorMsg, 16, 1);
@@ -300,7 +300,7 @@ BEGIN
     END
 
     IF @idTipoConcesion IS NOT NULL 
-       AND NOT EXISTS (SELECT 1 FROM Concesiones.TipoConcesion WHERE idTipoConcesion = @idTipoConcesion)
+       AND NOT EXISTS (SELECT 1 FROM Concesiones.tipoConcesion WHERE idTipoConcesion = @idTipoConcesion)
     BEGIN
         SET @errorMsg = 'No existe un tipo de concesion con id: ' + CAST(@idTipoConcesion AS VARCHAR(10));
         RAISERROR(@errorMsg, 16, 1);
@@ -309,7 +309,7 @@ BEGIN
 
     SELECT @fechaInicioFinal = ISNULL(@fechaInicio, fechaInicio),
            @fechaFinFinal = ISNULL(@fechaFin, fechaFin)
-    FROM Concesiones.Concesion
+    FROM Concesiones.concesion
     WHERE idConcesion = @idConcesion;
 
     IF @fechaFinFinal <= @fechaInicioFinal
@@ -324,7 +324,7 @@ BEGIN
         RETURN;
     END
 
-    UPDATE Concesiones.Concesion
+    UPDATE Concesiones.concesion
     SET idEmpresa = ISNULL(@idEmpresa, idEmpresa),
         idParque = ISNULL(@idParque, idParque),
         idTipoConcesion = ISNULL(@idTipoConcesion, idTipoConcesion),
@@ -339,26 +339,26 @@ GO
 
 -- BAJA CONCESION
 
-CREATE OR ALTER PROCEDURE Concesiones.Concesion_Baja
+CREATE OR ALTER PROCEDURE Concesiones.concesion_Baja
     @idConcesion INT
 AS
 BEGIN
     DECLARE @errorMsg VARCHAR(200);
 
-    IF NOT EXISTS (SELECT 1 FROM Concesiones.Concesion WHERE idConcesion = @idConcesion)
+    IF NOT EXISTS (SELECT 1 FROM Concesiones.concesion WHERE idConcesion = @idConcesion)
     BEGIN
         SET @errorMsg = 'No existe una concesion con id: ' + CAST(@idConcesion AS VARCHAR(10));
         RAISERROR(@errorMsg, 16, 1);
         RETURN;
     END
 
-    IF EXISTS (SELECT 1 FROM Concesiones.PagoCanon WHERE idConcesion = @idConcesion)
+    IF EXISTS (SELECT 1 FROM Concesiones.pagoCanon WHERE idConcesion = @idConcesion)
     BEGIN
         RAISERROR('No se puede eliminar: la concesion tiene pagos de canon asociados.', 16, 1);
         RETURN;
     END
 
-    DELETE FROM Concesiones.Concesion
+    DELETE FROM Concesiones.concesion
     WHERE idConcesion = @idConcesion;
 END
 GO
@@ -367,7 +367,7 @@ GO
 
 -- ALTA PAGO CANON
 
-CREATE OR ALTER PROCEDURE Concesiones.PagoCanon_Alta
+CREATE OR ALTER PROCEDURE Concesiones.pagoCanon_Alta
     @idConcesion INT,
     @fecha DATE,
     @monto DECIMAL(12, 2),
@@ -377,7 +377,7 @@ AS
 BEGIN
     DECLARE @errorMsg VARCHAR(200);
 
-    IF NOT EXISTS (SELECT 1 FROM Concesiones.Concesion WHERE idConcesion = @idConcesion)
+    IF NOT EXISTS (SELECT 1 FROM Concesiones.concesion WHERE idConcesion = @idConcesion)
     BEGIN
         SET @errorMsg = 'No existe una concesion con id: ' + CAST(@idConcesion AS VARCHAR(10));
         RAISERROR(@errorMsg, 16, 1);
@@ -410,7 +410,7 @@ BEGIN
     END
 
     -- No puede haber dos pagos del mismo periodo para la misma concesion
-    IF EXISTS (SELECT 1 FROM Concesiones.PagoCanon 
+    IF EXISTS (SELECT 1 FROM Concesiones.pagoCanon 
                WHERE idConcesion = @idConcesion AND periodo = @periodo)
     BEGIN
         SET @errorMsg = 'Ya existe un pago para el periodo ' + @periodo + ' en esta concesion.';
@@ -418,7 +418,7 @@ BEGIN
         RETURN;
     END
 
-    INSERT INTO Concesiones.PagoCanon (idConcesion, fecha, monto, periodo, estado)
+    INSERT INTO Concesiones.pagoCanon (idConcesion, fecha, monto, periodo, estado)
     VALUES (@idConcesion, @fecha, @monto, @periodo, @estado);
 END
 GO
@@ -427,7 +427,7 @@ GO
 
 -- MODIFICAR PAGO CANON
 
-CREATE OR ALTER PROCEDURE Concesiones.PagoCanon_Modificar
+CREATE OR ALTER PROCEDURE Concesiones.pagoCanon_Modificar
     @idPagoCanon INT,
     @fecha DATE = NULL,
     @monto DECIMAL(12, 2) = NULL,
@@ -436,7 +436,7 @@ AS
 BEGIN
     DECLARE @errorMsg VARCHAR(200);
 
-    IF NOT EXISTS (SELECT 1 FROM Concesiones.PagoCanon WHERE idPagoCanon = @idPagoCanon)
+    IF NOT EXISTS (SELECT 1 FROM Concesiones.pagoCanon WHERE idPagoCanon = @idPagoCanon)
     BEGIN
         SET @errorMsg = 'No existe un pago de canon con id: ' + CAST(@idPagoCanon AS VARCHAR(10));
         RAISERROR(@errorMsg, 16, 1);
@@ -455,7 +455,7 @@ BEGIN
         RETURN;
     END
 
-    UPDATE Concesiones.PagoCanon
+    UPDATE Concesiones.pagoCanon
     SET fecha = ISNULL(@fecha, fecha),
         monto = ISNULL(@monto, monto),
         estado = ISNULL(@estado, estado)
@@ -467,20 +467,20 @@ GO
 
 -- BAJA PAGO CANON
 
-CREATE OR ALTER PROCEDURE Concesiones.PagoCanon_Baja
+CREATE OR ALTER PROCEDURE Concesiones.pagoCanon_Baja
     @idPagoCanon INT
 AS
 BEGIN
     DECLARE @errorMsg VARCHAR(200);
 
-    IF NOT EXISTS (SELECT 1 FROM Concesiones.PagoCanon WHERE idPagoCanon = @idPagoCanon)
+    IF NOT EXISTS (SELECT 1 FROM Concesiones.pagoCanon WHERE idPagoCanon = @idPagoCanon)
     BEGIN
         SET @errorMsg = 'No existe un pago de canon con id: ' + CAST(@idPagoCanon AS VARCHAR(10));
         RAISERROR(@errorMsg, 16, 1);
         RETURN;
     END
 
-    DELETE FROM Concesiones.PagoCanon
+    DELETE FROM Concesiones.pagoCanon
     WHERE idPagoCanon = @idPagoCanon;
 END
 GO
