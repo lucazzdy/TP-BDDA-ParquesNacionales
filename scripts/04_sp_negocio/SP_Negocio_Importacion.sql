@@ -25,15 +25,12 @@ GO
 /*=========================================================
 PARSEAR NOMBRE PARQUE
 Recibe el nombre completo del dataset 
-(ej: "Parque Nacional Iguazu") y devuelve a traves de 
+ej: Parque Nacional Iguazu, y devuelve a traves de 
 variables OUTPUT:
 - tipoParque: "Parque Nacional"
 - nombreLimpio: "Iguazu"
 
-Usa REPLACE para sacar el prefijo del nombre completo.
-Orden importante: prefijos mas largos primero (asi 
-"Parque Interjurisdiccional Marino Costero" se evalua
-antes que "Parque Interjurisdiccional Marino").
+Uso REPLACE para sacar el prefijo del nombre completo.
 =========================================================*/
 CREATE OR ALTER PROCEDURE Gestion.parsearNombreParque
     @nombreCompleto VARCHAR(200),
@@ -121,23 +118,21 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    DECLARE @nombreCompleto VARCHAR(200), @provincia VARCHAR(100), @anioCreacion INT;
+    DECLARE @nombreCompleto VARCHAR(200), @provincia VARCHAR(100);
     DECLARE @region VARCHAR(100), @superficie DECIMAL(12, 2);
     DECLARE @latitud DECIMAL(9, 6), @longitud DECIMAL(9, 6);
-    DECLARE @leyCreacion VARCHAR(100), @categoriaInternacional VARCHAR(200);
     DECLARE @tipoParque VARCHAR(50), @nombreLimpio VARCHAR(100);
     DECLARE @idTipoParque INT, @errorMsg VARCHAR(500);
     DECLARE @ok INT = 0, @err INT = 0;
 
     DECLARE c CURSOR LOCAL FAST_FORWARD FOR
-        SELECT nombreCompleto, provincia, anioCreacion, region, superficie,
-               latitud, longitud, leyCreacion, categoriaInternacional
+        SELECT nombreCompleto, provincia, region, superficie, latitud, longitud
         FROM Gestion.stagingSib
         WHERE nombreCompleto IS NOT NULL;
 
     OPEN c;
-    FETCH NEXT FROM c INTO @nombreCompleto, @provincia, @anioCreacion, @region,
-                           @superficie, @latitud, @longitud, @leyCreacion, @categoriaInternacional;
+    FETCH NEXT FROM c INTO @nombreCompleto, @provincia, @region,
+                           @superficie, @latitud, @longitud;
 
     WHILE @@FETCH_STATUS = 0
     BEGIN
@@ -180,11 +175,8 @@ BEGIN
                 @superficie = @superficie,
                 @idTipoParque = @idTipoParque,
                 @provincia = @provincia,
-                @anioCreacion = @anioCreacion,
                 @latitud = @latitud,
-                @longitud = @longitud,
-                @leyCreacion = @leyCreacion,
-                @categoriaInternacional = @categoriaInternacional;
+                @longitud = @longitud;
 
             INSERT INTO Gestion.logImportacion (origen, nombreCompleto, estado, mensaje)
             VALUES ('SIB', @nombreCompleto, 'OK', NULL);
@@ -200,8 +192,8 @@ BEGIN
         END CATCH
 
         NextRow:
-        FETCH NEXT FROM c INTO @nombreCompleto, @provincia, @anioCreacion, @region,
-                               @superficie, @latitud, @longitud, @leyCreacion, @categoriaInternacional;
+        FETCH NEXT FROM c INTO @nombreCompleto, @provincia, @region,
+                               @superficie, @latitud, @longitud;
     END
 
     CLOSE c;

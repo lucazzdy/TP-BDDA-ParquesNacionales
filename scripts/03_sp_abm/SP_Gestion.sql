@@ -118,7 +118,9 @@ CREATE OR ALTER PROCEDURE Gestion.parque_Alta
     @provincia VARCHAR(50),
     @codigoPostal VARCHAR(10) = NULL,
     @calle VARCHAR(100) = NULL,
-    @nro VARCHAR(10) = NULL
+    @nro VARCHAR(10) = NULL,
+    @latitud DECIMAL(9, 6) = NULL,
+    @longitud DECIMAL(9, 6) = NULL
 AS
 BEGIN
     DECLARE @errorMsg VARCHAR(500) = '';
@@ -139,13 +141,19 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM Gestion.tipoParque WHERE idTipoParque = @idTipoParque)
         SET @errorMsg = @errorMsg + '- No existe un tipo de parque con id: ' + CAST(@idTipoParque AS VARCHAR(10)) + '.' + @saltoLinea;
 
+    IF @latitud IS NOT NULL AND (@latitud < -90 OR @latitud > 90)
+        SET @errorMsg = @errorMsg + '- La latitud debe estar entre -90 y 90.' + @saltoLinea;
+
+    IF @longitud IS NOT NULL AND (@longitud < -180 OR @longitud > 180)
+        SET @errorMsg = @errorMsg + '- La longitud debe estar entre -180 y 180.' + @saltoLinea;
+
     IF LEN(@errorMsg) > 0
     BEGIN
         ;THROW 50104, @errorMsg, 1;
     END
 
-    INSERT INTO Gestion.parque (nombre, superficie, idTipoParque, provincia, codigoPostal, calle, nro)
-    VALUES (@nombre, @superficie, @idTipoParque, @provincia, @codigoPostal, @calle, @nro);
+    INSERT INTO Gestion.parque (nombre, superficie, idTipoParque, provincia, codigoPostal, calle, nro, latitud, longitud)
+    VALUES (@nombre, @superficie, @idTipoParque, @provincia, @codigoPostal, @calle, @nro, @latitud, @longitud);
 END
 GO
 
@@ -161,7 +169,9 @@ CREATE OR ALTER PROCEDURE Gestion.parque_Modificar
     @provincia VARCHAR(50) = NULL,
     @codigoPostal VARCHAR(10) = NULL,
     @calle VARCHAR(100) = NULL,
-    @nro VARCHAR(10) = NULL
+    @nro VARCHAR(10) = NULL,
+    @latitud DECIMAL(9, 6) = NULL,
+    @longitud DECIMAL(9, 6) = NULL
 AS
 BEGIN
     DECLARE @errorMsg VARCHAR(500) = '';
@@ -185,6 +195,12 @@ BEGIN
     IF @idTipoParque IS NOT NULL AND NOT EXISTS (SELECT 1 FROM Gestion.tipoParque WHERE idTipoParque = @idTipoParque)
         SET @errorMsg = @errorMsg + '- No existe un tipo de parque con id: ' + CAST(@idTipoParque AS VARCHAR(10)) + '.' + @saltoLinea;
 
+    IF @latitud IS NOT NULL AND (@latitud < -90 OR @latitud > 90)
+        SET @errorMsg = @errorMsg + '- La latitud debe estar entre -90 y 90.' + @saltoLinea;
+
+    IF @longitud IS NOT NULL AND (@longitud < -180 OR @longitud > 180)
+        SET @errorMsg = @errorMsg + '- La longitud debe estar entre -180 y 180.' + @saltoLinea;
+
     IF LEN(@errorMsg) > 0
     BEGIN
         ;THROW 50105, @errorMsg, 1;
@@ -197,7 +213,9 @@ BEGIN
         provincia = ISNULL(@provincia, provincia),
         codigoPostal = ISNULL(@codigoPostal, codigoPostal),
         calle = ISNULL(@calle, calle),
-        nro = ISNULL(@nro, nro)
+        nro = ISNULL(@nro, nro),
+        latitud = ISNULL(@latitud, latitud),
+        longitud = ISNULL(@longitud, longitud)
     WHERE idParque = @idParque;
 END
 GO

@@ -38,6 +38,9 @@ BEGIN
         codigoPostal VARCHAR(10) NULL,
         calle VARCHAR(100) NULL,
         nro VARCHAR(10) NULL,
+        -- Coordenadas para mapas
+        latitud DECIMAL(9, 6) NULL,
+        longitud DECIMAL(9, 6) NULL,
         CONSTRAINT PK_parque PRIMARY KEY (idParque),
         -- FK al tipo de parque
         CONSTRAINT FK_parque_tipoParque FOREIGN KEY (idTipoParque) REFERENCES Gestion.tipoParque(idTipoParque)
