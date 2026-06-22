@@ -63,85 +63,64 @@ EXEC Concesiones.empresa_Alta @nombre = 'Aventura Total SA';
 -- Las referencias al parque se hacen por NOMBRE via subquery
 -- ====================================================================
 
--- Concesion 1: Iguazú, restaurante VIGENTE
-EXEC Concesiones.concesion_Alta 
-    @idEmpresa=2, 
-    @idParque=(SELECT idParque FROM Gestion.parque WHERE nombre='Iguazú'), 
-    @idTipoConcesion=1, 
-    @fechaInicio='2024-01-01', @fechaFin='2028-12-31', 
-    @montoCanonMensual=250000;
+DECLARE @idParque INT;
 
--- Concesion 2: Iguazú, tienda VIGENTE
+-- Concesion 1: Iguazú, restaurante VIGENTE
+SELECT @idParque = idParque FROM Gestion.parque WHERE nombre = 'Iguazú';
 EXEC Concesiones.concesion_Alta 
-    @idEmpresa=7, 
-    @idParque=(SELECT idParque FROM Gestion.parque WHERE nombre='Iguazú'), 
-    @idTipoConcesion=2, 
-    @fechaInicio='2023-06-01', @fechaFin='2027-05-31', 
-    @montoCanonMensual=120000;
+    @idEmpresa=2, @idParque=@idParque, @idTipoConcesion=1, 
+    @fechaInicio='2024-01-01', @fechaFin='2028-12-31', @montoCanonMensual=250000;
+
+-- Concesion 2: Iguazú, tienda VIGENTE (mismo parque)
+EXEC Concesiones.concesion_Alta 
+    @idEmpresa=7, @idParque=@idParque, @idTipoConcesion=2, 
+    @fechaInicio='2023-06-01', @fechaFin='2027-05-31', @montoCanonMensual=120000;
 
 -- Concesion 3: Nahuel Huapi, turismo VIGENTE
+SELECT @idParque = idParque FROM Gestion.parque WHERE nombre = 'Nahuel Huapi';
 EXEC Concesiones.concesion_Alta 
-    @idEmpresa=6, 
-    @idParque=(SELECT idParque FROM Gestion.parque WHERE nombre='Nahuel Huapi'), 
-    @idTipoConcesion=3, 
-    @fechaInicio='2025-01-01', @fechaFin='2029-12-31', 
-    @montoCanonMensual=350000;
+    @idEmpresa=6, @idParque=@idParque, @idTipoConcesion=3, 
+    @fechaInicio='2025-01-01', @fechaFin='2029-12-31', @montoCanonMensual=350000;
 
--- Concesion 4: Nahuel Huapi, cabañas VIGENTE
+-- Concesion 4: Nahuel Huapi, cabañas VIGENTE (mismo parque)
 EXEC Concesiones.concesion_Alta 
-    @idEmpresa=4, 
-    @idParque=(SELECT idParque FROM Gestion.parque WHERE nombre='Nahuel Huapi'), 
-    @idTipoConcesion=4, 
-    @fechaInicio='2024-03-01', @fechaFin='2027-02-28', 
-    @montoCanonMensual=180000;
+    @idEmpresa=4, @idParque=@idParque, @idTipoConcesion=4, 
+    @fechaInicio='2024-03-01', @fechaFin='2027-02-28', @montoCanonMensual=180000;
 
 -- Concesion 5: Los Glaciares, restaurante VENCIDA
+SELECT @idParque = idParque FROM Gestion.parque WHERE nombre = 'Los Glaciares';
 EXEC Concesiones.concesion_Alta 
-    @idEmpresa=8, 
-    @idParque=(SELECT idParque FROM Gestion.parque WHERE nombre='Los Glaciares'), 
-    @idTipoConcesion=1, 
-    @fechaInicio='2020-01-01', @fechaFin='2023-12-31', 
-    @montoCanonMensual=200000;
+    @idEmpresa=8, @idParque=@idParque, @idTipoConcesion=1, 
+    @fechaInicio='2020-01-01', @fechaFin='2023-12-31', @montoCanonMensual=200000;
 
--- Concesion 6: Los Glaciares, turismo VIGENTE
+-- Concesion 6: Los Glaciares, turismo VIGENTE (mismo parque)
 EXEC Concesiones.concesion_Alta 
-    @idEmpresa=1, 
-    @idParque=(SELECT idParque FROM Gestion.parque WHERE nombre='Los Glaciares'), 
-    @idTipoConcesion=3, 
-    @fechaInicio='2024-06-01', @fechaFin='2028-05-31', 
-    @montoCanonMensual=280000;
+    @idEmpresa=1, @idParque=@idParque, @idTipoConcesion=3, 
+    @fechaInicio='2024-06-01', @fechaFin='2028-05-31', @montoCanonMensual=280000;
 
 -- Concesion 7: Lanín, camping VIGENTE
+SELECT @idParque = idParque FROM Gestion.parque WHERE nombre = 'Lanín';
 EXEC Concesiones.concesion_Alta 
-    @idEmpresa=5, 
-    @idParque=(SELECT idParque FROM Gestion.parque WHERE nombre='Lanín'), 
-    @idTipoConcesion=5, 
-    @fechaInicio='2025-09-01', @fechaFin='2028-08-31', 
-    @montoCanonMensual=90000;
+    @idEmpresa=5, @idParque=@idParque, @idTipoConcesion=5, 
+    @fechaInicio='2025-09-01', @fechaFin='2028-08-31', @montoCanonMensual=90000;
 
 -- Concesion 8: Los Alerces, turismo VIGENTE
+SELECT @idParque = idParque FROM Gestion.parque WHERE nombre = 'Los Alerces';
 EXEC Concesiones.concesion_Alta 
-    @idEmpresa=10, 
-    @idParque=(SELECT idParque FROM Gestion.parque WHERE nombre='Los Alerces'), 
-    @idTipoConcesion=3, 
-    @fechaInicio='2024-11-01', @fechaFin='2027-10-31', 
-    @montoCanonMensual=220000;
+    @idEmpresa=10, @idParque=@idParque, @idTipoConcesion=3, 
+    @fechaInicio='2024-11-01', @fechaFin='2027-10-31', @montoCanonMensual=220000;
 
 -- Concesion 9: Tierra del Fuego, restaurante VENCIDA
+SELECT @idParque = idParque FROM Gestion.parque WHERE nombre = 'Tierra del Fuego';
 EXEC Concesiones.concesion_Alta 
-    @idEmpresa=2, 
-    @idParque=(SELECT idParque FROM Gestion.parque WHERE nombre='Tierra del Fuego'), 
-    @idTipoConcesion=1, 
-    @fechaInicio='2019-01-01', @fechaFin='2024-12-31', 
-    @montoCanonMensual=150000;
+    @idEmpresa=2, @idParque=@idParque, @idTipoConcesion=1, 
+    @fechaInicio='2019-01-01', @fechaFin='2024-12-31', @montoCanonMensual=150000;
 
 -- Concesion 10: Calilegua, turismo VIGENTE
+SELECT @idParque = idParque FROM Gestion.parque WHERE nombre = 'Calilegua';
 EXEC Concesiones.concesion_Alta 
-    @idEmpresa=9, 
-    @idParque=(SELECT idParque FROM Gestion.parque WHERE nombre='Calilegua'), 
-    @idTipoConcesion=3, 
-    @fechaInicio='2025-04-01', @fechaFin='2028-03-31', 
-    @montoCanonMensual=130000;
+    @idEmpresa=9, @idParque=@idParque, @idTipoConcesion=3, 
+    @fechaInicio='2025-04-01', @fechaFin='2028-03-31', @montoCanonMensual=130000;
 
 
 -- ====================================================================

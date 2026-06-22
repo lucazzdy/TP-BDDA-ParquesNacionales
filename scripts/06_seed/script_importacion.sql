@@ -49,7 +49,7 @@ BULK INSERT Gestion.stagingSib
 FROM ''' + @rutaSib + '''
 WITH (
     FIELDTERMINATOR = '';'',
-    ROWTERMINATOR = ''\n'',
+    ROWTERMINATOR = ''0x0A'',
     CODEPAGE = ''65001'',         -- UTF-8
     FIRSTROW = 1,                 -- No tiene encabezado (lo sacamos al convertir)
     FIELDQUOTE = ''"''            -- SQL Server 2017+
@@ -67,7 +67,7 @@ BULK INSERT Gestion.stagingCiam
 FROM ''' + @rutaCiam + '''
 WITH (
     FIELDTERMINATOR = '';'',
-    ROWTERMINATOR = ''\n'',
+    ROWTERMINATOR = ''0x0A'',
     CODEPAGE = ''65001'',
     FIRSTROW = 2,                 -- Saltea el encabezado
     FIELDQUOTE = ''"''
@@ -107,10 +107,10 @@ SELECT * FROM Gestion.logImportacion
 WHERE estado IN ('ERROR', 'SALTADO')
 ORDER BY fechaProceso DESC;
 
--- Ver los parques cargados (con datos completos)
+-- Ver los parques cargados
 SELECT 
     p.idParque, p.nombre, tp.nombre AS tipo, p.provincia,
-    p.superficie, p.latitud, p.longitud, p.anioCreacion, p.categoriaInternacional
+    p.superficie, p.latitud, p.longitud
 FROM Gestion.parque p
 INNER JOIN Gestion.tipoParque tp ON tp.idTipoParque = p.idTipoParque
 ORDER BY p.idParque;

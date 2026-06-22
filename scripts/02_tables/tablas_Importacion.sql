@@ -18,22 +18,25 @@ GO
 -- Staging para el dataset SIB (areas protegidas con datos completos)
 IF OBJECT_ID('Gestion.stagingSib', 'U') IS NULL
 BEGIN
+    -- Todas las columnas en VARCHAR para que BULK INSERT no falle por tipos.
+    -- La conversion a INT/DECIMAL se hace despues en el SP de procesamiento
+    -- usando TRY_CAST, que devuelve NULL si no puede convertir.
     CREATE TABLE Gestion.stagingSib (
         provincia VARCHAR(100) NULL,
         nombreCompleto VARCHAR(200) NULL,
-        anioCreacion INT NULL,
+        anioCreacion VARCHAR(20) NULL,
         region VARCHAR(100) NULL,
-        superficie DECIMAL(12, 2) NULL,
-        latitud DECIMAL(9, 6) NULL,
-        longitud DECIMAL(9, 6) NULL,
+        superficie VARCHAR(30) NULL,
+        latitud VARCHAR(30) NULL,
+        longitud VARCHAR(30) NULL,
         leyCreacion VARCHAR(100) NULL,
         ecorregiones VARCHAR(200) NULL,
         categoriaInternacional VARCHAR(200) NULL,
-        especiesRegistradas INT NULL,
-        animales INT NULL,
-        bacterias INT NULL,
-        hongos INT NULL,
-        plantas INT NULL
+        especiesRegistradas VARCHAR(20) NULL,
+        animales VARCHAR(20) NULL,
+        bacterias VARCHAR(20) NULL,
+        hongos VARCHAR(20) NULL,
+        plantas VARCHAR(20) NULL
     );
 END
 GO
@@ -44,7 +47,7 @@ BEGIN
     CREATE TABLE Gestion.stagingCiam (
         region VARCHAR(100) NULL,
         nombreCompleto VARCHAR(200) NULL,
-        hectareas DECIMAL(12, 2) NULL,
+        hectareas VARCHAR(30) NULL,
         categoriaInternacional VARCHAR(200) NULL
     );
 END

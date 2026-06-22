@@ -126,7 +126,12 @@ BEGIN
     DECLARE @ok INT = 0, @err INT = 0;
 
     DECLARE c CURSOR LOCAL FAST_FORWARD FOR
-        SELECT nombreCompleto, provincia, region, superficie, latitud, longitud
+        SELECT nombreCompleto, 
+               provincia, 
+               region, 
+               TRY_CAST(superficie AS DECIMAL(12, 2)),
+               TRY_CAST(latitud AS DECIMAL(9, 6)),
+               TRY_CAST(longitud AS DECIMAL(9, 6))
         FROM Gestion.stagingSib
         WHERE nombreCompleto IS NOT NULL;
 
@@ -222,7 +227,7 @@ BEGIN
     DECLARE @ok INT = 0, @err INT = 0, @saltados INT = 0;
 
     DECLARE c CURSOR LOCAL FAST_FORWARD FOR
-        SELECT nombreCompleto, hectareas
+        SELECT nombreCompleto, TRY_CAST(hectareas AS DECIMAL(12, 2))
         FROM Gestion.stagingCiam
         WHERE nombreCompleto IS NOT NULL;
 
