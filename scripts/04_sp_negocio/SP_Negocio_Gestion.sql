@@ -19,7 +19,6 @@ GO
 IMPORTAR PARQUE
 Upsert: si existe un parque con el mismo nombre, actualiza
 sus datos. Si no existe, lo crea.
-Soporta los campos que traen los datasets de SIB y CIAM.
 =========================================================*/
 CREATE OR ALTER PROCEDURE Gestion.importarParque
     @nombre VARCHAR(100),
@@ -29,11 +28,8 @@ CREATE OR ALTER PROCEDURE Gestion.importarParque
     @codigoPostal VARCHAR(10) = NULL,
     @calle VARCHAR(100) = NULL,
     @nro VARCHAR(10) = NULL,
-    @anioCreacion INT = NULL,
     @latitud DECIMAL(9, 6) = NULL,
-    @longitud DECIMAL(9, 6) = NULL,
-    @leyCreacion VARCHAR(100) = NULL,
-    @categoriaInternacional VARCHAR(150) = NULL
+    @longitud DECIMAL(9, 6) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -64,7 +60,7 @@ BEGIN
         ;THROW 50150, @errorMsg, 1;
     END
 
-    -- Verifico si el parque ya existe
+    -- Verifico si el parque ya existe (matchea por nombre)
     SELECT @idParqueExistente = idParque
     FROM Gestion.parque
     WHERE nombre = @nombre;
@@ -72,10 +68,8 @@ BEGIN
     IF @idParqueExistente IS NULL
     BEGIN
         -- No existe: alta
-        INSERT INTO Gestion.parque (nombre, superficie, idTipoParque, provincia, codigoPostal, calle, nro,
-                                    anioCreacion, latitud, longitud, leyCreacion, categoriaInternacional)
-        VALUES (@nombre, @superficie, @idTipoParque, @provincia, @codigoPostal, @calle, @nro,
-                @anioCreacion, @latitud, @longitud, @leyCreacion, @categoriaInternacional);
+        INSERT INTO Gestion.parque (nombre, superficie, idTipoParque, provincia, codigoPostal, calle, nro, latitud, longitud)
+        VALUES (@nombre, @superficie, @idTipoParque, @provincia, @codigoPostal, @calle, @nro, @latitud, @longitud);
     END
     ELSE
     BEGIN
@@ -87,11 +81,8 @@ BEGIN
             codigoPostal = ISNULL(@codigoPostal, codigoPostal),
             calle = ISNULL(@calle, calle),
             nro = ISNULL(@nro, nro),
-            anioCreacion = ISNULL(@anioCreacion, anioCreacion),
             latitud = ISNULL(@latitud, latitud),
-            longitud = ISNULL(@longitud, longitud),
-            leyCreacion = ISNULL(@leyCreacion, leyCreacion),
-            categoriaInternacional = ISNULL(@categoriaInternacional, categoriaInternacional)
+            longitud = ISNULL(@longitud, longitud)
         WHERE idParque = @idParqueExistente;
     END
 END
@@ -124,11 +115,8 @@ BEGIN
         tp.nombre AS tipoParque,
         p.superficie,
         p.provincia,
-        p.anioCreacion,
         p.latitud,
-        p.longitud,
-        p.leyCreacion,
-        p.categoriaInternacional
+        p.longitud
     FROM Gestion.parque p
     INNER JOIN Gestion.tipoParque tp ON tp.idTipoParque = p.idTipoParque
     WHERE p.idParque = @idParque;
