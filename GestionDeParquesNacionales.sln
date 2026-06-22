@@ -1,0 +1,75 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# SQL Server Management Studio Version 21
+VisualStudioVersion = 17.14.36603.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01_database", "01_database", "{369CB01D-A1A7-72D2-AABC-3F0945D148A2}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\01_database\GestionParquesNacionales_DB_SCHEMAS.sql = scripts\01_database\GestionParquesNacionales_DB_SCHEMAS.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02_tables", "02_tables", "{7DC331D0-3EC4-40A6-69FB-1CBEB2E0D1EA}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\02_tables\tablas_Actividades.sql = scripts\02_tables\tablas_Actividades.sql
+		scripts\02_tables\tablas_Concesiones.sql = scripts\02_tables\tablas_Concesiones.sql
+		scripts\02_tables\tablas_Gestion.sql = scripts\02_tables\tablas_Gestion.sql
+		scripts\02_tables\tablas_Importacion.sql = scripts\02_tables\tablas_Importacion.sql
+		scripts\02_tables\Tablas_Personal.sql = scripts\02_tables\Tablas_Personal.sql
+		scripts\02_tables\tablas_Ventas.sql = scripts\02_tables\tablas_Ventas.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03_sp_abm", "03_sp_abm", "{643747C7-0307-8931-84D8-A7D1915E22E5}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\03_sp_abm\sp_Actividades.sql = scripts\03_sp_abm\sp_Actividades.sql
+		scripts\03_sp_abm\SP_Concesiones.sql = scripts\03_sp_abm\SP_Concesiones.sql
+		scripts\03_sp_abm\SP_Gestion.sql = scripts\03_sp_abm\SP_Gestion.sql
+		scripts\03_sp_abm\SP_Personal.sql = scripts\03_sp_abm\SP_Personal.sql
+		scripts\03_sp_abm\SP_Ventas.sql = scripts\03_sp_abm\SP_Ventas.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04_sp_negocio", "04_sp_negocio", "{5835D766-9847-1D08-5E95-5A99FD0F495D}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\04_sp_negocio\SP_Negocio_Concesiones.sql = scripts\04_sp_negocio\SP_Negocio_Concesiones.sql
+		scripts\04_sp_negocio\SP_Negocio_Gestion.sql = scripts\04_sp_negocio\SP_Negocio_Gestion.sql
+		scripts\04_sp_negocio\SP_Negocio_Importacion.sql = scripts\04_sp_negocio\SP_Negocio_Importacion.sql
+		scripts\04_sp_negocio\SP_Negocio_Ventas.sql = scripts\04_sp_negocio\SP_Negocio_Ventas.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "05_testing", "05_testing", "{407CAF19-D506-2637-4B8A-F4DE78C81282}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\05_testing\Testing_Actividades.sql = scripts\05_testing\Testing_Actividades.sql
+		scripts\05_testing\Testing_Concesiones.sql = scripts\05_testing\Testing_Concesiones.sql
+		scripts\05_testing\Testing_Gestion.sql = scripts\05_testing\Testing_Gestion.sql
+		scripts\05_testing\Testing_Negocio_Concesiones.sql = scripts\05_testing\Testing_Negocio_Concesiones.sql
+		scripts\05_testing\Testing_Negocio_Gestion.sql = scripts\05_testing\Testing_Negocio_Gestion.sql
+		scripts\05_testing\Testing_Negocio_Importacion.sql = scripts\05_testing\Testing_Negocio_Importacion.sql
+		scripts\05_testing\Testing_Personal.sql = scripts\05_testing\Testing_Personal.sql
+		scripts\05_testing\Testing_Reportes_GestionConcesiones.sql = scripts\05_testing\Testing_Reportes_GestionConcesiones.sql
+		scripts\05_testing\Testing_Ventas.sql = scripts\05_testing\Testing_Ventas.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "06_seed", "06_seed", "{1670470B-4B64-725C-D0F7-3206B6B2A88E}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\06_seed\script_importacion.sql = scripts\06_seed\script_importacion.sql
+		scripts\06_seed\Seed_Gestion_Concesiones.sql = scripts\06_seed\Seed_Gestion_Concesiones.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "07_reportes", "07_reportes", "{D60C296D-AE37-4B7B-8A9D-6F8F141957F6}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\07_reportes\SP_Reportes_GestionConcesiones.sql = scripts\07_reportes\SP_Reportes_GestionConcesiones.sql
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Default|Default = Default|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{07DF8399-CFDA-4838-AEB5-ACDA53ED7CC9}.Default|Default.ActiveCfg = Default
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {379FB812-D887-48A2-8552-4A36F84F084A}
+	EndGlobalSection
+EndGlobal
