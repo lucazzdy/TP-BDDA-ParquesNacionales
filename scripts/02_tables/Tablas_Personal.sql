@@ -28,34 +28,34 @@ GuardaParques
 -- Eliminar Tablas (GuardaParques)
 ---------------------------------------------------------
 
-DROP TABLE IF EXISTS Personal.HistorialGuardaParques;
+DROP TABLE IF EXISTS Personal.historialGuardaparques;
 GO
 
-DROP TABLE IF EXISTS Personal.GuardaParques;
+DROP TABLE IF EXISTS Personal.guardaparques;
 GO
 
 ---------------------------------------------------------
 -- Crear Tabla GuardaParques
 ---------------------------------------------------------
 
-CREATE TABLE Personal.GuardaParques(
-	Legajo INT IDENTITY(1,1),
-	Documento CHAR(8) UNIQUE NOT NULL,
+CREATE TABLE Personal.guardaparques(
+	legajo INT IDENTITY(1,1),
+	documento CHAR(8) UNIQUE NOT NULL,
 
-	Nombre VARCHAR(50) NOT NULL,
-	Apellido VARCHAR(50) NOT NULL,
+	nombre VARCHAR(50) NOT NULL,
+	apellido VARCHAR(50) NOT NULL,
 
-	FechaNacimiento DATE NOT NULL,
+	fechaNacimiento DATE NOT NULL,
 
-	Estado VARCHAR(10) NOT NULL,
+	estado VARCHAR(10) NOT NULL,
 
-	CONSTRAINT PK_GuardaParques PRIMARY KEY ( Legajo ),
+	CONSTRAINT PK_guardaparques PRIMARY KEY ( legajo ),
 
-	CONSTRAINT CK_Documentos_GuardaParques CHECK ( Documento LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]' ),
+	CONSTRAINT CK_documentos_Guardaparques CHECK ( documento LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]' ),
 
-	CONSTRAINT CK_FechaNacimiento_GuardaParques CHECK ( FechaNacimiento <= DATEADD( YEAR, -18, GETDATE() ) ),
+	CONSTRAINT CK_fechaNacimiento_Guardaparques CHECK ( fechaNacimiento <= DATEADD( YEAR, -18, GETDATE() ) ),
 
-	CONSTRAINT CK_Estado_GuardaParques CHECK ( Estado IN ( 'ACTIVO', 'INACTIVO', 'SUSPENDIDO', 'LICENCIA' ) )
+	CONSTRAINT CK_estado_Guardaparques CHECK ( estado IN ( 'ACTIVO', 'INACTIVO', 'SUSPENDIDO', 'LICENCIA' ) )
 );
 GO
 
@@ -63,25 +63,25 @@ GO
 -- Crear Tabla Historial de los GuardaParques
 ---------------------------------------------------------
 
-CREATE TABLE Personal.HistorialGuardaParques(
-	IDHistorial INT IDENTITY(1,1),
-	LegajoGuardaParques INT NOT NULL,
-	IDParque INT NOT NULL,
+CREATE TABLE Personal.historialGuardaparques(
+	idHistorial INT IDENTITY(1,1),
+	legajoGuardaparques INT NOT NULL,
+	idParque INT NOT NULL,
 
-	FechaIngreso DATE NOT NULL,
-	FechaEgreso DATE NULL,
+	fechaIngreso DATE NOT NULL,
+	fechaEgreso DATE NULL,
 
-	MotivoEgreso VARCHAR(200) NULL,
+	motivoEgreso VARCHAR(200) NULL,
 
-	CONSTRAINT PK_ID_Historial_GuardaParques PRIMARY KEY ( IDHistorial ),
+	CONSTRAINT PK_id_historialGuardaparques PRIMARY KEY ( idHistorial ),
 
-	CONSTRAINT FK_Legajo_GuardaParques_Histoial_GuardaParques FOREIGN KEY (LegajoGuardaParques)
-		REFERENCES Personal.GuardaParques(Legajo),
+	CONSTRAINT FK_legajoGuardaparques_histoialGuardaparques FOREIGN KEY (legajoGuardaparques)
+		REFERENCES Personal.guardaparques(legajo),
 
-	CONSTRAINT FK_ID_Parque_Histoial_GuardaParques FOREIGN KEY (IDParque)
+	CONSTRAINT FK_idParqueHistoial_guardaParques FOREIGN KEY (idParque)
 		REFERENCES Gestion.Parque(idParque),
 
-	CONSTRAINT CK_FechaEgreso_Historial_GuardaParques CHECK (FechaEgreso IS NULL OR  FechaEgreso >= FechaIngreso)
+	CONSTRAINT CK_FechaEgreso_Historial_GuardaParques CHECK (fechaEgreso IS NULL OR  fechaEgreso >= fechaIngreso)
 );
 GO
 
@@ -93,31 +93,31 @@ Guias
 -- Eliminar tablas (Guias)
 ---------------------------------------------------------
 
-DROP TABLE IF EXISTS Personal.Titulos;
+DROP TABLE IF EXISTS Personal.titulos;
 GO
 
-DROP TABLE IF EXISTS Personal.Especialidad;
+DROP TABLE IF EXISTS Personal.especialidad;
 GO
 
-DROP TABLE IF EXISTS Personal.Guias;
+DROP TABLE IF EXISTS Personal.guias;
 GO
 
-DROP TABLE IF EXISTS Personal.Habilitaciones;
+DROP TABLE IF EXISTS Personal.habilitaciones;
 GO
 
-DROP TABLE IF EXISTS Personal.HabilitacionesGuias;
+DROP TABLE IF EXISTS Personal.habilitacionesGuias;
 GO
 
 ---------------------------------------------------------
 -- Crear tabla Titulos
 ---------------------------------------------------------
 
-CREATE TABLE Personal.Titulos(
-	CodTitulo INT IDENTITY(1,1),
-	Nombre VARCHAR(50) UNIQUE NOT NULL,
-	Descripcion VARCHAR(200) NULL,
+CREATE TABLE Personal.titulos(
+	codTitulo INT IDENTITY(1,1),
+	nombre VARCHAR(50) UNIQUE NOT NULL,
+	descripcion VARCHAR(200) NULL,
 
-	CONSTRAINT PK_Titulos_Guia  PRIMARY KEY (CodTitulo)
+	CONSTRAINT PK_Titulos_Guia  PRIMARY KEY (codTitulo)
 );
 GO
 
@@ -125,12 +125,12 @@ GO
 -- Crear tabla Especialidades
 ---------------------------------------------------------
 
-CREATE TABLE Personal.Especialidad(
-	CodEspecialidad INT IDENTITY(1,1),
-	Nombre VARCHAR(50) UNIQUE NOT NULL,
-	Descripcion VARCHAR(200) NULL,
+CREATE TABLE Personal.especialidad(
+	codEspecialidad INT IDENTITY(1,1),
+	nombre VARCHAR(50) UNIQUE NOT NULL,
+	descripcion VARCHAR(200) NULL,
 
-	CONSTRAINT PK_Especialidad_Guia  PRIMARY KEY (CodEspecialidad)
+	CONSTRAINT PK_Especialidad_Guia  PRIMARY KEY (codEspecialidad)
 );
 GO
 
@@ -138,27 +138,27 @@ GO
 -- Crear tabla Guias
 ---------------------------------------------------------
 
-CREATE TABLE Personal.Guias(
-	Legajo INT IDENTITY(1,1),
-	Documento CHAR(8) UNIQUE NOT NULL,
+CREATE TABLE Personal.guias(
+	legajo INT IDENTITY(1,1),
+	documento CHAR(8) UNIQUE NOT NULL,
 
-	Nombre VARCHAR(50) NOT NULL,
-	Apellido VARCHAR(50) NOT NULL,
+	nombre VARCHAR(50) NOT NULL,
+	apellido VARCHAR(50) NOT NULL,
 
-	FechaNacimiento DATE NOT NULL,
+	fechaNacimiento DATE NOT NULL,
 
-	CodTitulo INT NOT NULL,
-	CodEspecialidad INT NOT NULL,
+	codTitulo INT NOT NULL,
+	codEspecialidad INT NOT NULL,
 
-	CONSTRAINT PK_Guias  PRIMARY KEY (Legajo),
+	CONSTRAINT PK_Guias  PRIMARY KEY (legajo),
 
-	CONSTRAINT CK_Documentos_Guias CHECK ( Documento LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]' ),
+	CONSTRAINT CK_Documentos_Guias CHECK ( documento LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]' ),
 
-	CONSTRAINT FK_Guias_Titulos FOREIGN KEY (CodTitulo)
-		REFERENCES Personal.Titulos(CodTitulo),
+	CONSTRAINT FK_Guias_Titulos FOREIGN KEY (codTitulo)
+		REFERENCES Personal.Titulos(codTitulo),
 
-	CONSTRAINT FK_Guias_Especialidad FOREIGN KEY (CodEspecialidad)
-		REFERENCES Personal.Especialidad(CodEspecialidad),
+	CONSTRAINT FK_Guias_Especialidad FOREIGN KEY (codEspecialidad)
+		REFERENCES Personal.Especialidad(codEspecialidad),
 );
 GO
 
@@ -166,13 +166,13 @@ GO
 -- Crear tabla Habilitaciones
 ---------------------------------------------------------
 
-CREATE TABLE Personal.Habilitaciones(
-	IDHabilitaciones INT IDENTITY(1,1),
+CREATE TABLE Personal.habilitaciones(
+	idHabilitaciones INT IDENTITY(1,1),
 
-	Nombre VARCHAR(50) NOT NULL,
-	Descripcion VARCHAR(200) NULL,
+	nombre VARCHAR(50) NOT NULL,
+	descripcion VARCHAR(200) NULL,
 
-	CONSTRAINT PK_ID_Habilitaciones  PRIMARY KEY (IDHabilitaciones)
+	CONSTRAINT PK_ID_Habilitaciones  PRIMARY KEY (idHabilitaciones)
 );
 GO
 
@@ -180,26 +180,26 @@ GO
 -- Crear tabla Habilitaciones que tiene cada Guia en cada Parque
 ---------------------------------------------------------
 
-CREATE TABLE Personal.HabilitacionesGuias(
-	IDHabilitacionGuia INT IDENTITY (1,1),
-	IDHabilitacion INT NOT NULL,
-	LegajoGuia INT NOT NULL,
-	IDParque INT NOT NULL,
+CREATE TABLE Personal.habilitacionesGuias(
+	idHabilitacionGuia INT IDENTITY (1,1),
+	idHabilitacion INT NOT NULL,
+	legajoGuia INT NOT NULL,
+	idParque INT NOT NULL,
 
-	FechaComienzo DATE NOT NULL,
-	FechaFin DATE NOT NULL,
+	fechaComienzo DATE NOT NULL,
+	fechaFin DATE NOT NULL,
 
-	CONSTRAINT PK_ID_Habilitaciones_Guias PRIMARY KEY (IDHabilitacionGuia),
+	CONSTRAINT PK_ID_Habilitaciones_Guias PRIMARY KEY (idHabilitacionGuia),
 
-	CONSTRAINT FK_HabilitacionesGuias_Habilitaciones FOREIGN KEY (IDHabilitacion)
-		REFERENCES Personal.Habilitaciones(IDHabilitaciones),
+	CONSTRAINT FK_HabilitacionesGuias_Habilitaciones FOREIGN KEY (idHabilitacion)
+		REFERENCES Personal.habilitaciones(idHabilitaciones),
 
-	CONSTRAINT FK_HabilitacionesGuias_Guias FOREIGN KEY (LegajoGuia)
-		REFERENCES Personal.Guias(Legajo),
+	CONSTRAINT FK_HabilitacionesGuias_Guias FOREIGN KEY (legajoGuia)
+		REFERENCES Personal.guias(legajo),
 
-	CONSTRAINT FK_HabilitacionesGuias_Parques FOREIGN KEY (IDParque)
-		REFERENCES Gestion.Parque(idParque),
+	CONSTRAINT FK_HabilitacionesGuias_Parques FOREIGN KEY (idParque)
+		REFERENCES Gestion.parque(idParque),
 
-	CONSTRAINT CK_FechaFin_HabilitacionesGuias CHECK ( FechaFin >= FechaComienzo )
+	CONSTRAINT CK_FechaFin_HabilitacionesGuias CHECK ( fechaFin >= fechaComienzo )
 );
 GO

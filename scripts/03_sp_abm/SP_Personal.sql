@@ -26,32 +26,32 @@ STORE PROCEDURE TABLA GUARDAPARQUES
 ---------------------------------------------------------
 
 
-CREATE OR ALTER PROCEDURE Personal.Guardaparques_Alta
+CREATE OR ALTER PROCEDURE Personal.altaGuardaparques
 (
-    @Documento CHAR(8),
-    @Nombre VARCHAR(50),
-    @Apellido VARCHAR(50),
-    @FechaNacimiento DATE,
-    @Estado VARCHAR(10)
+    @documento CHAR(8),
+    @nombre VARCHAR(50),
+    @apellido VARCHAR(50),
+    @fechaNacimiento DATE,
+    @estado VARCHAR(10)
 )
 AS
 BEGIN
     SET NOCOUNT ON;
 
     -- Validaciones
-    IF @Nombre IS NULL OR LTRIM(RTRIM(@Nombre)) = ''
+    IF @nombre IS NULL OR LTRIM(RTRIM(@nombre)) = ''
     BEGIN
         RAISERROR('El nombre es obligatorio.',16,1);
         RETURN;
     END;
 
-    IF @Apellido IS NULL OR LTRIM(RTRIM(@Apellido)) = ''
+    IF @apellido IS NULL OR LTRIM(RTRIM(@apellido)) = ''
     BEGIN
         RAISERROR('El apellido es obligatorio.',16,1);
         RETURN;
     END;
 
-    IF @Documento IS NULL OR LTRIM(RTRIM(@Documento)) = ''
+    IF @documento IS NULL OR LTRIM(RTRIM(@documento)) = ''
     BEGIN
         RAISERROR('El documento es obligatorio.',16,1);
         RETURN;
@@ -59,36 +59,36 @@ BEGIN
 
     IF EXISTS (
         SELECT 1
-        FROM Personal.Guardaparques
-        WHERE Documento = @Documento
+        FROM Personal.guardaparques
+        WHERE documento = @documento
     )
     BEGIN
         RAISERROR('Ya existe un guardaparque con ese documento.',16,1);
         RETURN;
     END;
 
-    IF @FechaNacimiento >= DATEADD(YEAR, -18, GETDATE())
+    IF @fechaNacimiento >= DATEADD(YEAR, -18, GETDATE())
     BEGIN
         RAISERROR('La fecha de nacimiento es inválida. Debe ser mayor de 18 años.',16,1);
         RETURN;
     END;
 
     -- Inserción
-    INSERT INTO Personal.Guardaparques
+    INSERT INTO Personal.guardaparques
     (
-        Documento,
-        Nombre,
-        Apellido,
-        FechaNacimiento,
-        Estado
+        documento,
+        nombre,
+        apellido,
+        fechaNacimiento,
+        estado
     )
     VALUES
     (
-        @Documento,
-        @Nombre,
-        @Apellido,
-        @FechaNacimiento,
-        @Estado
+        @documento,
+        @nombre,
+        @apellido,
+        @fechaNacimiento,
+        @estado
     );
 END;
 GO
@@ -97,14 +97,14 @@ GO
 -- MODIFICACION DE GUARDAPARQUES POR LEGAJO
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.ModificarGuardaparques
+CREATE OR ALTER PROCEDURE Personal.modificarGuardaparque
 (
-    @Legajo INT,
-    @NuevoDocumento VARCHAR(20) = NULL,
-    @NuevoNombre VARCHAR(50) = NULL,
-    @NuevoApellido VARCHAR(50) = NULL,
-    @NuevaFechaNacimiento DATE = NULL,
-    @NuevoEstado VARCHAR(10) = NULL
+    @legajo INT,
+    @nuevoDocumento VARCHAR(20) = NULL,
+    @nuevoNombre VARCHAR(50) = NULL,
+    @nuevoApellido VARCHAR(50) = NULL,
+    @nuevaFechaNacimiento DATE = NULL,
+    @nuevoEstado VARCHAR(10) = NULL
 )
 AS
 BEGIN
@@ -112,35 +112,35 @@ BEGIN
     IF NOT EXISTS
     (
         SELECT 1
-        FROM Personal.Guardaparques
-        WHERE Legajo = @Legajo
+        FROM Personal.guardaparques
+        WHERE legajo = @legajo
     )
     BEGIN
         RAISERROR('El legajo no existe.',16,1);
         RETURN;
     END;
 
-    IF @NuevoDocumento IS NOT NULL
+    IF @nuevoDocumento IS NOT NULL
        AND EXISTS
        (
            SELECT 1
-           FROM Personal.Guardaparques
-           WHERE Documento = @NuevoDocumento
-             AND Legajo <> @Legajo
+           FROM Personal.guardaparques
+           WHERE documento = @nuevoDocumento
+             AND legajo <> @legajo
        )
     BEGIN
         RAISERROR('Ya existe otro guardaparque con ese documento.',16,1);
         RETURN;
     END;
 
-    UPDATE Personal.Guardaparques
+    UPDATE Personal.guardaparques
     SET
-        Documento = ISNULL(@NuevoDocumento, Documento),
-        Nombre = ISNULL(@NuevoNombre, Nombre),
-        Apellido = ISNULL(@NuevoApellido, Apellido),
-        FechaNacimiento = ISNULL(@NuevaFechaNacimiento, FechaNacimiento),
-        Estado = ISNULL(@NuevoEstado, Estado)
-    WHERE Legajo = @Legajo;
+        documento = ISNULL(@nuevoDocumento, documento),
+        nombre = ISNULL(@nuevoNombre, nombre),
+        apellido = ISNULL(@nuevoApellido, apellido),
+        fechaNacimiento = ISNULL(@nuevaFechaNacimiento, fechaNacimiento),
+        estado = ISNULL(@nuevoEstado, estado)
+    WHERE legajo = @legajo;
 
     PRINT 'Guardaparque modificado correctamente.';
 
@@ -151,9 +151,9 @@ GO
 -- BAJA DE GUARDAPARQUES
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.Guardaparque_Baja
+CREATE OR ALTER PROCEDURE Personal.bajaGuardaparque
 (
-    @Legajo INT
+    @legajo INT
 )
 AS
 BEGIN
@@ -161,8 +161,8 @@ BEGIN
     IF NOT EXISTS
     (
         SELECT 1
-        FROM Personal.GuardaParques
-        WHERE Legajo = @Legajo
+        FROM Personal.guardaparques
+        WHERE legajo = @legajo
     )
     BEGIN
         RAISERROR('El legajo no existe.',16,1);
@@ -172,18 +172,18 @@ BEGIN
     IF EXISTS
     (
         SELECT 1
-        FROM Personal.GuardaParques
-        WHERE Legajo = @Legajo
-          AND Estado = 'INACTIVO'
+        FROM Personal.guardaparques
+        WHERE legajo = @legajo
+          AND estado = 'INACTIVO'
     )
     BEGIN
         RAISERROR('El guardaparque ya se encuentra inactivo.',16,1);
         RETURN;
     END;
 
-    UPDATE Personal.GuardaParques
-    SET Estado = 'INACTIVO'
-    WHERE Legajo = @Legajo;
+    UPDATE Personal.guardaparques
+    SET estado = 'INACTIVO'
+    WHERE legajo = @legajo;
 
     PRINT 'Guardaparque dado de baja correctamente.';
 
@@ -198,11 +198,11 @@ STORE PROCEDURE TABLA HISTORIAL GUARDAPARQUES
 -- ASIGNACION DE GUARDAPARQUES A UN PARQUE
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.AsignarGuardaparqueParque
+CREATE OR ALTER PROCEDURE Personal.asignarGuardaparqueParque
 (
-    @Legajo INT,
-    @IDParque INT,
-    @FechaIngreso DATE
+    @legajo INT,
+    @idParque INT,
+    @fechaIngreso DATE
 )
 AS
 BEGIN
@@ -210,8 +210,8 @@ BEGIN
     IF NOT EXISTS
     (
         SELECT 1
-        FROM Personal.GuardaParques
-        WHERE Legajo = @Legajo
+        FROM Personal.guardaparques
+        WHERE legajo = @legajo
     )
     BEGIN
         RAISERROR('El guardaparque no existe.',16,1);
@@ -221,8 +221,8 @@ BEGIN
     IF NOT EXISTS
     (
         SELECT 1
-        FROM Gestion.Parque
-        WHERE IDParque = @IDParque
+        FROM Gestion.parque
+        WHERE idParque = @idParque
     )
     BEGIN
         RAISERROR('El parque no existe.',16,1);
@@ -232,26 +232,26 @@ BEGIN
     IF EXISTS
     (
         SELECT 1
-        FROM Personal.HistorialGuardaParques
-        WHERE LegajoGuardaParques = @Legajo
-        AND FechaEgreso IS NULL
+        FROM Personal.historialGuardaParques
+        WHERE legajoGuardaparques = @legajo
+        AND fechaEgreso IS NULL
     )
     BEGIN
         RAISERROR('El guardaparque ya posee una asignacion activa.',16,1);
         RETURN;
     END;
 
-    INSERT INTO Personal.HistorialGuardaParques
+    INSERT INTO Personal.historialGuardaparques
     (
-        LegajoGuardaParques,
-        IDParque,
-        FechaIngreso
+        legajoGuardaparques,
+        idParque,
+        fechaIngreso
     )
     VALUES
     (
-        @Legajo,
-        @IDParque,
-        @FechaIngreso
+        @legajo,
+        @idParque,
+        @fechaIngreso
     );
 
     PRINT 'Asignacion realizada correctamente.';
@@ -263,12 +263,12 @@ GO
 -- REASIGNACION DE GUARDAPARQUES A UN PARQUE
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.ReasignarGuardaparque
+CREATE OR ALTER PROCEDURE Personal.reasignarGuardaparque
 (
-    @Legajo INT,
-    @NuevoParque INT,
-    @FechaCambio DATE,
-    @MotivoEgreso VARCHAR(200) = NULL
+    @legajo INT,
+    @nuevoParque INT,
+    @fechaCambio DATE,
+    @motivoEgreso VARCHAR(200) = NULL
 )
 AS
 BEGIN
@@ -278,8 +278,8 @@ BEGIN
         IF NOT EXISTS
         (
             SELECT 1
-            FROM Personal.GuardaParques
-            WHERE Legajo = @Legajo
+            FROM Personal.guardaparques
+            WHERE legajo = @legajo
         )
         BEGIN
             RAISERROR('El guardaparque no existe.',16,1);
@@ -289,8 +289,8 @@ BEGIN
         IF NOT EXISTS
         (
             SELECT 1
-            FROM Gestion.Parque
-            WHERE IDParque = @NuevoParque
+            FROM Gestion.parque
+            WHERE idParque = @nuevoParque
         )
         BEGIN
             RAISERROR('El parque no existe.',16,1);
@@ -299,24 +299,24 @@ BEGIN
 
         BEGIN TRANSACTION;
 
-        UPDATE Personal.HistorialGuardaParques
+        UPDATE Personal.historialGuardaparques
         SET
-            FechaEgreso = @FechaCambio,
-            MotivoEgreso = @MotivoEgreso
-        WHERE LegajoGuardaParques = @Legajo
-          AND FechaEgreso IS NULL;
+            fechaEgreso = @fechaCambio,
+            motivoEgreso = @motivoEgreso
+        WHERE legajoGuardaParques = @legajo
+          AND fechaEgreso IS NULL;
 
-        INSERT INTO Personal.HistorialGuardaParques
+        INSERT INTO Personal.historialGuardaparques
         (
-            LegajoGuardaParques,
-            IDParque,
-            FechaIngreso
+            legajoGuardaparques,
+            idParque,
+            fechaIngreso
         )
         VALUES
         (
-            @Legajo,
-            @NuevoParque,
-            @FechaCambio
+            @legajo,
+            @nuevoParque,
+            @fechaCambio
         );
 
         COMMIT TRANSACTION;
@@ -345,14 +345,14 @@ STORE PROCEDURE TABLA GUIAS
 -- ALTA GUIA
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.AltaGuia
+CREATE OR ALTER PROCEDURE Personal.altaGuia
 (
-    @Documento CHAR(8),
-    @Nombre VARCHAR(50),
-    @Apellido VARCHAR(50),
-    @FechaNacimiento DATE,
-    @CodTitulo INT,
-    @CodEspecialidad INT
+    @documento CHAR(8),
+    @nombre VARCHAR(50),
+    @apellido VARCHAR(50),
+    @fechaNacimiento DATE,
+    @codTitulo INT,
+    @codEspecialidad INT
 )
 AS
 BEGIN
@@ -360,31 +360,31 @@ BEGIN
     IF EXISTS
     (
         SELECT 1
-        FROM Personal.Guias
-        WHERE Documento = @Documento
+        FROM Personal.guias
+        WHERE documento = @documento
     )
     BEGIN
         RAISERROR('El documento ya existe.',16,1);
         RETURN;
     END;
 
-    INSERT INTO Personal.Guias
+    INSERT INTO Personal.guias
     (
-        Documento,
-        Nombre,
-        Apellido,
-        FechaNacimiento,
-        CodTitulo,
-        CodEspecialidad
+        documento,
+        nombre,
+        apellido,
+        fechaNacimiento,
+        codTitulo,
+        codEspecialidad
     )
     VALUES
     (
-        @Documento,
-        @Nombre,
-        @Apellido,
-        @FechaNacimiento,
-        @CodTitulo,
-        @CodEspecialidad
+        @documento,
+        @nombre,
+        @apellido,
+        @fechaNacimiento,
+        @codTitulo,
+        @codEspecialidad
     );
 
 END;
@@ -394,26 +394,26 @@ GO
 -- MODIFICACION GUIA
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.ModificarGuia
+CREATE OR ALTER PROCEDURE Personal.modificarGuia
 (
-    @Legajo INT,
-    @Nombre VARCHAR(50),
-    @Apellido VARCHAR(50),
-    @FechaNacimiento DATE,
-    @CodTitulo INT,
-    @CodEspecialidad INT
+    @legajo INT,
+    @nombre VARCHAR(50),
+    @apellido VARCHAR(50),
+    @fechaNacimiento DATE,
+    @codTitulo INT,
+    @codEspecialidad INT
 )
 AS
 BEGIN
 
-    UPDATE Personal.Guias
+    UPDATE Personal.guias
     SET
-        Nombre = @Nombre,
-        Apellido = @Apellido,
-        FechaNacimiento = @FechaNacimiento,
-        CodTitulo = @CodTitulo,
-        CodEspecialidad = @CodEspecialidad
-    WHERE Legajo = @Legajo;
+        nombre = @nombre,
+        apellido = @apellido,
+        fechaNacimiento = @fechaNacimiento,
+        codTitulo = @codTitulo,
+        codEspecialidad = @codEspecialidad
+    WHERE legajo = @legajo;
 
 END;
 GO
@@ -422,15 +422,15 @@ GO
 -- BAJA GUIA
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.BajaGuia
+CREATE OR ALTER PROCEDURE Personal.bajaGuia
 (
-    @Legajo INT
+    @legajo INT
 )
 AS
 BEGIN
 
-    DELETE FROM Personal.Guias
-    WHERE Legajo = @Legajo;
+    DELETE FROM Personal.guias
+    WHERE legajo = @legajo;
 
 END;
 GO
@@ -443,10 +443,10 @@ STORE PROCEDURE TABLA TITULOS GUIAS
 -- ALTA TITULOS GUIA
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.AltaTitulo
+CREATE OR ALTER PROCEDURE Personal.altaTitulo
 (
-    @Nombre VARCHAR(50),
-    @Descripcion VARCHAR(200) = NULL
+    @nombre VARCHAR(50),
+    @descripcion VARCHAR(200) = NULL
 )
 AS
 BEGIN
@@ -454,23 +454,23 @@ BEGIN
     IF EXISTS
     (
         SELECT 1
-        FROM Personal.Titulos
-        WHERE Nombre = @Nombre
+        FROM Personal.titulos
+        WHERE nombre = @nombre
     )
     BEGIN
         RAISERROR('Ya existe un título con ese nombre.',16,1);
         RETURN;
     END
 
-    INSERT INTO Personal.Titulos
+    INSERT INTO Personal.titulos
     (
-        Nombre,
-        Descripcion
+        nombre,
+        descripcion
     )
     VALUES
     (
-        @Nombre,
-        @Descripcion
+        @nombre,
+        @descripcion
     );
 
 END;
@@ -480,11 +480,11 @@ GO
 -- MODIFICACION TITULOS GUIAS
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.ModificarTitulo
+CREATE OR ALTER PROCEDURE Personal.modificarTitulo
 (
-    @CodTitulo INT,
-    @Nombre VARCHAR(50),
-    @Descripcion VARCHAR(200) = NULL
+    @codTitulo INT,
+    @nombre VARCHAR(50),
+    @descripcion VARCHAR(200) = NULL
 )
 AS
 BEGIN
@@ -492,8 +492,8 @@ BEGIN
     IF NOT EXISTS
     (
         SELECT 1
-        FROM Personal.Titulos
-        WHERE CodTitulo = @CodTitulo
+        FROM Personal.titulos
+        WHERE codTitulo = @codTitulo
     )
     BEGIN
         RAISERROR('El titulo no existe.',16,1);
@@ -502,9 +502,9 @@ BEGIN
 
     UPDATE Personal.Titulos
     SET
-        Nombre = @Nombre,
-        Descripcion = @Descripcion
-    WHERE CodTitulo = @CodTitulo;
+        nombre = @nombre,
+        descripcion = @descripcion
+    WHERE codTitulo = @codTitulo;
 
 END;
 GO
@@ -513,9 +513,9 @@ GO
 -- BAJA TITULOS GUIAS
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.BajaTitulo
+CREATE OR ALTER PROCEDURE Personal.bajaTitulo
 (
-    @CodTitulo INT
+    @codTitulo INT
 )
 AS
 BEGIN
@@ -523,16 +523,16 @@ BEGIN
     IF EXISTS
     (
         SELECT 1
-        FROM Personal.Guias
-        WHERE CodTitulo = @CodTitulo
+        FROM Personal.guias
+        WHERE codTitulo = @codTitulo
     )
     BEGIN
         RAISERROR('No se puede eliminar el titulo porque está asignado a uno o más guias.',16,1);
         RETURN;
     END;
 
-    DELETE FROM Personal.Titulos
-    WHERE CodTitulo = @CodTitulo;
+    DELETE FROM Personal.titulos
+    WHERE codTitulo = @codTitulo;
 
 END;
 GO
@@ -545,10 +545,10 @@ STORE PROCEDURE TABLA ESPECIALIDAD GUIAS
 -- ALTA ESPECIALIDAD GUIAS
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.AltaEspecialidad
+CREATE OR ALTER PROCEDURE Personal.altaEspecialidad
 (
-    @Nombre VARCHAR(50),
-    @Descripcion VARCHAR(200) = NULL
+    @nombre VARCHAR(50),
+    @descripcion VARCHAR(200) = NULL
 )
 AS
 BEGIN
@@ -556,23 +556,23 @@ BEGIN
     IF EXISTS
     (
         SELECT 1
-        FROM Personal.Especialidad
-        WHERE Nombre = @Nombre
+        FROM Personal.especialidad
+        WHERE nombre = @nombre
     )
     BEGIN
         RAISERROR('La especialidad ya existe.',16,1);
         RETURN;
     END
 
-    INSERT INTO Personal.Especialidad
+    INSERT INTO Personal.especialidad
     (
-        Nombre,
-        Descripcion
+        nombre,
+        descripcion
     )
     VALUES
     (
-        @Nombre,
-        @Descripcion
+        @nombre,
+        @descripcion
     );
 
 END;
@@ -582,11 +582,11 @@ GO
 -- MODIFICACION ESPECIALIDAD GUIAS
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.ModificarEspecialidad
+CREATE OR ALTER PROCEDURE Personal.modificarEspecialidad
 (
-    @CodEspecialidad INT,
-    @Nombre VARCHAR(50),
-    @Descripcion VARCHAR(200) = NULL
+    @codEspecialidad INT,
+    @nombre VARCHAR(50),
+    @descripcion VARCHAR(200) = NULL
 )
 AS
 BEGIN
@@ -594,19 +594,19 @@ BEGIN
     IF NOT EXISTS
     (
         SELECT 1
-        FROM Personal.Especialidad
-        WHERE CodEspecialidad = @CodEspecialidad
+        FROM Personal.especialidad
+        WHERE codEspecialidad = @codEspecialidad
     )
     BEGIN
         RAISERROR('La especialidad no existe.',16,1);
         RETURN;
     END;
 
-    UPDATE Personal.Especialidad
+    UPDATE Personal.especialidad
     SET
-        Nombre = @Nombre,
-        Descripcion = @Descripcion
-    WHERE CodEspecialidad = @CodEspecialidad;
+        nombre = @nombre,
+        descripcion = @descripcion
+    WHERE codEspecialidad = @codEspecialidad;
 
 END;
 GO
@@ -615,9 +615,9 @@ GO
 -- BAJA ESPECIALIDAD GUIAS
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.BajaEspecialidad
+CREATE OR ALTER PROCEDURE Personal.bajaEspecialidad
 (
-    @CodEspecialidad INT
+    @codEspecialidad INT
 )
 AS
 BEGIN
@@ -625,16 +625,16 @@ BEGIN
     IF EXISTS
     (
         SELECT 1
-        FROM Personal.Guias
-        WHERE CodEspecialidad = @CodEspecialidad
+        FROM Personal.guias
+        WHERE codEspecialidad = @codEspecialidad
     )
     BEGIN
         RAISERROR('No se puede eliminar la especialidad porque está asignada a uno o más guias.',16,1);
         RETURN;
     END;
 
-    DELETE FROM Personal.Especialidad
-    WHERE CodEspecialidad = @CodEspecialidad;
+    DELETE FROM Personal.especialidad
+    WHERE codEspecialidad = @codEspecialidad;
 
 END;
 GO
@@ -646,23 +646,23 @@ STORE PROCEDURE TABLA HABILITACIONES
 -- ALTA HABILITACIONES
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.AltaHabilitacion
+CREATE OR ALTER PROCEDURE Personal.altaHabilitacion
 (
-    @Nombre VARCHAR(50),
-    @Descripcion VARCHAR(200)=NULL
+    @nombre VARCHAR(50),
+    @descripcion VARCHAR(200)=NULL
 )
 AS
 BEGIN
 
     INSERT INTO Personal.Habilitaciones
     (
-        Nombre,
-        Descripcion
+        nombre,
+        descripcion
     )
     VALUES
     (
-        @Nombre,
-        @Descripcion
+        @nombre,
+        @descripcion
     );
 
 END;
@@ -672,11 +672,11 @@ GO
 -- MODIFICACION HABILITACIONES
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.ModificarHabilitacion
+CREATE OR ALTER PROCEDURE Personal.modificarHabilitacion
 (
-    @IDHabilitacion INT,
-    @Nombre VARCHAR(50),
-    @Descripcion VARCHAR(200) = NULL
+    @idHabilitacion INT,
+    @nombre VARCHAR(50),
+    @descripcion VARCHAR(200) = NULL
 )
 AS
 BEGIN
@@ -684,19 +684,19 @@ BEGIN
     IF NOT EXISTS
     (
         SELECT 1
-        FROM Personal.Habilitaciones
-        WHERE IDHabilitaciones = @IDHabilitacion
+        FROM Personal.habilitaciones
+        WHERE idHabilitaciones = @idHabilitacion
     )
     BEGIN
         RAISERROR('La habilitación no existe.',16,1);
         RETURN;
     END;
 
-    UPDATE Personal.Habilitaciones
+    UPDATE Personal.habilitaciones
     SET
-        Nombre = @Nombre,
-        Descripcion = @Descripcion
-    WHERE IDHabilitaciones = @IDHabilitacion;
+        nombre = @nombre,
+        descripcion = @descripcion
+    WHERE idHabilitaciones = @idHabilitacion;
 
 END;
 GO
@@ -705,9 +705,9 @@ GO
 -- BAJA HABILITACIONES
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.BajaHabilitacion
+CREATE OR ALTER PROCEDURE Personal.bajaHabilitacion
 (
-    @IDHabilitacion INT
+    @idHabilitacion INT
 )
 AS
 BEGIN
@@ -715,8 +715,8 @@ BEGIN
     IF NOT EXISTS
     (
         SELECT 1
-        FROM Personal.Habilitaciones
-        WHERE IDHabilitaciones = @IDHabilitacion
+        FROM Personal.habilitaciones
+        WHERE idHabilitaciones = @idHabilitacion
     )
     BEGIN
         RAISERROR('La habilitación no existe.',16,1);
@@ -726,16 +726,16 @@ BEGIN
     IF EXISTS
     (
         SELECT 1
-        FROM Personal.HabilitacionesGuias
-        WHERE IDHabilitacion = @IDHabilitacion
+        FROM Personal.habilitacionesGuias
+        WHERE idHabilitacion = @idHabilitacion
     )
     BEGIN
         RAISERROR('No se puede eliminar la habilitación porque está asociada a guias.',16,1);
         RETURN;
     END;
 
-    DELETE FROM Personal.Habilitaciones
-    WHERE IDHabilitaciones = @IDHabilitacion;
+    DELETE FROM Personal.habilitaciones
+    WHERE idHabilitaciones = @idHabilitacion;
 
 END;
 GO
@@ -747,38 +747,38 @@ STORE PROCEDURE TABLA HABILITACIONES GUIAS POR PARQUE
 -- ALTA HABILITACIONES GUIAS POR PARQUE
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.AltaHabilitacionGuia
+CREATE OR ALTER PROCEDURE Personal.altaHabilitacionGuia
 (
-    @IDHabilitacion INT,
-    @LegajoGuia INT,
-    @IDParque INT,
-    @FechaComienzo DATE,
-    @FechaFin DATE
+    @idHabilitacion INT,
+    @legajoGuia INT,
+    @idParque INT,
+    @fechaComienzo DATE,
+    @fechaFin DATE
 )
 AS
 BEGIN
 
-    IF @FechaFin < @FechaComienzo
+    IF @fechaFin < @fechaComienzo
     BEGIN
         RAISERROR('La fecha fin no puede ser menor a la fecha inicio.',16,1);
         RETURN;
     END
 
-    INSERT INTO Personal.HabilitacionesGuias
+    INSERT INTO Personal.habilitacionesGuias
     (
-        IDHabilitacion,
-        LegajoGuia,
-        IDParque,
-        FechaComienzo,
-        FechaFin
+        idHabilitacion,
+        legajoGuia,
+        idParque,
+        fechaComienzo,
+        fechaFin
     )
     VALUES
     (
-        @IDHabilitacion,
-        @LegajoGuia,
-        @IDParque,
-        @FechaComienzo,
-        @FechaFin
+        @idHabilitacion,
+        @legajoGuia,
+        @idParque,
+        @fechaComienzo,
+        @fechaFin
     );
 
 END;
@@ -788,14 +788,14 @@ GO
 -- MODIFICACION HABILITACIONES GUIAS POR PARQUE
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.ModificarHabilitacionGuia
+CREATE OR ALTER PROCEDURE Personal.modificarHabilitacionGuia
 (
-    @IDHabilitacionGuia INT,
-    @IDHabilitacion INT,
-    @LegajoGuia INT,
-    @IDParque INT,
-    @FechaComienzo DATE,
-    @FechaFin DATE
+    @idHabilitacionGuia INT,
+    @idHabilitacion INT,
+    @legajoGuia INT,
+    @idParque INT,
+    @fechaComienzo DATE,
+    @fechaFin DATE
 )
 AS
 BEGIN
@@ -803,28 +803,28 @@ BEGIN
     IF NOT EXISTS
     (
         SELECT 1
-        FROM Personal.HabilitacionesGuias
-        WHERE IDHabilitacionGuia = @IDHabilitacionGuia
+        FROM Personal.habilitacionesGuias
+        WHERE idHabilitacionGuia = @idHabilitacionGuia
     )
     BEGIN
         RAISERROR('La habilitación del guía no existe.',16,1);
         RETURN;
     END;
 
-    IF @FechaFin < @FechaComienzo
+    IF @fechaFin < @fechaComienzo
     BEGIN
         RAISERROR('La fecha fin no puede ser menor a la fecha comienzo.',16,1);
         RETURN;
     END;
 
-    UPDATE Personal.HabilitacionesGuias
+    UPDATE Personal.habilitacionesGuias
     SET
-        IDHabilitacion = @IDHabilitacion,
-        LegajoGuia = @LegajoGuia,
-        IDParque = @IDParque,
-        FechaComienzo = @FechaComienzo,
-        FechaFin = @FechaFin
-    WHERE IDHabilitacionGuia = @IDHabilitacionGuia;
+        idHabilitacion = @idHabilitacion,
+        legajoGuia = @legajoGuia,
+        idParque = @idParque,
+        fechaComienzo = @fechaComienzo,
+        fechaFin = @fechaFin
+    WHERE idHabilitacionGuia = @idHabilitacionGuia;
 
 END;
 GO
@@ -832,9 +832,9 @@ GO
 ---------------------------------------------------------
 -- BAJA HABILITACIONES GUIAS POR PARQUE
 ---------------------------------------------------------
-CREATE OR ALTER PROCEDURE Personal.BajaHabilitacionGuia
+CREATE OR ALTER PROCEDURE Personal.bajaHabilitacionGuia
 (
-    @IDHabilitacionGuia INT
+    @idHabilitacionGuia INT
 )
 AS
 BEGIN
@@ -842,16 +842,16 @@ BEGIN
     IF NOT EXISTS
     (
         SELECT 1
-        FROM Personal.HabilitacionesGuias
-        WHERE IDHabilitacionGuia = @IDHabilitacionGuia
+        FROM Personal.habilitacionesGuias
+        WHERE idHabilitacionGuia = @idHabilitacionGuia
     )
     BEGIN
         RAISERROR('La habilitación del guía no existe.',16,1);
         RETURN;
     END;
 
-    DELETE FROM Personal.HabilitacionesGuias
-    WHERE IDHabilitacionGuia = @IDHabilitacionGuia;
+    DELETE FROM Personal.habilitacionesGuias
+    WHERE idHabilitacionGuia = @idHabilitacionGuia;
 
 END;
 GO

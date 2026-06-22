@@ -16,29 +16,29 @@ Resultado esperado:
 Se inserta correctamente.
 =======================================================*/
 
-EXEC Personal.Guardaparques_Alta
-    @Documento = '12345678',
-    @Nombre = 'Juan',
-    @Apellido = 'Perez',
-    @FechaNacimiento = '1990-05-10',
-    @Estado = 'ACTIVO';
+EXEC Personal.altaGuardaparques
+    @documento = '12345678',
+    @nombre = 'Juan',
+    @apellido = 'Perez',
+    @fechaNacimiento = '1990-05-10',
+    @estado = 'ACTIVO';
 
-EXEC Personal.Guardaparques_Alta
-    @Documento = '11111111',
-    @Nombre = 'Matias',
-    @Apellido = 'Perez',
-    @FechaNacimiento = '2000-05-10',
-    @Estado = 'ACTIVO';
+EXEC Personal.altaGuardaparques
+    @documento = '11111111',
+    @nombre = 'Matias',
+    @apellido = 'Perez',
+    @fechaNacimiento = '2000-05-10',
+    @estado = 'ACTIVO';
 
-EXEC Personal.Guardaparques_Alta
-    @Documento = '12345679',
-    @Nombre = 'Juana',
-    @Apellido = 'Perez',
-    @FechaNacimiento = '1995-05-10',
-    @Estado = 'ACTIVO';
+EXEC Personal.altaGuardaparques
+    @documento = '12345679',
+    @nombre = 'Juana',
+    @apellido = 'Perez',
+    @fechaNacimiento = '1995-05-10',
+    @estado = 'ACTIVO';
 
 SELECT *
-FROM Personal.GuardaParques;
+FROM Personal.guardaparques;
 GO
 
 /*=======================================================
@@ -47,12 +47,12 @@ Resultado esperado:
 Error - El nombre es obligatorio.
 =======================================================*/
 
-EXEC Personal.Guardaparques_Alta
-    @Documento = '11111111',
-    @Nombre = '',
-    @Apellido = 'Perez',
-    @FechaNacimiento = '1990-05-10',
-    @Estado = 'ACTIVO';
+EXEC Personal.altaGuardaparques
+    @documento = '11111111',
+    @nombre = '',
+    @apellido = 'Perez',
+    @fechaNacimiento = '1990-05-10',
+    @estado = 'ACTIVO';
 GO
 
 /*=======================================================
@@ -61,12 +61,12 @@ Resultado esperado:
 Error - El apellido es obligatorio.
 =======================================================*/
 
-EXEC Personal.Guardaparques_Alta
-    @Documento = '22222222',
-    @Nombre = 'Juan',
-    @Apellido = '',
-    @FechaNacimiento = '1990-05-10',
-    @Estado = 'ACTIVO';
+EXEC Personal.altaGuardaparques
+    @documento = '22222222',
+    @nombre = 'Juan',
+    @apellido = '',
+    @fechaNacimiento = '1990-05-10',
+    @estado = 'ACTIVO';
 GO
 
 /*=======================================================
@@ -75,12 +75,12 @@ Resultado esperado:
 Error - Ya existe un guardaparque con ese documento.
 =======================================================*/
 
-EXEC Personal.Guardaparques_Alta
-    @Documento = '12345678',
-    @Nombre = 'Pedro',
-    @Apellido = 'Gomez',
-    @FechaNacimiento = '1991-01-01',
-    @Estado = 'ACTIVO';
+EXEC Personal.altaGuardaparques
+    @documento = '12345678',
+    @nombre = 'Pedro',
+    @apellido = 'Gomez',
+    @fechaNacimiento = '1991-01-01',
+    @estado = 'ACTIVO';
 GO
 
 /*=======================================================
@@ -89,12 +89,12 @@ Resultado esperado:
 Error - Debe ser mayor de 18 años.
 =======================================================*/
 
-EXEC Personal.Guardaparques_Alta
-    @Documento = '33333333',
-    @Nombre = 'Lucas',
-    @Apellido = 'Martinez',
-    @FechaNacimiento = '2025-01-01',
-    @Estado = 'ACTIVO';
+EXEC Personal.altaGuardaparques
+    @documento = '33333333',
+    @nombre = 'Lucas',
+    @apellido = 'Martinez',
+    @fechaNacimiento = '2025-01-01',
+    @estado = 'ACTIVO';
 GO
 
 ---------------------------------------------------------
@@ -107,13 +107,13 @@ Resultado esperado:
 Se modifica correctamente.
 =======================================================*/
 
-EXEC Personal.ModificarGuardaparques
-    @Legajo = 1,
-    @NuevoNombre = 'Juan Carlos';
+EXEC Personal.modificarGuardaparque
+    @legajo = 1,
+    @nuevoNombre = 'Juan Carlos';
 
 SELECT *
-FROM Personal.GuardaParques
-WHERE Legajo = 1;
+FROM Personal.guardaparques
+WHERE legajo = 1;
 GO
 
 /*=======================================================
@@ -122,8 +122,8 @@ Resultado esperado:
 Error - El legajo no existe.
 =======================================================*/
 
-EXEC Personal.ModificarGuardaparques
-    @Legajo = 999;
+EXEC Personal.modificarGuardaparque
+    @legajo = 999;
 GO
 
 /*=======================================================
@@ -132,9 +132,9 @@ Resultado esperado:
 Error - Ya existe otro guardaparque con ese documento.
 =======================================================*/
 
-EXEC Personal.ModificarGuardaparques
-    @Legajo = 1,
-    @NuevoDocumento = '87654321';
+EXEC Personal.modificarGuardaparque
+    @legajo = 1,
+    @nuevoDocumento = '87654321';
 GO
 
 ---------------------------------------------------------
@@ -147,12 +147,12 @@ Resultado esperado:
 Estado = INACTIVO
 =======================================================*/
 
-EXEC Personal.Guardaparque_Baja
+EXEC Personal.bajaGuardaparque
     @Legajo = 1;
 
-SELECT Legajo, Estado
-FROM Personal.GuardaParques
-WHERE Legajo = 1;
+SELECT legajo, estado
+FROM personal.guardaParques
+WHERE legajo = 1;
 GO
 
 /*=======================================================
@@ -161,8 +161,8 @@ Resultado esperado:
 Error - El legajo no existe.
 =======================================================*/
 
-EXEC Personal.Guardaparque_Baja
-    @Legajo = 999;
+EXEC Personal.bajaGuardaparque
+    @legajo = 999;
 GO
 
 /*=======================================================
@@ -171,8 +171,8 @@ Resultado esperado:
 Error - El guardaparque ya se encuentra inactivo.
 =======================================================*/
 
-EXEC Personal.Guardaparque_Baja
-    @Legajo = 1;
+EXEC Personal.bajaGuardaparque
+    @legajo = 1;
 GO
 
 /*=========================================================
@@ -191,14 +191,14 @@ Asignación realizada correctamente.
 
 --PUEDE FALLAR SI NO HAY UN PARQUE CREADO
 
-EXEC Personal.AsignarGuardaparqueParque
-    @Legajo = 2,
-    @IDParque = 1,
-    @FechaIngreso = '2025-01-01';
+EXEC Personal.asignarGuardaparqueParque
+    @legajo = 2,
+    @idParque = 1,
+    @fechaIngreso = '2025-01-01';
 
 SELECT *
-FROM Personal.HistorialGuardaParques
-WHERE LegajoGuardaParques = 2;
+FROM Personal.historialGuardaparques
+WHERE legajoGuardaparques = 2;
 GO
 
 /*=======================================================
@@ -207,10 +207,10 @@ Resultado esperado:
 Error - El guardaparque no existe.
 =======================================================*/
 
-EXEC Personal.AsignarGuardaparqueParque
-    @Legajo = 999,
-    @IDParque = 1,
-    @FechaIngreso = '2025-01-01';
+EXEC Personal.asignarGuardaparqueParque
+    @legajo = 999,
+    @idParque = 1,
+    @fechaIngreso = '2025-01-01';
 GO
 
 /*=======================================================
@@ -219,10 +219,10 @@ Resultado esperado:
 Error - El parque no existe.
 =======================================================*/
 
-EXEC Personal.AsignarGuardaparqueParque
-    @Legajo = 2,
-    @IDParque = 999,
-    @FechaIngreso = '2025-01-01';
+EXEC Personal.asignarGuardaparqueParque
+    @legajo = 2,
+    @idParque = 999,
+    @fechaIngreso = '2025-01-01';
 GO
 
 /*=======================================================
@@ -231,10 +231,10 @@ Resultado esperado:
 Error - Ya posee una asignación activa.
 =======================================================*/
 
-EXEC Personal.AsignarGuardaparqueParque
-    @Legajo = 2,
-    @IDParque = 2,
-    @FechaIngreso = '2025-01-01';
+EXEC Personal.asignarGuardaparqueParque
+    @legajo = 2,
+    @idParque = 2,
+    @fechaIngreso = '2025-01-01';
 GO
 
 ---------------------------------------------------------
@@ -250,15 +250,15 @@ Se cierra la asignación actual y se crea una nueva.
 --PUEDE FALLAR SI NO HAY MAS PARQUES CREADOS O OTRO GUIA
 
 EXEC Personal.ReasignarGuardaparque
-    @Legajo = 2,
-    @NuevoParque = 2,
-    @FechaCambio = '2026-12-01',
-    @MotivoEgreso = 'Traslado operativo';
+    @legajo = 2,
+    @nuevoParque = 2,
+    @fechaCambio = '2026-12-01',
+    @motivoEgreso = 'Traslado operativo';
 
 SELECT *
-FROM Personal.HistorialGuardaParques
-WHERE LegajoGuardaParques = 2
-ORDER BY IDHistorial;
+FROM Personal.historialGuardaParques
+WHERE legajoGuardaparques = 2
+ORDER BY idHistorial;
 GO
 
 /*=======================================================
@@ -267,10 +267,10 @@ Resultado esperado:
 MotivoEgreso queda NULL.
 =======================================================*/
 
-EXEC Personal.ReasignarGuardaparque
-    @Legajo = 2,
-    @NuevoParque = 3,
-    @FechaCambio = '2026-12-01'
+EXEC Personal.reasignarGuardaparque
+    @legajo = 2,
+    @nuevoParque = 3,
+    @fechaCambio = '2026-12-01'
 GO
 
 /*=======================================================
@@ -279,10 +279,10 @@ Resultado esperado:
 Error - El guardaparque no existe.
 =======================================================*/
 
-EXEC Personal.ReasignarGuardaparque
-    @Legajo = 999,
-    @NuevoParque = 1,
-    @FechaCambio = '2026-12-01';
+EXEC Personal.reasignarGuardaparque
+    @legajo = 999,
+    @nuevoParque = 1,
+    @fechaCambio = '2026-12-01';
 GO
 
 /*=======================================================
@@ -291,10 +291,10 @@ Resultado esperado:
 Error - El parque no existe.
 =======================================================*/
 
-EXEC Personal.ReasignarGuardaparque
-    @Legajo = 2,
-    @NuevoParque = 999,
-    @FechaCambio = '2026-12-01';
+EXEC Personal.reasignarGuardaparque
+    @legajo = 2,
+    @nuevoParque = 999,
+    @fechaCambio = '2026-12-01';
 GO
 
 /*=======================================================
@@ -310,20 +310,20 @@ Resultado esperado:
 Se crean correctamente 3 títulos.
 =======================================================*/
 
-EXEC Personal.AltaTitulo
-    @Nombre = 'Licenciado en Turismo',
-    @Descripcion = 'Titulo universitario';
+EXEC Personal.altaTitulo
+    @nombre = 'Licenciado en Turismo',
+    @descripcion = 'Titulo universitario';
 
-EXEC Personal.AltaTitulo
-    @Nombre = 'Biologo',
-    @Descripcion = 'Especialista en fauna';
+EXEC Personal.altaTitulo
+    @nombre = 'Biologo',
+    @descripcion = 'Especialista en fauna';
 
-EXEC Personal.AltaTitulo
-    @Nombre = 'Guia de Montaña',
-    @Descripcion = 'Especialista en montaña';
+EXEC Personal.altaTitulo
+    @nombre = 'Guia de Montaña',
+    @descripcion = 'Especialista en montaña';
 
 SELECT *
-FROM Personal.Titulos;
+FROM Personal.titulos;
 GO
 
 /*=======================================================
@@ -332,9 +332,9 @@ Resultado esperado:
 Error - Ya existe un título con ese nombre.
 =======================================================*/
 
-EXEC Personal.AltaTitulo
-    @Nombre = 'Biologo',
-    @Descripcion = 'Duplicado';
+EXEC Personal.altaTitulo
+    @nombre = 'Biologo',
+    @descripcion = 'Duplicado';
 GO
 
 ---------------------------------------------------------
@@ -346,14 +346,14 @@ Resultado esperado:
 Se modifica correctamente el título.
 =======================================================*/
 
-EXEC Personal.ModificarTitulo
-    @CodTitulo = 1,
-    @Nombre = 'Licenciado en Ecoturismo',
-    @Descripcion = 'Titulo actualizado';
+EXEC Personal.modificarTitulo
+    @codTitulo = 1,
+    @nombre = 'Licenciado en Ecoturismo',
+    @descripcion = 'Titulo actualizado';
 
 SELECT *
-FROM Personal.Titulos
-WHERE CodTitulo = 1;
+FROM Personal.titulos
+WHERE codTitulo = 1;
 GO
 
 /*=======================================================
@@ -362,10 +362,10 @@ Resultado esperado:
 Error - El titulo no existe.
 =======================================================*/
 
-EXEC Personal.ModificarTitulo
-    @CodTitulo = 999,
-    @Nombre = 'Prueba',
-    @Descripcion = 'Prueba';
+EXEC Personal.modificarTitulo
+    @codTitulo = 999,
+    @nombre = 'Prueba',
+    @descripcion = 'Prueba';
 GO
 
 ---------------------------------------------------------
@@ -377,11 +377,11 @@ Resultado esperado:
 Se elimina correctamente el título.
 =======================================================*/
 
-EXEC Personal.BajaTitulo
-    @CodTitulo = 3;
+EXEC Personal.bajaTitulo
+    @codTitulo = 3;
 
 SELECT *
-FROM Personal.Titulos;
+FROM Personal.titulos;
 GO
 
 /*=======================================================
@@ -390,8 +390,8 @@ Resultado esperado:
 Error - No se puede eliminar el titulo porque está asignado a uno o más guias.
 =======================================================*/
 
-EXEC Personal.BajaTitulo
-    @CodTitulo = 1;
+EXEC Personal.bajaTitulo
+    @codTitulo = 1;
 GO
 
 /*=======================================================
@@ -407,20 +407,20 @@ Resultado esperado:
 Se crean correctamente 3 especialidades.
 =======================================================*/
 
-EXEC Personal.AltaEspecialidad
-    @Nombre = 'Fauna',
-    @Descripcion = 'Especialista en animales';
+EXEC Personal.altaEspecialidad
+    @nombre = 'Fauna',
+    @descripcion = 'Especialista en animales';
 
-EXEC Personal.AltaEspecialidad
-    @Nombre = 'Flora',
-    @Descripcion = 'Especialista en vegetación';
+EXEC Personal.altaEspecialidad
+    @nombre = 'Flora',
+    @descripcion = 'Especialista en vegetación';
 
-EXEC Personal.AltaEspecialidad
-    @Nombre = 'Geologia',
-    @Descripcion = 'Especialista en geología';
+EXEC Personal.altaEspecialidad
+    @nombre = 'Geologia',
+    @descripcion = 'Especialista en geología';
 
 SELECT *
-FROM Personal.Especialidad;
+FROM Personal.especialidad;
 GO
 
 /*=======================================================
@@ -429,9 +429,9 @@ Resultado esperado:
 Error - La especialidad ya existe.
 =======================================================*/
 
-EXEC Personal.AltaEspecialidad
-    @Nombre = 'Fauna',
-    @Descripcion = 'Duplicada';
+EXEC Personal.altaEspecialidad
+    @nombre = 'Fauna',
+    @descripcion = 'Duplicada';
 GO
 
 ---------------------------------------------------------
@@ -443,14 +443,14 @@ Resultado esperado:
 Se modifica correctamente la especialidad.
 =======================================================*/
 
-EXEC Personal.ModificarEspecialidad
-    @CodEspecialidad = 1,
-    @Nombre = 'Fauna Silvestre',
-    @Descripcion = 'Actualizada';
+EXEC Personal.modificarEspecialidad
+    @codEspecialidad = 1,
+    @nombre = 'Fauna Silvestre',
+    @descripcion = 'Actualizada';
 
 SELECT *
-FROM Personal.Especialidad
-WHERE CodEspecialidad = 1;
+FROM Personal.especialidad
+WHERE codEspecialidad = 1;
 GO
 
 /*=======================================================
@@ -459,10 +459,10 @@ Resultado esperado:
 Error - La especialidad no existe.
 =======================================================*/
 
-EXEC Personal.ModificarEspecialidad
-    @CodEspecialidad = 999,
-    @Nombre = 'Prueba',
-    @Descripcion = 'Prueba';
+EXEC Personal.modificarEspecialidad
+    @codEspecialidad = 999,
+    @nombre = 'Prueba',
+    @descripcion = 'Prueba';
 GO
 
 ---------------------------------------------------------
@@ -475,11 +475,11 @@ Resultado esperado:
 Se elimina correctamente la especialidad.
 =======================================================*/
 
-EXEC Personal.BajaEspecialidad
-    @CodEspecialidad = 3;
+EXEC Personal.bajaEspecialidad
+    @codEspecialidad = 3;
 
 SELECT *
-FROM Personal.Especialidad;
+FROM Personal.especialidad;
 GO
 
 /*=======================================================
@@ -495,17 +495,17 @@ Resultado esperado:
 Se crean correctamente 3 guías.
 =======================================================*/
 
-EXEC Personal.AltaGuia
+EXEC Personal.altaGuia
     '11111111','Pedro','Lopez','1985-01-01',1,1;
 
-EXEC Personal.AltaGuia
+EXEC Personal.altaGuia
     '22222222','Maria','Perez','1988-02-02',1,2;
 
-EXEC Personal.AltaGuia
+EXEC Personal.altaGuia
     '33333333','Carlos','Gomez','1990-03-03',2,1;
 
 SELECT *
-FROM Personal.Guias;
+FROM Personal.guias;
 GO
 
 /*=======================================================
@@ -514,7 +514,7 @@ Resultado esperado:
 Error - El documento ya existe.
 =======================================================*/
 
-EXEC Personal.AltaGuia
+EXEC Personal.altaGuia
     '11111111','Juan','Prueba','1995-01-01',1,1;
 GO
 
@@ -528,17 +528,17 @@ Resultado esperado:
 Se modifica correctamente el guía.
 =======================================================*/
 
-EXEC Personal.ModificarGuia
-    @Legajo = 1,
-    @Nombre = 'Pedro Modificado',
-    @Apellido = 'Lopez Modificado',
-    @FechaNacimiento = '1985-01-01',
-    @CodTitulo = 2,
-    @CodEspecialidad = 2;
+EXEC Personal.modificarGuia
+    @legajo = 1,
+    @nombre = 'Pedro Modificado',
+    @apellido = 'Lopez Modificado',
+    @fechaNacimiento = '1985-01-01',
+    @codTitulo = 2,
+    @codEspecialidad = 2;
 
 SELECT *
-FROM Personal.Guias
-WHERE Legajo = 1;
+FROM Personal.guias
+WHERE legajo = 1;
 GO
 
 ---------------------------------------------------------
@@ -550,11 +550,11 @@ Resultado esperado:
 Se elimina correctamente el guía.
 =======================================================*/
 
-EXEC Personal.BajaGuia
-    @Legajo = 3;
+EXEC Personal.bajaGuia
+    @legajo = 3;
 
 SELECT *
-FROM Personal.Guias;
+FROM Personal.guias;
 GO
 
 /*=======================================================
@@ -569,20 +569,20 @@ Resultado esperado:
 Se crean correctamente 3 habilitaciones.
 =======================================================*/
 
-EXEC Personal.AltaHabilitacion
+EXEC Personal.altaHabilitacion
     'Senderismo',
     'Recorridos de senderos';
 
-EXEC Personal.AltaHabilitacion
+EXEC Personal.altaHabilitacion
     'Montañismo',
     'Actividades de montaña';
 
-EXEC Personal.AltaHabilitacion
+EXEC Personal.altaHabilitacion
     'Avistaje',
     'Observación de fauna';
 
 SELECT *
-FROM Personal.Habilitaciones;
+FROM Personal.habilitaciones;
 GO
 ---------------------------------------------------------
 -- MODIFICACION HABILITACIONES
@@ -593,14 +593,14 @@ Resultado esperado:
 Se modifica correctamente la habilitación.
 =======================================================*/
 
-EXEC Personal.ModificarHabilitacion
-    @IDHabilitacion = 1,
-    @Nombre = 'Senderismo Avanzado',
-    @Descripcion = 'Actualizada';
+EXEC Personal.modificarHabilitacion
+    @idHabilitacion = 1,
+    @nombre = 'Senderismo Avanzado',
+    @descripcion = 'Actualizada';
 
 SELECT *
-FROM Personal.Habilitaciones
-WHERE IDHabilitaciones = 1;
+FROM Personal.habilitaciones
+WHERE idHabilitaciones = 1;
 GO
 
 /*=======================================================
@@ -609,10 +609,10 @@ Resultado esperado:
 Error - La habilitación no existe.
 =======================================================*/
 
-EXEC Personal.ModificarHabilitacion
-    @IDHabilitacion = 999,
-    @Nombre = 'Prueba',
-    @Descripcion = 'Prueba';
+EXEC Personal.modificarHabilitacion
+    @idHabilitacion = 999,
+    @nombre = 'Prueba',
+    @descripcion = 'Prueba';
 GO
 ---------------------------------------------------------
 -- BAJA HABILITACIONES
@@ -624,11 +624,11 @@ Resultado esperado:
 Se elimina correctamente la habilitación.
 =======================================================*/
 
-EXEC Personal.BajaHabilitacion
-    @IDHabilitacion = 3;
+EXEC Personal.bajaHabilitacion
+    @idHabilitacion = 3;
 
 SELECT *
-FROM Personal.Habilitaciones;
+FROM Personal.habilitaciones;
 GO
 
 /*=======================================================
@@ -637,8 +637,8 @@ Resultado esperado:
 Error - No se puede eliminar la habilitación porque está asociada a guías.
 =======================================================*/
 
-EXEC Personal.BajaHabilitacion
-    @IDHabilitacion = 1;
+EXEC Personal.bajaHabilitacion
+    @idHabilitacion = 1;
 GO
 
 /*=======================================================
@@ -647,8 +647,8 @@ Resultado esperado:
 Error - La habilitación no existe.
 =======================================================*/
 
-EXEC Personal.BajaHabilitacion
-    @IDHabilitacion = 999;
+EXEC Personal.bajaHabilitacion
+    @idHabilitacion = 999;
 GO
 
 /*=======================================================
@@ -663,15 +663,15 @@ Resultado esperado:
 Se crea correctamente la habilitación de guía.
 =======================================================*/
 
-EXEC Personal.AltaHabilitacionGuia
-    @IDHabilitacion = 1,
-    @LegajoGuia = 1,
-    @IDParque = 1,
-    @FechaComienzo = '2026-01-01',
-    @FechaFin = '2026-12-31';
+EXEC Personal.altaHabilitacionGuia
+    @idHabilitacion = 1,
+    @legajoGuia = 1,
+    @idParque = 1,
+    @fechaComienzo = '2026-01-01',
+    @fechaFin = '2026-12-31';
 
 SELECT *
-FROM Personal.HabilitacionesGuias;
+FROM Personal.habilitacionesGuias;
 GO
 
 
@@ -685,17 +685,17 @@ Resultado esperado:
 Se modifica correctamente la habilitación de guía.
 =======================================================*/
 
-EXEC Personal.ModificarHabilitacionGuia
-    @IDHabilitacionGuia = 1,
-    @IDHabilitacion = 2,
-    @LegajoGuia = 1,
-    @IDParque = 2,
-    @FechaComienzo = '2026-02-01',
-    @FechaFin = '2026-11-30';
+EXEC Personal.modificarHabilitacionGuia
+    @idHabilitacionGuia = 1,
+    @idHabilitacion = 2,
+    @legajoGuia = 1,
+    @idParque = 2,
+    @fechaComienzo = '2026-02-01',
+    @fechaFin = '2026-11-30';
 
 SELECT *
-FROM Personal.HabilitacionesGuias
-WHERE IDHabilitacionGuia = 1;
+FROM Personal.habilitacionesGuias
+WHERE idHabilitacionGuia = 1;
 GO
 
 /*=======================================================
@@ -704,13 +704,13 @@ Resultado esperado:
 Error - La habilitación del guía no existe.
 =======================================================*/
 
-EXEC Personal.ModificarHabilitacionGuia
-    @IDHabilitacionGuia = 999,
-    @IDHabilitacion = 1,
-    @LegajoGuia = 1,
-    @IDParque = 1,
-    @FechaComienzo = '2026-01-01',
-    @FechaFin = '2026-12-31';
+EXEC Personal.modificarHabilitacionGuia
+    @idHabilitacionGuia = 999,
+    @idHabilitacion = 1,
+    @legajoGuia = 1,
+    @idParque = 1,
+    @fechaComienzo = '2026-01-01',
+    @fechaFin = '2026-12-31';
 GO
 
 ---------------------------------------------------------
@@ -723,11 +723,11 @@ Resultado esperado:
 Se elimina correctamente la habilitación del guía.
 =======================================================*/
 
-EXEC Personal.BajaHabilitacionGuia
-    @IDHabilitacionGuia = 1;
+EXEC Personal.bajaHabilitacionGuia
+    @idHabilitacionGuia = 1;
 
 SELECT *
-FROM Personal.HabilitacionesGuias;
+FROM Personal.habilitacionesGuias;
 GO
 
 /*=======================================================
@@ -736,6 +736,6 @@ Resultado esperado:
 Error - La habilitación del guía no existe.
 =======================================================*/
 
-EXEC Personal.BajaHabilitacionGuia
-    @IDHabilitacionGuia = 999;
+EXEC Personal.bajaHabilitacionGuia
+    @idHabilitacionGuia = 999;
 GO
