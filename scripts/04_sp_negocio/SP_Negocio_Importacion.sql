@@ -217,18 +217,17 @@ BEGIN
     SET NOCOUNT ON;
 
     DECLARE @nombreCompleto VARCHAR(200), @hectareas DECIMAL(12, 2);
-    DECLARE @categoriaInternacional VARCHAR(200);
     DECLARE @tipoParque VARCHAR(50), @nombreLimpio VARCHAR(100);
     DECLARE @idParque INT, @errorMsg VARCHAR(500);
     DECLARE @ok INT = 0, @err INT = 0, @saltados INT = 0;
 
     DECLARE c CURSOR LOCAL FAST_FORWARD FOR
-        SELECT nombreCompleto, hectareas, categoriaInternacional
+        SELECT nombreCompleto, hectareas
         FROM Gestion.stagingCiam
         WHERE nombreCompleto IS NOT NULL;
 
     OPEN c;
-    FETCH NEXT FROM c INTO @nombreCompleto, @hectareas, @categoriaInternacional;
+    FETCH NEXT FROM c INTO @nombreCompleto, @hectareas;
 
     WHILE @@FETCH_STATUS = 0
     BEGIN
@@ -252,15 +251,10 @@ BEGIN
                 GOTO NextRow;
             END
 
-            -- Reemplazar guion "-" por NULL en categoria
-            IF @categoriaInternacional = '-' OR LTRIM(RTRIM(@categoriaInternacional)) = ''
-                SET @categoriaInternacional = NULL;
-
             -- Actualizar via parque_Modificar
             EXEC Gestion.parque_Modificar
                 @idParque = @idParque,
-                @superficie = @hectareas,
-                @categoriaInternacional = @categoriaInternacional;
+                @superficie = @hectareas;
 
             INSERT INTO Gestion.logImportacion (origen, nombreCompleto, estado, mensaje)
             VALUES ('CIAM', @nombreCompleto, 'OK', NULL);
@@ -276,7 +270,7 @@ BEGIN
         END CATCH
 
         NextRow:
-        FETCH NEXT FROM c INTO @nombreCompleto, @hectareas, @categoriaInternacional;
+        FETCH NEXT FROM c INTO @nombreCompleto, @hectareas;
     END
 
     CLOSE c;
