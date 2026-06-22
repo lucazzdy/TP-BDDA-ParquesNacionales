@@ -14,143 +14,150 @@ USE GestionParquesNacionales;
 GO
 
 -- VALIDACION Y ELIMINACION DE TABLAS PREVIAS (en orden inverso por las FK)
-IF OBJECT_ID('Ventas.EntradaActividad', 'U') IS NOT NULL DROP TABLE Ventas.EntradaActividad;
-IF OBJECT_ID('Ventas.Entrada', 'U') IS NOT NULL DROP TABLE Ventas.Entrada;
-IF OBJECT_ID('Ventas.Pago', 'U') IS NOT NULL DROP TABLE ventas.Pago;
-IF OBJECT_ID('Ventas.ItemVenta', 'U') IS NOT NULL DROP TABLE ventas.ItemVenta;
-IF OBJECT_ID('Ventas.Venta', 'U') IS NOT NULL DROP TABLE ventas.Venta;
-IF OBJECT_ID('Ventas.PreciosParque', 'U') IS NOT NULL DROP TABLE ventas.PreciosParque;
-IF OBJECT_ID('Ventas.FormaPago', 'U') IS NOT NULL DROP TABLE ventas.FormaPago;
-IF OBJECT_ID('Ventas.Visitante', 'U') IS NOT NULL DROP TABLE ventas.Visitante;
-IF OBJECT_ID('Ventas.TipoVisitante', 'U') IS NOT NULL DROP TABLE ventas.TipoVisitante;
+IF OBJECT_ID('Ventas.entradaActividad', 'U') IS NOT NULL DROP TABLE Ventas.entradaActividad;
+IF OBJECT_ID('Ventas.entrada', 'U') IS NOT NULL DROP TABLE Ventas.entrada;
+IF OBJECT_ID('Ventas.pago', 'U') IS NOT NULL DROP TABLE ventas.pago;
+IF OBJECT_ID('Ventas.itemVenta', 'U') IS NOT NULL DROP TABLE ventas.itemVenta;
+IF OBJECT_ID('Ventas.venta', 'U') IS NOT NULL DROP TABLE ventas.venta;
+IF OBJECT_ID('Ventas.preciosParque', 'U') IS NOT NULL DROP TABLE ventas.preciosParque;
+IF OBJECT_ID('Ventas.formaPago', 'U') IS NOT NULL DROP TABLE ventas.formaPago;
+IF OBJECT_ID('Ventas.visitante', 'U') IS NOT NULL DROP TABLE ventas.visitante;
+IF OBJECT_ID('Ventas.tipoVisitante', 'U') IS NOT NULL DROP TABLE ventas.tipoVisitante;
 GO
 
 
 -- CREACION DE TABLAS
 
-IF OBJECT_ID('Ventas.TipoVisitante', 'U') IS NULL
+IF OBJECT_ID('Ventas.tipoVisitante', 'U') IS NULL
 BEGIN
-    CREATE TABLE Ventas.TipoVisitante(
-        IDTipoVisitante INT IDENTITY(1,1),
-        Descripcion VARCHAR (20) NOT NULL,
-        CONSTRAINT PK_TipoVisitante PRIMARY KEY (IDTipoVisitante)
+    CREATE TABLE Ventas.tipoVisitante(
+        idTipoVisitante INT IDENTITY(1,1),
+        descripcion VARCHAR (20) NOT NULL,
+        CONSTRAINT PK_TipoVisitante PRIMARY KEY (idTipoVisitante)
     )
 END
 GO
 
-IF OBJECT_ID('Ventas.Visitante', 'U') IS NULL
+IF OBJECT_ID('Ventas.visitante', 'U') IS NULL
 BEGIN
-    CREATE TABLE Ventas.Visitante(
-        IDVisitante INT IDENTITY(1,1),
-        IDTipoVisitante INT NOT NULL,
-        Nombre VARCHAR(50) NOT NULL,
-        Apellido VARCHAR (50) NOT NULL,
-        FechaNacimiento DATE NOT NULL CHECK (FechaNacimiento <= GETDATE()),
-        TipoDocumento VARCHAR (20) NOT NULL,
-        NumeroDocumento INT NOT NULL CHECK (NumeroDocumento > 0),
-        CONSTRAINT PK_Visitante PRIMARY KEY (IDVisitante),
-        CONSTRAINT FK_Visitante_TipoVisitante FOREIGN KEY (IDTipoVisitante) REFERENCES Ventas.TipoVisitante (IDTipoVisitante),
-        CONSTRAINT UQ_Visitante_TipoDocumento_NumeroDocumento UNIQUE (TipoDocumento, NumeroDocumento)
+    CREATE TABLE Ventas.visitante(
+        idVisitante INT IDENTITY(1,1),
+        idTipoVisitante INT NOT NULL,
+        nombre VARCHAR(50) NOT NULL,
+        apellido VARCHAR (50) NOT NULL,
+        fechaNacimiento DATE NOT NULL CHECK (fechaNacimiento <= GETDATE()),
+        tipoDocumento VARCHAR (20) NOT NULL,
+        numeroDocumento INT NOT NULL CHECK (numeroDocumento > 0),
+        CONSTRAINT PK_Visitante PRIMARY KEY (idVisitante),
+        CONSTRAINT FK_Visitante_TipoVisitante FOREIGN KEY (idTipoVisitante) REFERENCES Ventas.TipoVisitante (idTipoVisitante),
+        CONSTRAINT UQ_Visitante_TipoDocumento_NumeroDocumento UNIQUE (tipoDocumento, numeroDocumento)
     );
 END
 GO
 
 
-IF OBJECT_ID('Ventas.FormaPago', 'U') IS NULL
+IF OBJECT_ID('Ventas.formaPago', 'U') IS NULL
 BEGIN
-    CREATE TABLE Ventas.FormaPago(
-        IDFormaPago INT IDENTITY(1,1),
-        Descripcion VARCHAR(30) NOT NULL,
-        CONSTRAINT PK_FormaPago PRIMARY KEY (IDFormaPago) 
+    CREATE TABLE Ventas.formaPago(
+        idFormaPago INT IDENTITY(1,1),
+        descripcion VARCHAR(30) NOT NULL,
+        CONSTRAINT PK_FormaPago PRIMARY KEY (idFormaPago) 
     );
 END
 GO
 
-IF OBJECT_ID('Ventas.PreciosParque', 'U') IS NULL
+IF OBJECT_ID('Ventas.preciosParque', 'U') IS NULL
 BEGIN
-    CREATE TABLE Ventas.PreciosParque(
-        IDParque INT NOT NULL,
-        IDTipoVisitante INT NOT NULL,
-        FechaDesde DATE NOT NULL DEFAULT GETDATE(),
-        Precio DECIMAL(10,2) CHECK( Precio >= 0),
-        CONSTRAINT PK_PreciosParque PRIMARY KEY (IDParque, IDTipoVisitante, FechaDesde),
-        CONSTRAINT FK_PreciosParque_TipoVisitante FOREIGN KEY (IDTipoVisitante) REFERENCES Ventas.TipoVisitante(IDTipoVisitante),
-        CONSTRAINT FK_PreciosParque_Parque FOREIGN KEY (IDParque) REFERENCES Gestion.Parque(idParque)
+    CREATE TABLE Ventas.preciosParque(
+        idParque INT NOT NULL,
+        idTipoVisitante INT NOT NULL,
+        fechaDesde DATE NOT NULL DEFAULT GETDATE(),
+        precio DECIMAL(10,2) CHECK( precio >= 0),
+        CONSTRAINT PK_PreciosParque PRIMARY KEY (idParque, idTipoVisitante, fechaDesde),
+        CONSTRAINT FK_PreciosParque_TipoVisitante FOREIGN KEY (idTipoVisitante) REFERENCES Ventas.tipoVisitante(idTipoVisitante),
+        CONSTRAINT FK_PreciosParque_Parque FOREIGN KEY (idParque) REFERENCES Gestion.parque(idParque)
     );
 END
 GO
 
-IF OBJECT_ID('Ventas.Venta', 'U') IS NULL
+IF OBJECT_ID('Ventas.venta', 'U') IS NULL
 BEGIN
-    CREATE TABLE Ventas.Venta(
-        IDVenta INT IDENTITY(1,1),
-        IDParque INT NOT NULL,
-        NumeroFactura INT NOT NULL CHECK (NumeroFactura > 0),
-        PuntoVenta INT NOT NULL CHECK (PuntoVenta > 0),
-        Total DECIMAL(10,2) NOT NULL,
-        CONSTRAINT PK_Venta PRIMARY KEY (IDVenta),
-        CONSTRAINT FK_Venta_Parque FOREIGN KEY (IDParque) REFERENCES Gestion.Parque (idParque),
-        CONSTRAINT UQ_Venta_PuntoVenta_NumeroFactura UNIQUE (PuntoVenta, NumeroFactura)
+    CREATE TABLE Ventas.venta(
+        idVenta INT IDENTITY(1,1),
+        idParque INT NOT NULL,
+        numeroFactura INT NOT NULL CHECK (numeroFactura > 0),
+        puntoVenta INT NOT NULL CHECK (puntoVenta > 0),
+        total DECIMAL(10,2) NOT NULL,
+        CONSTRAINT PK_Venta PRIMARY KEY (idVenta),
+        CONSTRAINT FK_Venta_Parque FOREIGN KEY (idParque) REFERENCES Gestion.parque (idParque),
+        CONSTRAINT UQ_Venta_PuntoVenta_NumeroFactura UNIQUE (puntoVenta, numeroFactura)
     );
 END
 GO
 
-IF OBJECT_ID('Ventas.ItemVenta', 'U') IS NULL
+IF OBJECT_ID('Ventas.itemVenta', 'U') IS NULL
 BEGIN
-    CREATE TABLE Ventas.ItemVenta(
-        IDVenta INT NOT NULL,
-        IDItemVenta INT NOT NULL CHECK(IDItemVenta > 0),
-        TipoItem VARCHAR(20) NOT NULL CHECK (TipoItem IN ('Entrada', 'Actividad')),
-        Cantidad INT NOT NULL CHECK (Cantidad > 0),
-        PrecioUnitario DECIMAL (10,2) NOT NULL CHECK(PrecioUnitario >= 0),
-        CONSTRAINT PK_ItemVenta PRIMARY KEY (IDItemVenta, IDVenta),
-        CONSTRAINT FK_ItemVenta_Venta FOREIGN KEY (IDVenta) REFERENCES Ventas.Venta (IDVenta)
+    CREATE TABLE Ventas.itemVenta(
+        idVenta INT NOT NULL,
+        idItemVenta INT NOT NULL CHECK(idItemVenta > 0),
+        idTipoVisitante INT NULL,
+        idActividad INT NULL,
+        tipoItem VARCHAR(20) NOT NULL,
+        cantidad INT NOT NULL CHECK (cantidad > 0),
+        precioUnitario DECIMAL (10,2) NOT NULL CHECK(precioUnitario >= 0),
+        CONSTRAINT PK_ItemVenta PRIMARY KEY (idItemVenta, idVenta),
+        CONSTRAINT FK_ItemVenta_Venta FOREIGN KEY (idVenta) REFERENCES Ventas.Venta (idVenta),
+        CONSTRAINT FK_ItemVenta_TipoVisitante FOREIGN KEY (idTipoVisitante) REFERENCES Ventas.TipoVisitante(idTipoVisitante),
+        CONSTRAINT FK_ItemVenta_Actividad FOREIGN KEY (idActividad) REFERENCES Actividades.actividad (idActividad),
+        CONSTRAINT CK_ItemVenta_Actividad_TipoVisitante CHECK ((tipoItem = 'Entrada' AND idTipoVisitante IS NOT NULL AND idActividad IS NULL) OR 
+                                                               (tipoItem = 'Actividad' AND idTipoVisitante IS NULL AND idActividad IS NOT NULL)),
     );
 END
 GO
 
-IF OBJECT_ID('Ventas.Pago', 'U') IS NULL
+IF OBJECT_ID('Ventas.pago', 'U') IS NULL
 BEGIN
-    CREATE TABLE Ventas.Pago(
-        IDPago INT IDENTITY(1,1),
-        IDVenta INT NOT NULL,
-        IDFormaPago INT NOT NULL,
-        Fecha DATETIME DEFAULT GETDATE(),
-        Estado NVARCHAR(9) NOT NULL,
-        Importe DECIMAL (10,2) CHECK(Importe > 0),
-        CONSTRAINT PK_Pago PRIMARY KEY (IDPago),
-        CONSTRAINT FK_Pago_Venta FOREIGN KEY (IDVenta) REFERENCES Ventas.Venta (IDVenta),
-        CONSTRAINT FK_Pago_FormaPago FOREIGN KEY (IDFormaPago) REFERENCES Ventas.FormaPago (IDFormaPago)
+    CREATE TABLE Ventas.pago(
+        idPago INT IDENTITY(1,1),
+        idVenta INT NOT NULL,
+        idFormaPago INT NOT NULL,
+        fecha DATETIME DEFAULT GETDATE(),
+        estado NVARCHAR(9) NOT NULL,
+        importe DECIMAL (10,2) CHECK(importe > 0),
+        CONSTRAINT PK_Pago PRIMARY KEY (idPago),
+        CONSTRAINT FK_Pago_Venta FOREIGN KEY (idVenta) REFERENCES Ventas.Venta (idVenta),
+        CONSTRAINT FK_Pago_FormaPago FOREIGN KEY (idFormaPago) REFERENCES Ventas.FormaPago (idFormaPago)
     );
 END
 GO
 
-IF OBJECT_ID('Ventas.Entrada', 'U') IS NULL
+IF OBJECT_ID('Ventas.entrada', 'U') IS NULL
 BEGIN
-    CREATE TABLE Ventas.Entrada (
-        CodigoEntrada CHAR(10) NOT NULL CHECK (CodigoEntrada LIKE '[A-Z]-[0-9][0-9][0-9][0-9][0-9][0-9]-[A-Z]'),
-        FechaAcceso DATE NOT NULL,              
-        FechaCompra DATETIME NOT NULL DEFAULT GETDATE(),
-        IDVisitante INT NOT NULL,               
-        IDParque INT NOT NULL,                  
-        IDTipoVisitante INT NOT NULL,
-        Precio DECIMAL (10,2) NOT NULL CHECK (Precio >= 0)     
-        CONSTRAINT PK_Entrada PRIMARY KEY (CodigoEntrada),
-        CONSTRAINT FK_Entrada_Visitante FOREIGN KEY (IDVisitante) REFERENCES Ventas.Visitante(IDVisitante),
-        CONSTRAINT FK_Entrada_Parque FOREIGN KEY (IDParque)  REFERENCES Gestion.Parque(idParque),
-        CONSTRAINT FK_Entrada_TipoVisitante FOREIGN KEY (IDTipoVisitante) REFERENCES Ventas.TipoVisitante(IDTipoVisitante)
+    CREATE TABLE Ventas.entrada (
+        codigoEntrada CHAR(10) NOT NULL CHECK (codigoEntrada LIKE '[A-Z]-[0-9][0-9][0-9][0-9][0-9][0-9]-[A-Z]'),
+        idVenta INT NOT NULL, CHECK(idVenta > 0),
+        fechaAcceso DATE NOT NULL,              
+        fechaCompra DATETIME NOT NULL DEFAULT GETDATE(),
+        idVisitante INT NOT NULL,               
+        idParque INT NOT NULL,                  
+        idTipoVisitante INT NOT NULL,
+        precio DECIMAL (10,2) NOT NULL CHECK (precio >= 0)     
+        CONSTRAINT PK_Entrada PRIMARY KEY (codigoEntrada),
+        CONSTRAINT FK_Entrada_Visitante FOREIGN KEY (idVisitante) REFERENCES Ventas.Visitante(idVisitante),
+        CONSTRAINT FK_Entrada_Parque FOREIGN KEY (idParque)  REFERENCES Gestion.Parque(idParque),
+        CONSTRAINT FK_Entrada_TipoVisitante FOREIGN KEY (idTipoVisitante) REFERENCES Ventas.TipoVisitante(idTipoVisitante)
     );
 END
 GO
 
 --Esta tabla surge de la relacion N a N entre entrada y actividad
-IF OBJECT_ID('Ventas.EntradaActividad', 'U') IS NULL
+IF OBJECT_ID('Ventas.entradaActividad', 'U') IS NULL
 BEGIN
-    CREATE TABLE Ventas.EntradaActividad (
-        CodigoEntrada CHAR(10) NOT NULL,
-        IDActividad INT NOT NULL,
-        CONSTRAINT PK_Entrada_Actividad PRIMARY KEY (CodigoEntrada, IDActividad),
-        CONSTRAINT FK_Entrada_Actividad_Ent FOREIGN KEY (CodigoEntrada) REFERENCES Ventas.entrada(CodigoEntrada),
-        CONSTRAINT FK_Entrada_Actividad_Act FOREIGN KEY (IDActividad) REFERENCES Actividades.Actividad(idActividad)
+    CREATE TABLE Ventas.entradaActividad (
+        codigoEntrada CHAR(10) NOT NULL,
+        idActividad INT NOT NULL,
+        CONSTRAINT PK_Entrada_Actividad PRIMARY KEY (codigoEntrada, idActividad),
+        CONSTRAINT FK_Entrada_Actividad_Ent FOREIGN KEY (CodigoEntrada) REFERENCES Ventas.entrada(codigoEntrada),
+        CONSTRAINT FK_Entrada_Actividad_Act FOREIGN KEY (idActividad) REFERENCES Actividades.Actividad(idActividad)
     );
 END
