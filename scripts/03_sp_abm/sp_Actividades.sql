@@ -41,7 +41,8 @@ CREATE OR ALTER PROCEDURE Actividades.tipoActividadModificar(
         )
 AS
 BEGIN
-    DECLARE @errorMsg VARCHAR(100)
+    DECLARE @errorMsg VARCHAR(500) = ''
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10)
     
     -- Chequeo que el idTipoActividad a MODIFICAR exista en tabla Actividades.tipoActividad
     IF NOT EXISTS (
@@ -50,13 +51,17 @@ BEGIN
         WHERE idTipoActividad = @idTipoActividad
         )
     BEGIN
-        SET @errorMsg = 'No existe un Tipo de actividad con id: ' + CAST(@idTipoActividad AS VARCHAR)
-        ;THROW 50200, @errorMsg,1
+        SET @errorMsg = 'No existe un Tipo de actividad con id: ' + CAST(@idTipoActividad AS VARCHAR) + '.' + @saltoLinea
     END
 
     IF @descripcion IS NOT NULL AND LEN(@descripcion) > 199
     BEGIN
-        ;THROW 50201, 'La descripcion no puede superar los 200 caracteres',2
+        SET @errorMsg = @errorMsg + '- La descripcion no puede superar los 200 caracteres.' + @saltoLinea
+    END
+
+    IF LEN(@errorMsg) > 0
+    BEGIN
+        ;THROW 50200, @errorMsg,1
     END
 
     UPDATE Actividades.tipoActividad
@@ -100,36 +105,36 @@ CREATE OR ALTER PROCEDURE Actividades.actividadAlta(
         )
 AS
 BEGIN
-    DECLARE @errorMsg VARCHAR(100)
+    DECLARE @errorMsg VARCHAR(500) = ''
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10)
 
     -- Chequeo que el nombre a INSERTAR no prexista en tabla Actividades.actividad
     IF @nombre IN(SELECT nombre FROM Actividades.actividad)
     BEGIN
-        SET @errorMsg = 'Ya existe una actividad con nombre: ' + @nombre
-        ;THROW 51100, @errorMsg,1
+        SET @errorMsg = 'Ya existe una actividad con nombre: ' + @nombre + '.' + @saltoLinea
     END
 
     -- Chequeo que el nombre a INSERTAR no este vacio
     IF LTRIM(RTRIM(@nombre)) = ''
     BEGIN
-        ;THROW 51101, 'El nombre no puede estar vacio!',2
+        SET @errorMsg = @errorMsg + 'El nombre no puede estar vacio!' + @saltoLinea
     END
 
     -- Chequeo que la duracion a INSERTAR no sea NULL
     IF @duracion IS NULL
     BEGIN
-        ;THROW 51102, 'La duracion es un campo obligatorio',3
+        SET @errorMsg = @errorMsg + 'La duracion es un campo obligatorio' + @saltoLinea
     END
     -- Chequeo que la duracion a INSERTAR sea mayor a 0
     IF @duracion <= 0
     BEGIN
-        ;THROW 51103, 'El tiempo de duracion debe ser mayor a 0',4
+        SET @errorMsg = @errorMsg + 'El tiempo de duracion debe ser mayor a 0.' + @saltoLinea
     END
 
     -- Chqueo que el costo a INSERTAR sea 0 (gratis) o mas
     IF @costo < 0
     BEGIN
-        ;THROW 51104, 'El costo debe ser mayor o igual a 0',5
+        SET @errorMsg = @errorMsg + 'El costo debe ser mayor o igual a 0.' + @saltoLinea
     END
 
     -- Chequeo que la idTipoActividad a INSERTAR exista en tabla Actividad.tipoActividad
@@ -139,8 +144,12 @@ BEGIN
         WHERE idTipoActividad = @idTipoActividad
         )
     BEGIN
-        SET @errorMsg = 'No existe un tipo de actividad con id: ' + CAST(@idTipoActividad AS VARCHAR)
-        ;THROW 51105, @errorMsg, 6
+        SET @errorMsg = @errorMsg + 'No existe un tipo de actividad con id: ' + CAST(@idTipoActividad AS VARCHAR) + '.' + @saltoLinea
+    END
+
+    IF LEN(@errorMsg) > 0
+    BEGIN
+        ;THROW 50400, @errorMsg,1
     END
 
     INSERT INTO Actividades.actividad(nombre, costo, duracion, idTipoActividad)
@@ -158,7 +167,8 @@ CREATE OR ALTER PROCEDURE Actividades.actividadModificar(
         )
 AS
 BEGIN
-    DECLARE @errorMsg VARCHAR(100)
+    DECLARE @errorMsg VARCHAR(500)
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10)
 
     -- Chequeo que la actividad a MODIFICAR exista en tabla Actividades.actividad
     IF NOT EXISTS (
@@ -167,33 +177,31 @@ BEGIN
         WHERE idActividad = @idActividad
         )
     BEGIN
-        SET @errorMsg = 'No existe la actividad con id: ' + CAST(@idActividad AS VARCHAR)
-        ;THROW 51200, @errorMsg,1
+        SET @errorMsg = 'No existe la actividad con id: ' + CAST(@idActividad AS VARCHAR) + '.' + @saltoLinea
     END
 
     -- Si se especifica nombre para MODIFICAR este no debe prexistir en la tabla Actividades.actividad
     IF @nombre IS NOT NULL AND @nombre IN(SELECT nombre FROM Actividades.actividad)
     BEGIN
-        SET @errorMsg = 'Ya existe una actividad con nombre: ' + @nombre
-        ;THROW 51201, @errorMsg,2
+        SET @errorMsg = @errorMsg + 'Ya existe una actividad con nombre: ' + @nombre + '.' + @saltoLinea
     END
 
      -- Chequeo que el nombre a MODIFICAR no este vacio
     IF @nombre IS NOT NULL AND LTRIM(RTRIM(@nombre)) = ''
     BEGIN
-        ;THROW 51202, 'El nombre no puede estar vacio!',3
+        SET @errorMsg = @errorMsg + 'El nombre no puede estar vacio!' + @saltoLinea
     END
 
     -- Chequeo que la duracion a MODIFICAR sea mayor a 0
     IF @duracion IS NOT NULL AND @duracion <= 0
     BEGIN
-        ;THROW 51203, 'El tiempo de duracion debe ser mayor a 0',4
+        SET @errorMsg = @errorMsg + 'El tiempo de duracion debe ser mayor a 0.' + @saltoLinea
     END
 
     -- Chequeo que el costo a MODIFICAR no sea negativo
     IF @costo IS NOT NULL AND @costo < 0
     BEGIN
-        ;THROW 51204, 'El costo debe ser mayor o igual a 0',5
+        SET @errorMsg = @errorMsg + 'El costo debe ser mayor o igual a 0.' + @saltoLinea
     END
 
     -- Chequeo que el idTipoActividad a MODIFICAR exista en tabla Actividades.tipoActividad
@@ -204,10 +212,13 @@ BEGIN
         WHERE tipoActividad.idTipoActividad = @idTipoActividad
         )
     BEGIN
-        SET @errorMsg = 'No existe el tipo de actividad con id: ' + CAST(@idTipoActividad AS VARCHAR)
-        ;THROW 51205, @errorMsg, 6
+        SET @errorMsg = @errorMsg + 'No existe el tipo de actividad con id: ' + CAST(@idTipoActividad AS VARCHAR) + '.' + @saltoLinea
     END
 
+    IF LEN(@errorMsg) > 0
+    BEGIN
+        ;THROW 50500, @errorMsg,1
+    END
 
     UPDATE Actividades.actividad
     SET nombre = ISNULL(@nombre, nombre), 
@@ -250,13 +261,15 @@ go
 -- Alta de tour con idActividad, idGuia y fechaInicio obligatorio y fechaDesde actual sino se especifica
 CREATE OR ALTER PROCEDURE Actividades.tourAlta(
         @idActividad INT,
-        @idGuia INT,
+        @legajo INT,
         @fechaInicio DATE,
-        @fechaDesde DATE = NULL
+        @fechaDesde DATE = NULL,
+        @cupoMaximo INT = NULL
         )
 AS
 BEGIN
-    DECLARE @errorMsg VARCHAR(100)
+    DECLARE @errorMsg VARCHAR(500)
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10)
 
       -- Chequeo que el idActividad a INSERTAR exista en tabla Actividades.actividad
     IF NOT EXISTS (
@@ -265,64 +278,83 @@ BEGIN
         WHERE idActividad = @idActividad
     )
     BEGIN
-        SET @errorMsg = 'No existe actividad con id: ' + CAST(@idActividad AS VARCHAR)
-        ;THROW 55100, @errorMsg,1
+        SET @errorMsg = 'No existe actividad con id: ' + CAST(@idActividad AS VARCHAR) + '.' + @saltoLinea
     END
 
-      -- Chequeo que el idGuia a INSERTAR exista en tabla Actividades.Guia
+      -- Chequeo que el legajo a INSERTAR exista en tabla Personal.guias
     IF NOT EXISTS (
         SELECT 1
-        FROM Actividades.Guia
-        WHERE idGuia = @idGuia
+        FROM Personal.guias
+        WHERE legajo = @legajo
     )
     BEGIN
-        SET @errorMsg = 'No existe guia con id: ' + CAST(@idGuia AS VARCHAR)
-        ;THROW 55101, @errorMsg,2
+        SET @errorMsg = @errorMsg + 'No existe guia con legajo: ' + CAST(@legajo AS VARCHAR) + '.' + @saltoLinea
     END
 
     -- Chequeo que fechaInicio a INSERTAR no sea menor a la fecha actual
     IF @fechaInicio < CAST(GETDATE() AS DATE)
     BEGIN
-        ;THROW 55102, 'El tour no puede iniciar previo a la fecha del dia.',3
+        SET @errorMsg = @errorMsg + 'El tour no puede iniciar previo a la fecha del dia.' + @saltoLinea
     END
 
     IF @fechaDesde IS NULL
         SET @fechaDesde = CAST(GETDATE() AS DATE)
 
-    INSERT INTO Actividades.tour(idActividad, idGuia, fechaInicio, fechaDesde)
-    VALUES (@idActividad, @idGuia, @fechaInicio, @fechaDesde)
+    IF @fechaDesde < CAST(GETDATE() AS DATE)
+    BEGIN
+        SET @errorMsg = @errorMsg + 'El tour no puede ser desde tiempo previo a la fecha del dia.' + @saltoLinea
+    END
+
+    IF @cupoMaximo IS NULL
+    BEGIN 
+        SET @errorMsg = @errorMsg + 'El cupo maximo es un campo obligatorio.' + @saltoLinea
+    END
+
+    IF @cupoMaximo <= 0
+    BEGIN
+        SET @errorMsg = @errorMsg + 'El cupo maximo debe ser mayor a 0.' + @saltoLinea
+    END
+
+    IF LEN(@errorMsg) > 0
+    BEGIN
+        ;THROW 50600, @errorMsg,1
+    END
+
+    INSERT INTO Actividades.tour(idActividad, legajo, fechaInicio, fechaDesde, cupoMaximo)
+    VALUES (@idActividad, @legajo, @fechaInicio, @fechaDesde, @cupoMaximo)
 END
 go
 
 -- Modificar datos de tour segun idGuia y idActividad
 CREATE OR ALTER PROCEDURE Actividades.tourModificar(
-        @idGuia INT = NULL,
-        @idGuiaFinal INT = NULL,
+        @legajo INT = NULL,
+        @legajoFinal INT = NULL,
         @idActividad INT = NULL,
         @idActividadFinal INT = NULL,
         @fechaInicio DATE = NULL,
-        @fechaDesde DATE = NULL
+        @fechaDesde DATE = NULL,
+        @cupoMaximo INT = NULL
         )
 AS
 BEGIN
-    DECLARE @errorMsg VARCHAR(100)
+    DECLARE @errorMsg VARCHAR(500)
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10)
 
-    -- Chequeo que el idGuia y idActividad a MODIFICAR no sean ambos NULL
-    IF @idGuia IS NULL AND @idActividad IS NULL
+    -- Chequeo que el legajo y idActividad a MODIFICAR no sean ambos NULL
+    IF @legajo IS NULL AND @idActividad IS NULL
     BEGIN
-        ;THROW 55200,'Se necesita un id de guia o actividad de referencia.',1
+        SET @errorMsg = 'Se necesita un legajo de guia o ID actividad de referencia.' + @saltoLinea
     END
 
-    -- Chequeo que el idGuiaFinal a MODIFICAR exista en tabla Actividades.Guia
-    IF @idGuiaFinal IS NOT NULL 
+    -- Chequeo que el legajoFinal a MODIFICAR exista en tabla Personal.guias
+    IF @legajoFinal IS NOT NULL 
                AND EXISTS (
                    SELECT 1
-                   FROM Actividades.Guia
-                   WHERE idGuia = @idGuiaFinal
+                   FROM Personal.guias
+                   WHERE legajo = @legajoFinal
                    )
     BEGIN
-        SET @errorMsg = 'No existe un guia con id: ' + CAST(@idGuiaFinal AS VARCHAR)
-        ;THROW 55201,@errorMsg,2
+        SET @errorMsg = @errorMsg + 'No existe un guia con legajo: ' + CAST(@legajoFinal AS VARCHAR) + '.' + @saltoLinea
     END
 
     -- Chequeo que el idActividadFinal a MODIFICAR exista en tabla Actividades.actividad
@@ -333,40 +365,61 @@ BEGIN
                    WHERE idActividad = @idActividadFinal
                    )
     BEGIN
-        SET @errorMsg = 'No existe una actividad con id: ' + CAST(@idActividadFinal AS VARCHAR)
-        ;THROW 55202,@errorMsg,3
+        SET @errorMsg = @errorMsg + 'No existe una actividad con id: ' + CAST(@idActividadFinal AS VARCHAR) + '.' + @saltoLinea
     END
 
     -- Chequeo que fechaInicio a MODIFICAR no sea menor a la fecha actual
     IF @fechaInicio IS NOT NULL AND @fechaInicio < CAST(GETDATE() AS DATE)
     BEGIN
-        ;THROW 55203, 'El tour no puede iniciar previo a la fecha del dia.',4
+        SET @errorMsg = @errorMsg + 'El tour no puede iniciar previo a la fecha del dia.' + @saltoLinea
     END
 
     -- Chequeo que fechaDesde a MODIFICAR no sea menor a la fecha actual
     IF @fechaDesde IS NOT NULL AND @fechaDesde < CAST(GETDATE() AS DATE)
     BEGIN
-        ;THROW 55204, 'El tour no puede iniciar previo a la fecha del dia.',5
+        SET @errorMsg = @errorMsg + 'El tour no puede ser desde tiempo previo a la fecha del dia.' + @saltoLinea
+    END
+
+    IF @cupoMaximo IS NOT NULL AND @cupoMaximo <= 0
+    BEGIN
+        SET @errorMsg = @errorMsg + 'El cupo maximo debe ser mayor a 0.' + @saltoLinea
+    END
+
+    IF LEN(@errorMsg) > 0
+    BEGIN
+        ;THROW 50700, @errorMsg,1
     END
 
 
     UPDATE Actividades.tour
-    SET idGuia = ISNULL(@idGuiaFinal, idGuia),
+    SET legajo = ISNULL(@legajoFinal, legajo),
         idActividad = ISNULL(@idActividadFinal, idActividad),
         fechaInicio = ISNULL(@fechaInicio, fechaInicio),
-        fechaDesde = ISNULL(@fechaDesde, fechaDesde)
-    WHERE idGuia = @idGuia AND idActividad = @idActividad
+        fechaDesde = ISNULL(@fechaDesde, fechaDesde),
+        cupoMaximo = ISNULL(@cupoMaximo, cupoMaximo)
+    WHERE legajo = @legajo AND idActividad = @idActividad
 END
 go
 
--- Eliminar una entrada de tour segun idGuia y idActividad
+-- Eliminar una entrada de tour segun legajo y/o idActividad
 CREATE OR ALTER PROCEDURE Actividades.tourBaja(
-        @idGuia INT,
+        @legajo INT,
         @idActividad INT
         )
 AS
 BEGIN
+    DECLARE @errorMsg VARCHAR(100)
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10)
+
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM Actividades.tour
+        WHERE legajo = @legajo AND idActividad = @idActividad
+        )
+        SET @errorMsg = 'No existe un tour con legajo: ' + CAST(@legajo AS VARCHAR) + ' e idActividad: ' + CAST(@idActividad AS VARCHAR) + '.' + @saltoLinea
+        ;THROW 50800, @errorMsg,1
+
     DELETE FROM Actividades.tour
-    WHERE idGuia = @idGuia AND idActividad = @idActividad
+    WHERE legajo = @legajo AND idActividad = @idActividad
 END
 go

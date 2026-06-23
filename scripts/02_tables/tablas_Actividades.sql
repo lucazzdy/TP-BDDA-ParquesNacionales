@@ -58,12 +58,12 @@ go
 
 CREATE TABLE Actividades.tour (
         idActividad INT NOT NULL,
-        idGuia INT NOT NULL,
+        legajo INT NOT NULL,
         fechaInicio DATE NOT NULL,
         fechaDesde DATE NULL,
         cupoMaximo TINYINT NOT NULL CHECK(cupoMaximo > 0),
         
-        CONSTRAINT PK_Tour PRIMARY KEY (idActividad, idGuia, fechaInicio),
+        CONSTRAINT PK_Tour PRIMARY KEY (idActividad, legajo, fechaInicio),
         CONSTRAINT FK_Tour_Actividad FOREIGN KEY (idActividad) REFERENCES Actividades.actividad(idActividad),
-        CONSTRAINT FK_Tour_Guia FOREIGN KEY (idGuia) REFERENCES Actividades.Guia(idGuia)
+        CONSTRAINT FK_Tour_Guia FOREIGN KEY (legajo) REFERENCES Personal.guias(legajo)
     );

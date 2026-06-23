@@ -450,7 +450,262 @@ PRINT '';
 
 SELECT * FROM Actividades.actividad
 
--- TODO: Agregar pruebas para procedimientos de Tour.
+
+
+-- ========================================
+-- 1. PROCEDIMIENTO: tourAlta
+-- ========================================
+PRINT '1. Probando tourAlta...';
+
+--- Comprobamos si hay guías existentes para usar en las pruebas, si no, creamos una guía de prueba con titulo y especialidad válidos. 
+--- Esto es necesario para poder realizar las pruebas de tourAlta, ya que requiere un legajo de guía válido.
+DECLARE @legajoPrueba INT,
+        @codTituloPrueba INT,
+        @codEspecialidadPrueba INT;
+
+IF (SELECT TOP 1 legajo FROM Personal.guias) IS NULL
+BEGIN
+    IF (SELECT TOP 1 codTitulo FROM Personal.titulos) IS NULL
+        BEGIN
+            -- Insertamos un título de prueba si no existe ninguno
+            EXEC Personal.altaTitulo
+                @nombre = 'Titulo Prueba',
+                @descripcion = 'Descripcion Titulo Prueba';
+        END
+    SET @codTituloPrueba = (SELECT TOP 1 codTitulo FROM Personal.titulos)
+
+    IF (SELECT TOP 1 codEspecialidad FROM Personal.especialidad) IS NULL
+    BEGIN
+        -- Insertamos una especialidad de prueba si no existe ninguna
+        EXEC Personal.altaEspecialidad
+            @nombre = 'Especialidad Prueba',
+            @descripcion = 'Descripcion Especialidad Prueba';
+    END
+    SET @codEspecialidadPrueba = (SELECT TOP 1 codEspecialidad FROM Personal.especialidad)
+    
+    EXEC Personal.altaGuia
+            @nombre = 'Guia Prueba',
+            @apellido = 'Apellido Prueba',
+            @documento = '12345678',
+            @codTitulo = @codTituloPrueba,
+            @codEspecialidad = @codEspecialidadPrueba,
+            @fechaNacimiento = '1990-01-01';
+END
+SET @legajoPrueba = (SELECT TOP 1 legajo FROM Personal.guias)
+
+BEGIN TRY
+    -- Caso 1: Alta exitosa con todos los parámetros
+    EXEC Actividades.tourAlta
+        @idActividad = @idActividadTest,
+        @legajo = @legajoPrueba,
+        @fechaInicio = '2026-07-01',
+        @fechaDesde = '2026-07-10',
+        @cupoMaximo = 15;
+    
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Alta - Alta exitoso con todos los parámetros', 'tourAlta', 'EXITOSO', 
+            'Tour registrado correctamente');
+    PRINT 'Caso 1: Alta exitosa';
+END TRY
+BEGIN CATCH
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Alta - Alta exitoso con todos los parámetros', 'tourAlta', 'ERROR', 
+            ERROR_MESSAGE());
+    PRINT 'Caso 1 falló: ' + ERROR_MESSAGE();
+END CATCH
+
+BEGIN TRY
+    -- Caso 2: Alta con fechaDesde NULL (campo opcional)
+    EXEC Actividades.tourAlta
+        @idActividad = @idActividadTest,
+        @legajo = @legajoPrueba,
+        @fechaInicio = '2026-07-15',
+        @fechaDesde = NULL,
+        @cupoMaximo = 10;
+    
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Alta - fechaDesde NULL (campo opcional)', 'tourAlta', 'EXITOSO', 
+            'Tour con fechaDesde NULL registrado');
+    PRINT 'Caso 2: fechaDesde NULL';
+END TRY
+BEGIN CATCH
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Alta - fechaDesde NULL (campo opcional)', 'tourAlta', 'ERROR', 
+            ERROR_MESSAGE());
+    PRINT 'Caso 2 falló: ' + ERROR_MESSAGE();
+END CATCH
+
+BEGIN TRY
+    -- Caso 3: Alta con idActividad inválido (debe fallar)
+    EXEC Actividades.tourAlta
+        @idActividad = 99999,
+        @legajo = @legajoPrueba,
+        @fechaInicio = '2026-07-20',
+        @fechaDesde = '2026-07-25',
+        @cupoMaximo = 10;
+    
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Alta - idActividad inválido (validación FK)', 'tourAlta', 'ERROR', 
+            'Se esperaba error por FK inválida pero el procedimiento fue exitoso');
+    PRINT 'Caso 3: Validación de FK (como se esperaba)';
+END TRY
+BEGIN CATCH
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Alta - idActividad inválido (validación FK)', 'tourAlta', 'EXITOSO', 
+            'Error capturado correctamente: ' + ERROR_MESSAGE());
+    PRINT 'Caso 3: FK validada correctamente';
+END CATCH
+
+BEGIN TRY
+    -- Caso 4: Alta con legajo inválido (debe fallar)
+    EXEC Actividades.tourAlta
+        @idActividad = @idActividadTest,
+        @legajo = 99999,
+        @fechaInicio = '2026-07-30',
+        @fechaDesde = '2026-08-05',
+        @cupoMaximo = 15;
+    
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Alta - legajo inválido (validación FK)', 'tourAlta', 'ERROR', 
+            'Se esperaba error por FK inválida pero el procedimiento fue exitoso');
+    PRINT 'Caso 4: Validación de FK (como se esperaba)';
+END TRY
+BEGIN CATCH
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Alta - legajo inválido (validación FK)', 'tourAlta', 'EXITOSO', 
+            'Error capturado correctamente: ' + ERROR_MESSAGE());
+    PRINT 'Caso 4: FK validada correctamente';
+END CATCH
+
+BEGIN TRY
+    -- Caso 5: Alta con cupoMaximo <= 0 (debe fallar)
+    EXEC Actividades.tourAlta
+        @idActividad = @idActividadTest,
+        @legajo = @legajoPrueba,
+        @fechaInicio = '2026-08-10',
+        @fechaDesde = '2026-08-15',
+        @cupoMaximo = 0;
+    
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Alta - cupoMaximo <= 0 (validación CHECK)', 'tourAlta', 'ERROR', 
+            'Se esperaba error por cupoMaximo inválido pero el procedimiento fue exitoso');
+    PRINT 'Caso 5: Validación de CHECK (como se esperaba)';
+END TRY
+BEGIN CATCH
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Alta - cupoMaximo <= 0 (validación CHECK)', 'tourAlta', 'EXITOSO', 
+            'Error capturado correctamente: ' + ERROR_MESSAGE());
+    PRINT 'Caso 5: Validación de CHECK funcionando';
+END CATCH
+
+-- ========================================
+-- 2. PROCEDIMIENTO: tourModificar
+-- ========================================
+
+BEGIN TRY
+    -- Caso 1: Modificación exitosa de todos los campos
+    EXEC Actividades.tourModificar
+        @idActividad = @idActividadTest,
+        @legajo = @legajoPrueba,
+        @fechaInicio = '2026-07-01',
+        @fechaDesde = '2026-07-15',
+        @cupoMaximo = 20;
+    
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Modificar - Actualización de todos los campos', 'tourModificar', 'EXITOSO', 
+            'Tour modificado correctamente');
+    PRINT 'Caso 1: Modificación exitosa';
+END TRY
+BEGIN CATCH
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Modificar - Actualización de todos los campos', 'tourModificar', 'ERROR', 
+            ERROR_MESSAGE());
+    PRINT 'Caso 1 falló: ' + ERROR_MESSAGE();
+END CATCH
+
+BEGIN TRY
+    -- Caso 2: Modificación con ID inexistente
+    EXEC Actividades.tourModificar
+        @idActividad = 99999,
+        @legajo = 99999,
+        @fechaInicio = '2026-08-01',
+        @fechaDesde = '2026-08-10',
+        @cupoMaximo = 15;
+    
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Modificar - ID inexistente (validación)', 'tourModificar', 'ERROR', 
+            'Se esperaba error con ID inexistente pero fue exitoso');
+    PRINT 'Caso 2: ID inexistente (como se esperaba)';
+END TRY
+BEGIN CATCH
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Modificar - ID inexistente (validación)', 'tourModificar', 'EXITOSO', 
+            'Error capturado correctamente: ' + ERROR_MESSAGE());
+    PRINT 'Caso 2: Validación de ID funcionando';
+END CATCH
+
+BEGIN TRY
+    -- Caso 3: Modificación con cupoMaximo <= 0 (debe fallar)
+    EXEC Actividades.tourModificar
+        @idActividad = @idActividadTest,
+        @legajo = @legajoPrueba,
+        @fechaInicio = '2026-07-01',
+        @fechaDesde = '2026-07-15',
+        @cupoMaximo = 0;
+    
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Modificar - cupoMaximo <= 0 (validación CHECK)', 'tourModificar', 'ERROR', 
+            'Se esperaba error por cupoMaximo inválido pero el procedimiento fue exitoso');
+    PRINT 'Caso 3: Validación de CHECK (como se esperaba)';
+END TRY
+BEGIN CATCH
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Modificar - cupoMaximo <= 0 (validación CHECK)', 'tourModificar', 'EXITOSO', 
+            'Error capturado correctamente: ' + ERROR_MESSAGE());
+    PRINT 'Caso 3: Validación de CHECK funcionando';
+END CATCH
+
+-- ========================================
+-- 3. PROCEDIMIENTO: tourBaja
+-- ========================================
+
+BEGIN TRY
+    -- Caso 1: Baja exitosa
+    EXEC Actividades.tourBaja
+        @idActividad = @idActividadTest,
+        @legajo = @legajoPrueba;
+    
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Baja - Eliminación exitosa', 'tourBaja', 'EXITOSO', 
+            'Tour eliminado correctamente');
+    PRINT 'Caso 1: Baja exitosa';
+END TRY
+BEGIN CATCH
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Baja - Eliminación exitosa', 'tourBaja', 'ERROR', 
+            ERROR_MESSAGE());
+    PRINT 'Caso 1 falló: ' + ERROR_MESSAGE();
+END CATCH
+
+BEGIN TRY
+    -- Caso 2: Baja de ID inexistente
+    EXEC Actividades.tourBaja
+        @idActividad = 99999,
+        @legajo = 99999;
+    
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Baja - ID inexistente (validación)', 'tourBaja', 'ERROR', 
+            'Se esperaba error con ID inexistente pero fue exitoso');
+    PRINT 'Caso 2: ID inexistente (como se esperaba)';
+END TRY
+BEGIN CATCH
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Baja - ID inexistente (validación)', 'tourBaja', 'EXITOSO', 
+            'Error capturado correctamente: ' + ERROR_MESSAGE());
+    PRINT 'Caso 2: Validación de ID funcionando';
+END CATCH
+
+SELECT * FROM Actividades.tour
 
 -- ========================================
 -- REPORTE FINAL
@@ -495,7 +750,10 @@ DELETE FROM Actividades.actividad
 
 DELETE FROM Actividades.tipoActividad 
     WHERE idTipoActividad IN (
-        SELECT TOP 3 idTipoActividad 
+        SELECT TOP 4 idTipoActividad 
         FROM Actividades.tipoActividad 
         ORDER BY idTipoActividad DESC
         );
+
+DELETE FROM Actividades.tour 
+    WHERE idActividad = @idActividadTest AND legajo = @legajoPrueba;
