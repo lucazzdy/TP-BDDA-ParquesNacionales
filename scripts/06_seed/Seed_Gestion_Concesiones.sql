@@ -34,6 +34,61 @@ GO
 
 
 -- ====================================================================
+-- PARQUES DEMO
+-- Suma 10 parques propios del seed (ademas de los importados del SIB)
+-- Cubre distintos tipos y provincias para tener variedad para pruebas
+-- Los IDs de tipoParque se obtienen por nombre porque vienen del SIB
+-- ====================================================================
+DECLARE @idTipoParqueNacional INT, @idTipoReservaNacional INT, 
+        @idTipoMonumentoNatural INT, @idTipoReservaEducativa INT;
+
+SELECT @idTipoParqueNacional = idTipoParque FROM Gestion.tipoParque WHERE nombre = 'Parque Nacional';
+SELECT @idTipoReservaNacional = idTipoParque FROM Gestion.tipoParque WHERE nombre = 'Reserva Nacional';
+SELECT @idTipoMonumentoNatural = idTipoParque FROM Gestion.tipoParque WHERE nombre = 'Monumento Natural';
+SELECT @idTipoReservaEducativa = idTipoParque FROM Gestion.tipoParque WHERE nombre = 'Reserva Natural Educativa';
+
+EXEC Gestion.parque_Alta @nombre = 'Parque Demo Norte', @superficie = 15000, 
+    @idTipoParque = @idTipoParqueNacional, @provincia = 'Salta',
+    @latitud = -24.5, @longitud = -65.0;
+
+EXEC Gestion.parque_Alta @nombre = 'Parque Demo Sur', @superficie = 22000, 
+    @idTipoParque = @idTipoParqueNacional, @provincia = 'Santa Cruz',
+    @latitud = -50.5, @longitud = -71.0;
+
+EXEC Gestion.parque_Alta @nombre = 'Parque Demo Este', @superficie = 8500, 
+    @idTipoParque = @idTipoParqueNacional, @provincia = 'Entre Rios',
+    @latitud = -32.0, @longitud = -58.5;
+
+EXEC Gestion.parque_Alta @nombre = 'Parque Demo Oeste', @superficie = 18000, 
+    @idTipoParque = @idTipoParqueNacional, @provincia = 'Mendoza',
+    @latitud = -34.0, @longitud = -69.5;
+
+EXEC Gestion.parque_Alta @nombre = 'Reserva Demo Centro', @superficie = 5000, 
+    @idTipoParque = @idTipoReservaNacional, @provincia = 'La Pampa',
+    @latitud = -37.5, @longitud = -65.5;
+
+EXEC Gestion.parque_Alta @nombre = 'Reserva Demo Costera', @superficie = 3200, 
+    @idTipoParque = @idTipoReservaNacional, @provincia = 'Buenos Aires',
+    @latitud = -38.0, @longitud = -57.5;
+
+EXEC Gestion.parque_Alta @nombre = 'Monumento Demo Andino', @superficie = 1500, 
+    @idTipoParque = @idTipoMonumentoNatural, @provincia = 'Mendoza',
+    @latitud = -33.5, @longitud = -69.8;
+
+EXEC Gestion.parque_Alta @nombre = 'Reserva Demo Patagonica', @superficie = 12000, 
+    @idTipoParque = @idTipoReservaNacional, @provincia = 'Chubut',
+    @latitud = -44.5, @longitud = -70.0;
+
+EXEC Gestion.parque_Alta @nombre = 'Reserva Demo Litoral', @superficie = 7800, 
+    @idTipoParque = @idTipoReservaEducativa, @provincia = 'Corrientes',
+    @latitud = -28.0, @longitud = -57.0;
+
+EXEC Gestion.parque_Alta @nombre = 'Parque Demo Pampeano', @superficie = 25000, 
+    @idTipoParque = @idTipoParqueNacional, @provincia = 'La Pampa',
+    @latitud = -36.5, @longitud = -64.5;
+
+
+-- ====================================================================
 -- TIPOS DE CONCESION
 -- ====================================================================
 EXEC Concesiones.tipoConcesion_Alta @descripcion = 'Restaurante';
