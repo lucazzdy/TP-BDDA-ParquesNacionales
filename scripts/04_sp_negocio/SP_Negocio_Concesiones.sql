@@ -8,8 +8,9 @@
                     - Zambrana, Mijael
 
     Descripción del Script: Stored procedures de logica de negocio
-                            del esquema Concesiones. Usan transacciones
-                            para operaciones que tocan varias tablas.
+                            del esquema Concesiones. Delegan la
+                            persistencia a los SPs ABM y aplican
+                            transacciones cuando tocan varias tablas.
 */
 
 USE GestionParquesNacionales;
@@ -21,7 +22,7 @@ REGISTRAR CONCESION CON PAGOS
 Alta de concesion + generacion automatica de pagos
 mensuales pendientes (uno por cada mes entre fechaInicio
 y fechaFin). Todo en una transaccion: si algo falla,
-se hace rollback.
+se hace rollback. Delega persistencia a los SPs ABM.
 =========================================================*/
 CREATE OR ALTER PROCEDURE Concesiones.registrarConcesionConPagos
     @idEmpresa INT,
@@ -34,42 +35,23 @@ AS
 BEGIN
     SET NOCOUNT ON;
     DECLARE @errorMsg VARCHAR(500) = '';
-    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
     DECLARE @idConcesion INT;
     DECLARE @fechaActual DATE;
     DECLARE @periodo CHAR(7);
 
-    -- Validaciones previas a la transaccion
-    IF NOT EXISTS (SELECT 1 FROM Concesiones.empresa WHERE idEmpresa = @idEmpresa)
-        SET @errorMsg = @errorMsg + '- No existe una empresa con id: ' + CAST(@idEmpresa AS VARCHAR(10)) + '.' + @saltoLinea;
-
-    IF NOT EXISTS (SELECT 1 FROM Gestion.parque WHERE idParque = @idParque)
-        SET @errorMsg = @errorMsg + '- No existe un parque con id: ' + CAST(@idParque AS VARCHAR(10)) + '.' + @saltoLinea;
-
-    IF NOT EXISTS (SELECT 1 FROM Concesiones.tipoConcesion WHERE idTipoConcesion = @idTipoConcesion)
-        SET @errorMsg = @errorMsg + '- No existe un tipo de concesion con id: ' + CAST(@idTipoConcesion AS VARCHAR(10)) + '.' + @saltoLinea;
-
-    IF @fechaInicio IS NULL OR @fechaFin IS NULL
-        SET @errorMsg = @errorMsg + '- Las fechas de inicio y fin son obligatorias.' + @saltoLinea;
-
-    IF @fechaInicio IS NOT NULL AND @fechaFin IS NOT NULL AND @fechaFin <= @fechaInicio
-        SET @errorMsg = @errorMsg + '- La fecha de fin debe ser posterior a la fecha de inicio.' + @saltoLinea;
-
-    IF @montoCanonMensual IS NULL OR @montoCanonMensual <= 0
-        SET @errorMsg = @errorMsg + '- El monto del canon mensual debe ser mayor a 0.' + @saltoLinea;
-
-    IF LEN(@errorMsg) > 0
-    BEGIN
-        ;THROW 50550, @errorMsg, 1;
-    END
-
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        INSERT INTO Concesiones.concesion (idEmpresa, idParque, idTipoConcesion, fechaInicio, fechaFin, montoCanonMensual)
-        VALUES (@idEmpresa, @idParque, @idTipoConcesion, @fechaInicio, @fechaFin, @montoCanonMensual);
+        EXEC Concesiones.concesion_Alta
+            @idEmpresa = @idEmpresa,
+            @idParque = @idParque,
+            @idTipoConcesion = @idTipoConcesion,
+            @fechaInicio = @fechaInicio,
+            @fechaFin = @fechaFin,
+            @montoCanonMensual = @montoCanonMensual;
 
-        SET @idConcesion = SCOPE_IDENTITY();
+        -- Recupero el id generado por el ABM
+        SET @idConcesion = IDENT_CURRENT('Concesiones.concesion');
 
         -- Generar un pago pendiente por cada mes entre fechaInicio y fechaFin
         SET @fechaActual = @fechaInicio;
@@ -77,8 +59,12 @@ BEGIN
         BEGIN
             SET @periodo = FORMAT(@fechaActual, 'yyyy-MM');
 
-            INSERT INTO Concesiones.pagoCanon (idConcesion, fecha, monto, periodo, estado)
-            VALUES (@idConcesion, @fechaActual, @montoCanonMensual, @periodo, 'Pendiente');
+            EXEC Concesiones.pagoCanon_Alta
+                @idConcesion = @idConcesion,
+                @fecha = @fechaActual,
+                @monto = @montoCanonMensual,
+                @periodo = @periodo,
+                @estado = 'Pendiente';
 
             SET @fechaActual = DATEADD(MONTH, 1, @fechaActual);
         END
@@ -100,7 +86,8 @@ GO
 REGISTRAR PAGO CANON
 Upsert de pago: si existe un pago para ese periodo en estado 
 Pendiente o Atrasado, lo marca como Pagado.
-Si no existe, lo crea como Pagado.
+Si no existe, lo crea como Pagado. Delega persistencia a 
+pagoCanon_Alta y pagoCanon_Modificar.
 =========================================================*/
 CREATE OR ALTER PROCEDURE Concesiones.registrarPagoCanon
     @idConcesion INT,
@@ -112,27 +99,11 @@ BEGIN
     SET NOCOUNT ON;
     DECLARE @errorMsg VARCHAR(500) = '';
     DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
+    DECLARE @idPagoCanonExistente INT;
     DECLARE @estadoActual VARCHAR(20);
 
-    IF NOT EXISTS (SELECT 1 FROM Concesiones.concesion WHERE idConcesion = @idConcesion)
-        SET @errorMsg = @errorMsg + '- No existe una concesion con id: ' + CAST(@idConcesion AS VARCHAR(10)) + '.' + @saltoLinea;
-
-    IF @periodo IS NULL OR @periodo NOT LIKE '[0-9][0-9][0-9][0-9]-[0-1][0-9]'
-        SET @errorMsg = @errorMsg + '- El periodo debe tener el formato YYYY-MM.' + @saltoLinea;
-
-    IF @monto IS NULL OR @monto <= 0
-        SET @errorMsg = @errorMsg + '- El monto del pago debe ser mayor a 0.' + @saltoLinea;
-
-    IF @fecha IS NULL
-        SET @errorMsg = @errorMsg + '- La fecha del pago es obligatoria.' + @saltoLinea;
-
-    IF LEN(@errorMsg) > 0
-    BEGIN
-        ;THROW 50552, @errorMsg, 1;
-    END
-
     -- Verificar si ya existe un registro para este periodo
-    SELECT @estadoActual = estado
+    SELECT @idPagoCanonExistente = idPagoCanon, @estadoActual = estado
     FROM Concesiones.pagoCanon
     WHERE idConcesion = @idConcesion AND periodo = @periodo;
 
@@ -142,20 +113,24 @@ BEGIN
         ;THROW 50553, @errorMsg, 1;
     END
 
-    IF @estadoActual IS NULL
+    IF @idPagoCanonExistente IS NULL
     BEGIN
-        -- No existe, lo creo como Pagado
-        INSERT INTO Concesiones.pagoCanon (idConcesion, fecha, monto, periodo, estado)
-        VALUES (@idConcesion, @fecha, @monto, @periodo, 'Pagado');
+        -- No existe: alta delegada al SP ABM
+        EXEC Concesiones.pagoCanon_Alta
+            @idConcesion = @idConcesion,
+            @fecha = @fecha,
+            @monto = @monto,
+            @periodo = @periodo,
+            @estado = 'Pagado';
     END
     ELSE
     BEGIN
-        -- Existia como Pendiente o Atrasado, lo actualizo
-        UPDATE Concesiones.pagoCanon
-        SET estado = 'Pagado',
-            fecha = @fecha,
-            monto = @monto
-        WHERE idConcesion = @idConcesion AND periodo = @periodo;
+        -- Existia como Pendiente o Atrasado: modificacion delegada al SP ABM
+        EXEC Concesiones.pagoCanon_Modificar
+            @idPagoCanon = @idPagoCanonExistente,
+            @fecha = @fecha,
+            @monto = @monto,
+            @estado = 'Pagado';
     END
 END
 GO
@@ -165,6 +140,8 @@ GO
 MARCAR PAGOS ATRASADOS
 Recorre los pagos en estado Pendiente cuyo periodo ya 
 paso (anterior al mes actual) y los marca como Atrasado.
+Operacion masiva: por performance se hace UPDATE directo
+en lugar de iterar pagoCanon_Modificar fila por fila.
 =========================================================*/
 CREATE OR ALTER PROCEDURE Concesiones.marcarPagosAtrasados
 AS
@@ -188,7 +165,8 @@ GO
 CERRAR CONCESION
 Termina una concesion antes de la fechaFin original.
 Elimina los pagos pendientes futuros (posteriores a 
-fechaCierre). Todo en transaccion.
+fechaCierre). Todo en transaccion. Delega persistencia
+a los SPs ABM (concesion_Modificar y pagoCanon_Baja).
 =========================================================*/
 CREATE OR ALTER PROCEDURE Concesiones.cerrarConcesion
     @idConcesion INT,
@@ -200,6 +178,7 @@ BEGIN
     DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
     DECLARE @fechaInicio DATE, @fechaFinOriginal DATE;
     DECLARE @periodoCierre CHAR(7);
+    DECLARE @idPagoCanonBaja INT;
 
     -- Por defecto se cierra al dia de hoy
     IF @fechaCierre IS NULL
@@ -231,14 +210,27 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        UPDATE Concesiones.concesion
-        SET fechaFin = @fechaCierre
-        WHERE idConcesion = @idConcesion;
+        -- Actualizar fechaFin via SP ABM
+        EXEC Concesiones.concesion_Modificar
+            @idConcesion = @idConcesion,
+            @fechaFin = @fechaCierre;
 
-        DELETE FROM Concesiones.pagoCanon
-        WHERE idConcesion = @idConcesion
-          AND estado = 'Pendiente'
-          AND periodo > @periodoCierre;
+        -- Eliminar pagos pendientes futuros uno por uno via SP ABM
+        WHILE EXISTS (
+            SELECT 1 FROM Concesiones.pagoCanon 
+            WHERE idConcesion = @idConcesion 
+              AND estado = 'Pendiente' 
+              AND periodo > @periodoCierre
+        )
+        BEGIN
+            SELECT TOP 1 @idPagoCanonBaja = idPagoCanon
+            FROM Concesiones.pagoCanon
+            WHERE idConcesion = @idConcesion 
+              AND estado = 'Pendiente' 
+              AND periodo > @periodoCierre;
+
+            EXEC Concesiones.pagoCanon_Baja @idPagoCanon = @idPagoCanonBaja;
+        END
 
         COMMIT TRANSACTION;
     END TRY

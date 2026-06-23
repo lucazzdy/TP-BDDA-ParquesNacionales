@@ -18,7 +18,8 @@ GO
 /*=========================================================
 IMPORTAR PARQUE
 Upsert: si existe un parque con el mismo nombre, actualiza
-sus datos. Si no existe, lo crea.
+sus datos. Si no existe, lo crea. Delega las validaciones
+y la persistencia a los SPs ABM (parque_Alta, parque_Modificar).
 =========================================================*/
 CREATE OR ALTER PROCEDURE Gestion.importarParque
     @nombre VARCHAR(100),
@@ -33,32 +34,7 @@ CREATE OR ALTER PROCEDURE Gestion.importarParque
 AS
 BEGIN
     SET NOCOUNT ON;
-    DECLARE @errorMsg VARCHAR(500) = '';
-    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
     DECLARE @idParqueExistente INT;
-
-    IF @nombre IS NULL OR LTRIM(RTRIM(@nombre)) = ''
-        SET @errorMsg = @errorMsg + '- El nombre del parque es obligatorio.' + @saltoLinea;
-
-    IF @provincia IS NULL OR LTRIM(RTRIM(@provincia)) = ''
-        SET @errorMsg = @errorMsg + '- La provincia es obligatoria.' + @saltoLinea;
-
-    IF @superficie IS NULL OR @superficie <= 0
-        SET @errorMsg = @errorMsg + '- La superficie debe ser mayor a 0.' + @saltoLinea;
-
-    IF NOT EXISTS (SELECT 1 FROM Gestion.tipoParque WHERE idTipoParque = @idTipoParque)
-        SET @errorMsg = @errorMsg + '- No existe un tipo de parque con id: ' + CAST(@idTipoParque AS VARCHAR(10)) + '.' + @saltoLinea;
-
-    IF @latitud IS NOT NULL AND (@latitud < -90 OR @latitud > 90)
-        SET @errorMsg = @errorMsg + '- La latitud debe estar entre -90 y 90.' + @saltoLinea;
-
-    IF @longitud IS NOT NULL AND (@longitud < -180 OR @longitud > 180)
-        SET @errorMsg = @errorMsg + '- La longitud debe estar entre -180 y 180.' + @saltoLinea;
-
-    IF LEN(@errorMsg) > 0
-    BEGIN
-        ;THROW 50150, @errorMsg, 1;
-    END
 
     -- Verifico si el parque ya existe (matchea por nombre)
     SELECT @idParqueExistente = idParque
@@ -67,23 +43,31 @@ BEGIN
 
     IF @idParqueExistente IS NULL
     BEGIN
-        -- No existe: alta
-        INSERT INTO Gestion.parque (nombre, superficie, idTipoParque, provincia, codigoPostal, calle, nro, latitud, longitud)
-        VALUES (@nombre, @superficie, @idTipoParque, @provincia, @codigoPostal, @calle, @nro, @latitud, @longitud);
+        -- No existe: alta delegada al SP ABM
+        EXEC Gestion.parque_Alta 
+            @nombre = @nombre,
+            @superficie = @superficie,
+            @idTipoParque = @idTipoParque,
+            @provincia = @provincia,
+            @codigoPostal = @codigoPostal,
+            @calle = @calle,
+            @nro = @nro,
+            @latitud = @latitud,
+            @longitud = @longitud;
     END
     ELSE
     BEGIN
-        -- Ya existe: actualizo solo los campos que vienen no nulos
-        UPDATE Gestion.parque
-        SET superficie = ISNULL(@superficie, superficie),
-            idTipoParque = ISNULL(@idTipoParque, idTipoParque),
-            provincia = ISNULL(@provincia, provincia),
-            codigoPostal = ISNULL(@codigoPostal, codigoPostal),
-            calle = ISNULL(@calle, calle),
-            nro = ISNULL(@nro, nro),
-            latitud = ISNULL(@latitud, latitud),
-            longitud = ISNULL(@longitud, longitud)
-        WHERE idParque = @idParqueExistente;
+        -- Ya existe: modificacion delegada al SP ABM
+        EXEC Gestion.parque_Modificar
+            @idParque = @idParqueExistente,
+            @superficie = @superficie,
+            @idTipoParque = @idTipoParque,
+            @provincia = @provincia,
+            @codigoPostal = @codigoPostal,
+            @calle = @calle,
+            @nro = @nro,
+            @latitud = @latitud,
+            @longitud = @longitud;
     END
 END
 GO
