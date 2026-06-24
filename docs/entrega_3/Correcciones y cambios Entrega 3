@@ -26,6 +26,7 @@ Cambios Realizados
 .Agregado de la entidad debil PreciosParque relacionado con Parque y tipo de Visitante, de esta forma cada parque tiene sus propios precios y se tener un historial.
 .Correcion de cardinalidad Entre TipoDeVisitante y Visitante (1 - N a N - 1).
 .Cambio de relacion de Ticket Factura, ahora se relaciona con venta y no con pago
+.Agregado de relacion entre Entrada y tipod de visitante para mantener el tipo de visitante al momento de comprar una entrada.
 
 Fecha 18/06/2026
 

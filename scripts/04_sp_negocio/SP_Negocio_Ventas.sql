@@ -17,7 +17,7 @@ BEGIN
     DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
     DECLARE @idTipoVisitante INT;
 
-    DECLARE @precioEntrada DECIMAL(10,2) = NULL;
+    DECLARE @total DECIMAL(10,2) = NULL;
     DECLARE @idVentaGenerado INT;
     DECLARE @cantActividadesAComprar INT;
     DECLARE @cantActividadesEncontradas INT;
@@ -53,10 +53,10 @@ BEGIN
 
     IF @idTipoVisitante IS NOT NULL AND @idParque IS NOT NULL
     BEGIN
-        SELECT TOP 1 @precioEntrada = Precio FROM Ventas.PreciosParque
+        SELECT TOP 1 @total = Precio FROM Ventas.PreciosParque
         WHERE IDParque = @idParque AND IDTipoVisitante = @idTipoVisitante AND FechaDesde <= @fechaAcceso ORDER BY FechaDesde DESC;
 
-        IF @precioEntrada IS NULL
+        IF @total IS NULL
             SET @errorMsg = @errorMsg + '- No hay una tarifa configurada para este tipo de visitante en la fecha elegida.' + @saltoLinea;
     END
 
@@ -87,15 +87,15 @@ BEGIN
             DECLARE @costoActividad DECIMAL(10,2);
 
             INSERT INTO Ventas.Venta (IDParque, NumeroFactura, PuntoVenta, Total)
-            VALUES(@idParque, @numeroFactura, @puntoVenta, @precioEntrada);
+            VALUES(@idParque, @numeroFactura, @puntoVenta, @total);
 
             SET @idVentaGenerado = SCOPE_IDENTITY()
 
             INSERT INTO Ventas.ItemVenta (IDVenta, IDItemVenta, TipoItem, Cantidad, PrecioUnitario)
-            VALUES (@idVentaGenerado, @idItemVenta, 'Entrada', 1, @precioEntrada);
+            VALUES (@idVentaGenerado, @idItemVenta, 'Entrada', 1, @total);
 
             INSERT INTO Ventas.Entrada (CodigoEntrada, FechaAcceso, FechaCompra, IDVisitante, IDParque, IDTipoVisitante, Precio)
-            VALUES(@codigoEntrada, @fechaAcceso, GETDATE(), @idVisitante, @idParque, @idTipoVisitante, @precioEntrada);
+            VALUES(@codigoEntrada, @fechaAcceso, GETDATE(), @idVisitante, @idParque, @idTipoVisitante, @total);
 
             SET @idItemVenta = 2;
 
@@ -119,10 +119,15 @@ BEGIN
 
             IF @cantActividadesAComprar > 0
             BEGIN
-                UPDATE Ventas.Venta 
-                SET Total = (SELECT SUM(PrecioUnitario) FROM Ventas.ItemVenta WHERE IDVenta = @idVentaGenerado)
+                SET @total = (SELECT SUM(PrecioUnitario) FROM Ventas.ItemVenta WHERE IDVenta = @idVentaGenerado)
+
+                UPDATE Ventas.venta 
+                SET Total = @total
                 WHERE IDVenta = @idVentaGenerado;
             END
+
+            INSERT INTO Ventas.Pago (IDVenta, IDFormaPago, Fecha, Estado, Importe)
+            VALUES (@idVentaGenerado, @idFormaPago, GETDATE(), 'Aprobado', @total);
         COMMIT TRANSACTION
     END TRY
     BEGIN CATCH
