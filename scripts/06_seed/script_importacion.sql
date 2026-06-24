@@ -34,7 +34,7 @@ GO
 DECLARE @rutaBase VARCHAR(500) = 'C:\Users\Lucas\Desktop\facu\bda\TP\TP-BDDA-ParquesNacionales\scripts\06_seed\datasets\';
 
 DECLARE @rutaSib VARCHAR(500) = @rutaBase + 'sib_areas_protegidas.xlsx';
-DECLARE @rutaCiam VARCHAR(500) = @rutaBase + 'ciam_superficies.csv';
+DECLARE @rutaCiam VARCHAR(500) = @rutaBase + 'aprn_h_ubicacion_superycatint_ha.csv';
 DECLARE @sql NVARCHAR(MAX);
 
 
@@ -90,9 +90,9 @@ BULK INSERT Gestion.stagingCiam
 FROM ''' + @rutaCiam + '''
 WITH (
     FIELDTERMINATOR = '';'',
-    ROWTERMINATOR = ''0x0A'',
+    ROWTERMINATOR = ''0x0A0D'',
     CODEPAGE = ''65001'',
-    FIRSTROW = 2,                 -- Saltea el encabezado
+    FIRSTROW = 2,
     FIELDQUOTE = ''"''
 );';
 EXEC sp_executesql @sql;

@@ -67,6 +67,11 @@ BEGIN
         SET @tipoParque = 'Reserva Natural Silvestre';
         SET @nombreLimpio = LTRIM(REPLACE(@nombreCompleto, 'Reserva Natural Silvestre ', ''));
     END
+    ELSE IF @nombreCompleto LIKE 'Reserva Natural %'
+    BEGIN
+        SET @tipoParque = 'Reserva Natural';
+        SET @nombreLimpio = LTRIM(REPLACE(@nombreCompleto, 'Reserva Natural ', ''));
+    END
     ELSE IF @nombreCompleto LIKE 'Reserva Nacional %'
     BEGIN
         SET @tipoParque = 'Reserva Nacional';
@@ -129,7 +134,7 @@ BEGIN
         SELECT nombreCompleto, 
                provincia, 
                region, 
-               TRY_CAST(superficie AS DECIMAL(12, 2)),
+               TRY_CAST(TRY_CAST(superficie AS FLOAT) AS DECIMAL(12, 2)),
                TRY_CAST(latitud AS DECIMAL(9, 6)),
                TRY_CAST(longitud AS DECIMAL(9, 6))
         FROM Gestion.stagingSib
@@ -227,7 +232,8 @@ BEGIN
     DECLARE @ok INT = 0, @err INT = 0, @saltados INT = 0;
 
     DECLARE c CURSOR LOCAL FAST_FORWARD FOR
-        SELECT nombreCompleto, TRY_CAST(hectareas AS DECIMAL(12, 2))
+        SELECT REPLACE(REPLACE(nombreCompleto, '"', ''), CHAR(13), ''),
+               TRY_CAST(REPLACE(hectareas, '"', '') AS DECIMAL(12, 2))
         FROM Gestion.stagingCiam
         WHERE nombreCompleto IS NOT NULL;
 
@@ -246,7 +252,7 @@ BEGIN
             -- Buscar el parque por nombre exacto
             SELECT @idParque = idParque 
             FROM Gestion.parque 
-            WHERE nombre = @nombreLimpio;
+            WHERE nombre = @nombreLimpio COLLATE Modern_Spanish_CI_AI;
 
             IF @idParque IS NULL
             BEGIN
