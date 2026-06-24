@@ -104,3 +104,17 @@ TO DISK = 'E:\SQLBackups\BackupCompleto.bak';
 =========================================================
 FIN DEL SCRIPT
 =======================================================*/
+
+-- Comando para Eliminar la Base de Datos
+/*
+USE master;
+GO
+
+ALTER DATABASE GestionParquesNacionales
+SET SINGLE_USER
+WITH ROLLBACK IMMEDIATE;
+GO
+
+DROP DATABASE GestionParquesNacionales;
+GO
+*/

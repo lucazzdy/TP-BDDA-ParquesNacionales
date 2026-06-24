@@ -134,7 +134,7 @@ Error - Ya existe otro guardaparque con ese documento.
 
 EXEC Personal.modificarGuardaparque
     @legajo = 1,
-    @nuevoDocumento = '87654321';
+    @nuevoDocumento = '11111111';
 GO
 
 ---------------------------------------------------------
