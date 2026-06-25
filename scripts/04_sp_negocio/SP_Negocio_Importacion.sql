@@ -299,6 +299,18 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Garantizar que exista la especialidad por defecto
+    DECLARE @codEspecialidadDefault INT;
+    SELECT @codEspecialidadDefault = codEspecialidad 
+    FROM Personal.especialidad WHERE nombre = 'General';
+
+    IF @codEspecialidadDefault IS NULL
+    BEGIN
+        EXEC Personal.altaEspecialidad @nombre = 'General', @descripcion = 'Especialidad por defecto';
+        SELECT @codEspecialidadDefault = codEspecialidad 
+        FROM Personal.especialidad WHERE nombre = 'General';
+    END
+
     DECLARE @origen VARCHAR(20) = 'CSV_GUIAS';
 
     
@@ -337,7 +349,7 @@ BEGIN
         LTRIM(RTRIM(SUBSTRING(apellidoYNombre, 1, CHARINDEX(',', apellidoYNombre) - 1))) AS apellido,
         '1900-01-01' AS fechaNacimiento,
         RTRIM(LTRIM(titulo)) AS nombreTitulo,
-        1 AS codEspecialidad
+        @codEspecialidadDefault AS codEspecialidad
     FROM Personal.stagingCsvGuias
     WHERE apellidoYNombre LIKE '%,%';
 

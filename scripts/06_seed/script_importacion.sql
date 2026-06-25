@@ -105,14 +105,16 @@ SELECT TOP 5 * FROM Gestion.stagingCiam;
 -- PASO 3: cargar el CSV de guias en su staging
 -- ===========================================================
 
+SET @sql = '
 BULK INSERT Personal.stagingCsvGuias
-FROM 'C:\Users\Lucas\Desktop\facu\bda\TP\TP-BDDA-ParquesNacionales\scripts\06_seed\datasets\guias-a-julio-2019.csv' -- Tu ruta física real
+FROM ''' + @rutaGuias + '''
 WITH (
     FIRSTROW = 2,
-    FIELDTERMINATOR = ';',
-    ROWTERMINATOR = '\n',
-    CODEPAGE = '65001' -- UTF-8 para caracteres especiales
-);
+    FIELDTERMINATOR = '';'',
+    ROWTERMINATOR = ''0x0A'',
+    CODEPAGE = ''65001''
+);';
+EXEC sp_executesql @sql;
 
 
 -- ===========================================================
@@ -128,7 +130,7 @@ EXEC Gestion.procesarImportacionCiam;
 
 
 -- ===========================================================
--- PASO 6: procesar la actualizacion del CIAM
+-- PASO 6: procesar la importacion de guias
 -- ===========================================================
 
 EXEC Personal.procesarImportacionGuiasCsv;
@@ -161,4 +163,4 @@ INNER JOIN Gestion.tipoParque tp ON tp.idTipoParque = p.idTipoParque
 ORDER BY p.idParque;
 
 SELECT g.legajo, g.nombre, g.apellido, t.Nombre  FROM Personal.guias g
-INNER JOIN Personal.titulos t ON t.codTitulo = g.legajo
+INNER JOIN Personal.titulos t ON t.codTitulo = g.codTitulo
