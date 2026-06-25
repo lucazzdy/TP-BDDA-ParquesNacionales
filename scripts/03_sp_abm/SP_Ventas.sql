@@ -419,7 +419,8 @@ CREATE OR ALTER PROCEDURE Ventas.venta_Alta
     @idParque INT,
     @numeroFactura INT,
     @puntoVenta INT,
-    @total DECIMAL(10,2)
+    @total DECIMAL(10,2),
+    @idVenta INT OUTPUT
 AS
 BEGIN
     DECLARE @errorMsg VARCHAR(300) = '';
@@ -451,6 +452,8 @@ BEGIN
 
     INSERT INTO Ventas.venta (idParque, numeroFactura, puntoVenta, total)
     VALUES (@idParque, @numeroFactura, @puntoVenta, @total);
+
+    SET @idVenta = SCOPE_IDENTITY();
 END
 GO
 
@@ -695,7 +698,7 @@ BEGIN
     IF @estado IS NULL OR TRIM(@estado) = ''
         SET @errorMsg = @errorMsg + '- El estado del pago no puede estar vacío.' + @saltoLinea;
 
-    IF @importe IS NULL OR @importe <= 0
+    IF @importe IS NULL OR @importe < 0
         SET @errorMsg = @errorMsg + '- El importe debe ser mayor a cero.' + @saltoLinea;
 
     IF LEN(@errorMsg) > 0
@@ -737,7 +740,7 @@ BEGIN
     IF @estado IS NULL OR TRIM(@estado) = ''
         SET @errorMsg = @errorMsg + '- El estado no puede estar vacío.' + @saltoLinea;
 
-    IF @importe IS NULL OR @importe <= 0
+    IF @importe IS NULL OR @importe < 0
         SET @errorMsg = @errorMsg + '- El importe debe ser mayor a cero.' + @saltoLinea;
 
     IF @fecha IS NOT NULL AND @fecha > GETDATE()
@@ -783,6 +786,7 @@ GO
 
 CREATE OR ALTER PROCEDURE Ventas.entrada_Alta
     @codigoEntrada CHAR(10),
+    @idVenta INT,
     @fechaAcceso DATE,
     @fechaCompra DATETIME,
     @idVisitante INT,
@@ -808,6 +812,9 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM Ventas.visitante WHERE idVisitante = @idVisitante)
         SET @errorMsg = @errorMsg + '- El visitante no existe.'  + @saltoLinea;
 
+    IF @idVenta IS NULL OR NOT EXISTS (SELECT 1 FROM Ventas.venta WHERE idVenta = @idVenta)
+        SET @errorMsg = @errorMsg + '- El id de venta ingresado no existe.' + @saltoLinea;
+
     IF NOT EXISTS (SELECT 1 FROM Gestion.parque WHERE idParque = @idParque)
         SET @errorMsg = @errorMsg + '- El parque no existe. ' + @saltoLinea;
 
@@ -827,8 +834,8 @@ BEGIN
     IF @fechaCompra IS NULL 
         SET @fechaCompra = GETDATE();
 
-    INSERT INTO Ventas.entrada (codigoEntrada, fechaAcceso, fechaCompra, idVisitante, idParque, idTipoVisitante, precio)
-    VALUES (@codigoEntrada, @fechaAcceso, @fechaCompra, @idVisitante, @idParque, @idTipoVisitante, @precio);
+    INSERT INTO Ventas.entrada (codigoEntrada, idVenta,fechaAcceso, fechaCompra, idVisitante, idParque, idTipoVisitante, precio)
+    VALUES (@codigoEntrada, @idVenta, @fechaAcceso, @fechaCompra, @idVisitante, @idParque, @idTipoVisitante, @precio);
 END
 GO
 

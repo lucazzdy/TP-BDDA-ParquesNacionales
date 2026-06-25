@@ -44,101 +44,104 @@ GO
     ALTA DE PRECIOS DE PARQUE
    ===========================*/
 
-
-DECLARE @idParque INT = 1;
-
-WHILE @idParque <= 51
+IF NOT EXISTS (SELECT 1 FROM Ventas.preciosParque)
 BEGIN
+    DECLARE @idParque INT = 1;
 
-    EXEC Ventas.preciosParque_Alta 
-        @idParque = @idParque,
-        @idTipoVisitante = 1,
-        @fechaDesde ='2025-01-01',
-        @precio = 12000
+    WHILE @idParque <= 51
+        BEGIN
 
-    EXEC Ventas.preciosParque_Alta 
-        @idParque = @idParque,
-        @idTipoVisitante = 2,
-        @fechaDesde = '2025-01-01',
-        @precio = 9000
+            EXEC Ventas.preciosParque_Alta 
+                @idParque = @idParque,
+                @idTipoVisitante = 1,
+                @fechaDesde ='2025-01-01',
+                @precio = 12000
 
-    EXEC Ventas.preciosParque_Alta 
-        @idParque = @idParque,
-        @idTipoVisitante = 3,
-        @fechaDesde = '2025-01-01',
-        @precio = 45000
+            EXEC Ventas.preciosParque_Alta 
+                @idParque = @idParque,
+                @idTipoVisitante = 2,
+                @fechaDesde = '2025-01-01',
+                @precio = 9000
 
-    EXEC Ventas.preciosParque_Alta 
-        @idParque = @idParque,
-        @idTipoVisitante = 4,
-        @fechaDesde ='2025-01-01',
-        @precio = 15000
+            EXEC Ventas.preciosParque_Alta 
+                @idParque = @idParque,
+                @idTipoVisitante = 3,
+                @fechaDesde = '2025-01-01',
+                @precio = 45000
 
-
-    EXEC Ventas.preciosParque_Alta 
-        @idParque = @idParque,
-        @idTipoVisitante = 5,
-        @fechaDesde ='2025-01-01',
-        @precio = 6000
-
-    EXEC Ventas.preciosParque_Alta 
-        @idParque = @idParque,
-        @idTipoVisitante = 6,
-        @fechaDesde = '2025-01-01',
-        @precio = 7000
-
-    EXEC Ventas.preciosParque_Alta 
-        @idParque = @idParque,
-        @idTipoVisitante = 7,
-        @fechaDesde ='2025-01-01',
-        @precio = 0
-
-    EXEC Ventas.preciosParque_Alta 
-        @idParque = @idParque,
-        @idTipoVisitante = 1,
-        @fechaDesde ='2025-01-01',
-        @precio = 15000
-
-    EXEC Ventas.preciosParque_Alta 
-        @idParque = @idParque,
-        @idTipoVisitante = 2,
-        @fechaDesde = '2025-01-01',
-        @precio = 12000
-
-    EXEC Ventas.preciosParque_Alta 
-        @idParque = @idParque,
-        @idTipoVisitante = 3,
-        @fechaDesde = '2025-01-01',
-        @precio = 55000
-
-    EXEC Ventas.preciosParque_Alta 
-        @idParque = @idParque,
-        @idTipoVisitante = 4,
-        @fechaDesde ='2025-01-01',
-        @precio = 18000
+            EXEC Ventas.preciosParque_Alta 
+                @idParque = @idParque,
+                @idTipoVisitante = 4,
+                @fechaDesde ='2025-01-01',
+                @precio = 15000
 
 
-    EXEC Ventas.preciosParque_Alta 
-        @idParque = @idParque,
-        @idTipoVisitante = 5,
-        @fechaDesde ='2025-01-01',
-        @precio = 8000
+            EXEC Ventas.preciosParque_Alta 
+                @idParque = @idParque,
+                @idTipoVisitante = 5,
+                @fechaDesde ='2025-01-01',
+                @precio = 6000
 
-    EXEC Ventas.preciosParque_Alta 
-        @idParque = @idParque,
-        @idTipoVisitante = 6,
-        @fechaDesde = '2025-01-01',
-        @precio = 9000
+            EXEC Ventas.preciosParque_Alta 
+                @idParque = @idParque,
+                @idTipoVisitante = 6,
+                @fechaDesde = '2025-01-01',
+                @precio = 7000
 
-    EXEC Ventas.preciosParque_Alta 
-        @idParque = @idParque,
-        @idTipoVisitante = 7,
-        @fechaDesde ='2025-01-01',
-        @precio = 0
+            EXEC Ventas.preciosParque_Alta 
+                @idParque = @idParque,
+                @idTipoVisitante = 7,
+                @fechaDesde ='2025-01-01',
+                @precio = 0
 
-    SET @idParque += 1;
+            EXEC Ventas.preciosParque_Alta 
+                @idParque = @idParque,
+                @idTipoVisitante = 1,
+                @fechaDesde ='2026-01-01',
+                @precio = 15000
 
+            EXEC Ventas.preciosParque_Alta 
+                @idParque = @idParque,
+                @idTipoVisitante = 2,
+                @fechaDesde = '2026-01-01',
+                @precio = 12000
+
+            EXEC Ventas.preciosParque_Alta 
+                @idParque = @idParque,
+                @idTipoVisitante = 3,
+                @fechaDesde = '2026-01-01',
+                @precio = 55000
+
+            EXEC Ventas.preciosParque_Alta 
+                @idParque = @idParque,
+                @idTipoVisitante = 4,
+                @fechaDesde ='2026-01-01',
+                @precio = 18000
+
+
+            EXEC Ventas.preciosParque_Alta 
+                @idParque = @idParque,
+                @idTipoVisitante = 5,
+                @fechaDesde ='2026-01-01',
+                @precio = 8000
+
+            EXEC Ventas.preciosParque_Alta 
+                @idParque = @idParque,
+                @idTipoVisitante = 6,
+                @fechaDesde = '2026-01-01',
+                @precio = 9000
+
+            EXEC Ventas.preciosParque_Alta 
+                @idParque = @idParque,
+                @idTipoVisitante = 7,
+                @fechaDesde ='2026-01-01',
+                @precio = 0
+
+            SET @idParque += 1;
+
+        END
 END
+GO
 
 /* ===========================
     ALTA DE VENTAS
@@ -147,6 +150,8 @@ END
 DECLARE @i INT = 1;
 DECLARE @codigoEntrada CHAR(10);
 DECLARE @idVisitante INT;
+DECLARE @idParque INT;
+DECLARE @idTipoVisitante INT;
 DECLARE @idFormaPago INT;
 DECLARE @fechaAcceso DATE;
 DECLARE @puntoVenta INT;
@@ -159,26 +164,25 @@ BEGIN
 
     -- Visitante aleatorio
 
-    SELECT TOP 1
-        @idVisitante = idVisitante
-    FROM Ventas.visitante
+    SELECT TOP 1 
+        @idParque = IDParque, 
+        @idTipoVisitante = IDTipoVisitante 
+    FROM Ventas.PreciosParque 
     ORDER BY NEWID();
 
-    -- Parque aleatorio
-
-    SELECT TOP 1
-        @idParque = idParque
-    FROM Gestion.parque
+    -- Luego busco un visitante que tenga ese @idTipoVisitante
+    SELECT TOP 1 @idVisitante = idVisitante 
+    FROM Ventas.visitante 
+    WHERE idTipoVisitante = @idTipoVisitante
     ORDER BY NEWID();
 
     -- Forma pago
 
-    SET @idFormaPago = 1 + ABS(CHECKSUM(NEWID())) % 5;
-
+    SELECT TOP 1 @idFormaPago = IDFormaPago FROM Ventas.FormaPago ORDER BY NEWID();
 
     -- Fecha acceso
 
-    SET @fechaAcceso = DATEADD(DAY, ABS(CHECKSUM(NEWID())) % 365, '2026-01-01');
+    SET @fechaAcceso = DATEADD(DAY, ABS(CHECKSUM(NEWID())) % 365, '2026-06-01');
 
     -- Factura
 
@@ -190,9 +194,7 @@ BEGIN
 
     -- Codigo entrada
 
-    SET @codigoEntrada =  CHAR(65 + ABS(CHECKSUM(NEWID())) % 26) + '-' + RIGHT('000000' + CAST(@i AS VARCHAR(6)),6)+ '-' + CHAR(65 + ABS(CHECKSUM(NEWID())) % 26);
-
-
+    SET @codigoEntrada = CONCAT(CHAR(65 + ABS(CHECKSUM(NEWID())) % 26), '-', RIGHT('000000' + CAST(@i AS VARCHAR(6)),6), '-', CHAR(65 + ABS(CHECKSUM(NEWID())) % 26));
 
     -- Actividades JSON
     -- algunas ventas sin actividades
@@ -217,7 +219,6 @@ BEGIN
 
 
     EXEC Ventas.procesarVentaIndividual
-
         @codigoEntrada = @codigoEntrada,
         @idVisitante = @idVisitante,
         @fechaAcceso = @fechaAcceso,
@@ -233,95 +234,9 @@ BEGIN
 END
 GO
 
--- lo mismo pero con venta masiva
-
-DECLARE @i INT = 1;
-DECLARE @cantidadVentas INT = 100;
-
-DECLARE @jsonCompra NVARCHAR(MAX);
-DECLARE @numeroFactura INT;
-DECLARE @idParque INT;
-DECLARE @idFormaPago INT;
-
-WHILE @i <= @cantidadVentas
-BEGIN
-
-    SET @idParque = (ABS(CHECKSUM(NEWID())) % 50) + 1;
-    SET @idFormaPago = (ABS(CHECKSUM(NEWID())) % 4) + 1;
-
-    SET @numeroFactura = ABS(CHECKSUM(NEWID())) % 900000 + 100000;
-
-
-    ;WITH Entradas AS
-    (
-        SELECT TOP ((ABS(CHECKSUM(NEWID())) % 5) + 1)
-            ROW_NUMBER() OVER(ORDER BY NEWID()) AS nro,
-            'A-' +
-            RIGHT('000000' + CAST(ABS(CHECKSUM(NEWID())) % 999999 AS VARCHAR(6)),6)
-            + '-' +
-            CHAR(65 + ABS(CHECKSUM(NEWID())) % 26) AS codigoEntrada,
-
-            (ABS(CHECKSUM(NEWID())) % 20) + 1 AS idVisitante,
-
-            CAST(
-                DATEADD(
-                    DAY,
-                    -(ABS(CHECKSUM(NEWID())) % 365),
-                    GETDATE()
-                ) AS DATE
-            ) AS fechaAcceso
-        FROM sys.objects
-    ),
-    Actividades AS
-    (
-        SELECT TOP ((ABS(CHECKSUM(NEWID())) % 5))
-            E.codigoEntrada,
-            (ABS(CHECKSUM(NEWID())) % 10) + 1 AS idActividad
-        FROM Entradas E
-        CROSS APPLY (
-            SELECT 1 AS x
-        ) X
-    )
-    SELECT @jsonCompra =
-    (
-        SELECT
-            (
-                SELECT 
-                    codigoEntrada,
-                    idVisitante,
-                    fechaAcceso
-                FROM Entradas
-                FOR JSON PATH
-            ) AS entradas,
-
-            (
-                SELECT
-                    codigoEntrada,
-                    idActividad
-                FROM Actividades
-                FOR JSON PATH
-            ) AS actividades
-
-        FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
-    );
-
-
-    EXEC Ventas.procesarVentaMasiva
-        @idParque = @idParque,
-        @idFormaPago = @idFormaPago,
-        @puntoVenta = 1,
-        @numeroFactura = @numeroFactura,
-        @jsonCompra = @jsonCompra;
-
-
-    SET @i += 1;
-END
-
-/* =======================
-    VERIFICACION
-   =======================*/
-
 SELECT * FROM Ventas.preciosParque
+SELECT * FROM Ventas.pagos
 SELECT * FROM Ventas.venta
+SELECT * FROM Ventas.itemVenta
 SELECT * FROM Ventas.entrada
 SELECT * FROM Ventas.entradaActividad

@@ -32,7 +32,7 @@ GO
 -- ===========================================================
 -- CONFIGURACION: cada integrante debe ajustar esta ruta
 -- ===========================================================
-DECLARE @rutaBase VARCHAR(500) = 'C:\Users\Lucas\Desktop\facu\bda\TP\TP-BDDA-ParquesNacionales\scripts\06_seed\datasets\';
+DECLARE @rutaBase VARCHAR(500) = 'D:\UNLaM\9no cuatrimestre\Bases de Datos Aplicada\TP\TP-BDDA-ParquesNacionales\scripts\06_seed\datasets\';
 
 DECLARE @rutaSib VARCHAR(500) = @rutaBase + 'sib_areas_protegidas.xlsx';
 DECLARE @rutaCiam VARCHAR(500) = @rutaBase + 'aprn_h_ubicacion_superycatint_ha.csv';

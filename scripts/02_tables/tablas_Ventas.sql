@@ -123,7 +123,7 @@ BEGIN
         idFormaPago INT NOT NULL,
         fecha DATETIME DEFAULT GETDATE(),
         estado NVARCHAR(9) NOT NULL,
-        importe DECIMAL (10,2) CHECK(importe > 0),
+        importe DECIMAL (10,2) CHECK(importe >= 0),
         CONSTRAINT PK_Pago PRIMARY KEY (idPago),
         CONSTRAINT FK_Pago_Venta FOREIGN KEY (idVenta) REFERENCES Ventas.Venta (idVenta),
         CONSTRAINT FK_Pago_FormaPago FOREIGN KEY (idFormaPago) REFERENCES Ventas.FormaPago (idFormaPago)
@@ -143,6 +143,7 @@ BEGIN
         idTipoVisitante INT NOT NULL,
         precio DECIMAL (10,2) NOT NULL CHECK (precio >= 0)     
         CONSTRAINT PK_Entrada PRIMARY KEY (codigoEntrada),
+        CONSTRAINT FK_Entrada_Venta FOREIGN KEY (idVenta) REFERENCES Ventas.venta (idVenta),
         CONSTRAINT FK_Entrada_Visitante FOREIGN KEY (idVisitante) REFERENCES Ventas.Visitante(idVisitante),
         CONSTRAINT FK_Entrada_Parque FOREIGN KEY (idParque)  REFERENCES Gestion.Parque(idParque),
         CONSTRAINT FK_Entrada_TipoVisitante FOREIGN KEY (idTipoVisitante) REFERENCES Ventas.TipoVisitante(idTipoVisitante)

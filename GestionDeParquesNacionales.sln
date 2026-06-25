@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# SQL Server Management Studio Version 22
-VisualStudioVersion = 18.5.11709.299
+# SQL Server Management Studio Version 21
+VisualStudioVersion = 17.14.36603.0 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01_database", "01_database", "{369CB01D-A1A7-72D2-AABC-3F0945D148A2}"
 	ProjectSection(SolutionItems) = preProject
@@ -53,7 +53,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "06_seed", "06_seed", "{1670
 	ProjectSection(SolutionItems) = preProject
 		scripts\06_seed\script_importacion.sql = scripts\06_seed\script_importacion.sql
 		scripts\06_seed\Seed_Actividades.sql = scripts\06_seed\Seed_Actividades.sql
-		scripts\06_seed\Seed_Actividades_Actividades.sql = scripts\06_seed\Seed_Actividades_Actividades.sql
 		scripts\06_seed\Seed_Gestion_Concesiones.sql = scripts\06_seed\Seed_Gestion_Concesiones.sql
 		scripts\06_seed\Seed_Personal.sql = scripts\06_seed\Seed_Personal.sql
 		scripts\06_seed\Seed_Ventas_Entradas_Actividades.sql = scripts\06_seed\Seed_Ventas_Entradas_Actividades.sql
@@ -76,7 +75,7 @@ Global
 		Default|Default = Default|Default
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{72C8522B-FB9F-4867-B435-449B0C6B76EA}.Default|Default.ActiveCfg = Default
+		{78001B93-FDA0-4366-BA78-4A09BB8CA88F}.Default|Default.ActiveCfg = Default
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
