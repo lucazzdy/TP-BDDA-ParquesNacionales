@@ -1,13 +1,13 @@
 /*=======================================================
     Script generado el 15/06/26
 
-Grupo n°7
-Integrantes:    - Acuña, Lucas Daniel
+Grupo nï¿½7
+Integrantes:    - Acuï¿½a, Lucas Daniel
                 - Alesina, Alan
                 - Gutierrez, Lucas Leone
                 - Zambrana, Mijael
 
-Descripción del Script: Este script genera todas las tablas del esquema Personal
+Descripciï¿½n del Script: Este script genera todas las tablas del esquema Personal
 =======================================================*/
 
 USE GestionParquesNacionales;
@@ -114,7 +114,7 @@ GO
 
 CREATE TABLE Personal.titulos(
 	codTitulo INT IDENTITY(1,1),
-	nombre VARCHAR(50) UNIQUE NOT NULL,
+	nombre VARCHAR(100) UNIQUE NOT NULL,
 	descripcion VARCHAR(200) NULL,
 
 	CONSTRAINT PK_Titulos_Guia  PRIMARY KEY (codTitulo)

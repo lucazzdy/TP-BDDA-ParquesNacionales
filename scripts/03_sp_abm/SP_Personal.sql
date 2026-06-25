@@ -1,13 +1,13 @@
 /*=======================================================
     Script generado el 15/06/26
 
-Grupo n°7
-Integrantes:    - Acuña, Lucas Daniel
+Grupo nï¿½7
+Integrantes:    - Acuï¿½a, Lucas Daniel
                 - Alesina, Alan
                 - Gutierrez, Lucas Leone
                 - Zambrana, Mijael
 
-Descripción del Script: Este script genera los stored procedures ABM para el esquema de Personal y sus tablas.
+Descripciï¿½n del Script: Este script genera los stored procedures ABM para el esquema de Personal y sus tablas.
 =======================================================*/
 
 USE GestionParquesNacionales;
@@ -69,11 +69,11 @@ BEGIN
 
     IF @fechaNacimiento >= DATEADD(YEAR, -18, GETDATE())
     BEGIN
-        RAISERROR('La fecha de nacimiento es inválida. Debe ser mayor de 18 años.',16,1);
+        RAISERROR('La fecha de nacimiento es invï¿½lida. Debe ser mayor de 18 aï¿½os.',16,1);
         RETURN;
     END;
 
-    -- Inserción
+    -- Inserciï¿½n
     INSERT INTO Personal.guardaparques
     (
         documento,
@@ -445,7 +445,7 @@ STORE PROCEDURE TABLA TITULOS GUIAS
 
 CREATE OR ALTER PROCEDURE Personal.altaTitulo
 (
-    @nombre VARCHAR(50),
+    @nombre VARCHAR(100),
     @descripcion VARCHAR(200) = NULL
 )
 AS
@@ -458,7 +458,7 @@ BEGIN
         WHERE nombre = @nombre
     )
     BEGIN
-        RAISERROR('Ya existe un título con ese nombre.',16,1);
+        RAISERROR('Ya existe un tï¿½tulo con ese nombre.',16,1);
         RETURN;
     END
 
@@ -483,7 +483,7 @@ GO
 CREATE OR ALTER PROCEDURE Personal.modificarTitulo
 (
     @codTitulo INT,
-    @nombre VARCHAR(50),
+    @nombre VARCHAR(100),
     @descripcion VARCHAR(200) = NULL
 )
 AS
@@ -527,7 +527,7 @@ BEGIN
         WHERE codTitulo = @codTitulo
     )
     BEGIN
-        RAISERROR('No se puede eliminar el titulo porque está asignado a uno o más guias.',16,1);
+        RAISERROR('No se puede eliminar el titulo porque estï¿½ asignado a uno o mï¿½s guias.',16,1);
         RETURN;
     END;
 
@@ -629,7 +629,7 @@ BEGIN
         WHERE codEspecialidad = @codEspecialidad
     )
     BEGIN
-        RAISERROR('No se puede eliminar la especialidad porque está asignada a uno o más guias.',16,1);
+        RAISERROR('No se puede eliminar la especialidad porque estï¿½ asignada a uno o mï¿½s guias.',16,1);
         RETURN;
     END;
 
@@ -688,7 +688,7 @@ BEGIN
         WHERE idHabilitaciones = @idHabilitacion
     )
     BEGIN
-        RAISERROR('La habilitación no existe.',16,1);
+        RAISERROR('La habilitaciï¿½n no existe.',16,1);
         RETURN;
     END;
 
@@ -719,7 +719,7 @@ BEGIN
         WHERE idHabilitaciones = @idHabilitacion
     )
     BEGIN
-        RAISERROR('La habilitación no existe.',16,1);
+        RAISERROR('La habilitaciï¿½n no existe.',16,1);
         RETURN;
     END;
 
@@ -730,7 +730,7 @@ BEGIN
         WHERE idHabilitacion = @idHabilitacion
     )
     BEGIN
-        RAISERROR('No se puede eliminar la habilitación porque está asociada a guias.',16,1);
+        RAISERROR('No se puede eliminar la habilitaciï¿½n porque estï¿½ asociada a guias.',16,1);
         RETURN;
     END;
 
@@ -807,7 +807,7 @@ BEGIN
         WHERE idHabilitacionGuia = @idHabilitacionGuia
     )
     BEGIN
-        RAISERROR('La habilitación del guía no existe.',16,1);
+        RAISERROR('La habilitaciï¿½n del guï¿½a no existe.',16,1);
         RETURN;
     END;
 
@@ -846,7 +846,7 @@ BEGIN
         WHERE idHabilitacionGuia = @idHabilitacionGuia
     )
     BEGIN
-        RAISERROR('La habilitación del guía no existe.',16,1);
+        RAISERROR('La habilitaciï¿½n del guï¿½a no existe.',16,1);
         RETURN;
     END;
 
