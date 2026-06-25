@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# SQL Server Management Studio Version 21
-VisualStudioVersion = 17.14.36603.0 d17.14
+# SQL Server Management Studio Version 22
+VisualStudioVersion = 18.5.11709.299
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01_database", "01_database", "{369CB01D-A1A7-72D2-AABC-3F0945D148A2}"
 	ProjectSection(SolutionItems) = preProject
@@ -29,6 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03_sp_abm", "03_sp_abm", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04_sp_negocio", "04_sp_negocio", "{5835D766-9847-1D08-5E95-5A99FD0F495D}"
 	ProjectSection(SolutionItems) = preProject
+		scripts\04_sp_negocio\SP_Negocio_Actividades.sql = scripts\04_sp_negocio\SP_Negocio_Actividades.sql
 		scripts\04_sp_negocio\SP_Negocio_Concesiones.sql = scripts\04_sp_negocio\SP_Negocio_Concesiones.sql
 		scripts\04_sp_negocio\SP_Negocio_Gestion.sql = scripts\04_sp_negocio\SP_Negocio_Gestion.sql
 		scripts\04_sp_negocio\SP_Negocio_Importacion.sql = scripts\04_sp_negocio\SP_Negocio_Importacion.sql
@@ -57,6 +58,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "07_reportes", "07_reportes", "{D60C296D-AE37-4B7B-8A9D-6F8F141957F6}"
 	ProjectSection(SolutionItems) = preProject
 		scripts\07_reportes\SP_Reportes_GestionConcesiones.sql = scripts\07_reportes\SP_Reportes_GestionConcesiones.sql
+		scripts\07_reportes\SP_Reportes_VisitasParques.sql = scripts\07_reportes\SP_Reportes_VisitasParques.sql
 	EndProjectSection
 EndProject
 Global
@@ -65,6 +67,7 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{5FB5BF9C-0C34-494D-AEB4-1EAE5E6E811A}.Default|Default.ActiveCfg = Default
+		{18182D17-EB3B-4AA1-B168-A6FCECB39C6E}.Default|Default.ActiveCfg = Default
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
