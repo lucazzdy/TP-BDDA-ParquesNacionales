@@ -63,3 +63,7 @@ BEGIN
     ORDER BY pg.fecha;
 END
 GO
+
+SELECT * FROM Ventas.venta
+EXEC Gestion.reporteVisitas;
+EXEC Gestion.reporteIngresos;

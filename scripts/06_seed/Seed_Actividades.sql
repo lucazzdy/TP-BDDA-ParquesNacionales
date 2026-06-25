@@ -22,6 +22,9 @@
 USE GestionParquesNacionales
 GO
 
+TRUNCATE TABLE Actividades.tour;
+TRUNCATE TABLE Actividades.actividad;
+TRUNCATE TABLE Actividades.tipoActividad;
 -- Insertar al menos 10 tipos de actividades
 
 EXEC Actividades.tipoActividadAlta @descripcion = 'Senderismo';
@@ -75,13 +78,14 @@ END
 
 DECLARE @cantidadTours INT = 50,
         @cantidadActividadesExistentes INT = (SELECT COUNT(*) FROM Actividades.actividad),
-        @cantidadGuiasExistentes INT = (SELECT COUNT(*) FROM Personal.guias);
+        @cantidadGuiasExistentes INT = (SELECT COUNT(*) FROM Personal.guias),
+        @legajoInicialGuia INT = (SELECT MIN(legajo) FROM Personal.guias);
 
 WHILE @cantidadTours > 0
 BEGIN
     DECLARE @idActividad INT = (ABS(CHECKSUM(NEWID())) % @cantidadActividadesExistentes + 1); -- ID de actividad entre 1 y cantidad de actividades
 
-    DECLARE @legajoGuia INT = (ABS(CHECKSUM(NEWID())) % @cantidadGuiasExistentes + 1); -- Legajo de guía entre 1 y cantidad de guías
+    DECLARE @legajoGuia INT = (ABS(CHECKSUM(NEWID())) % @cantidadGuiasExistentes + @legajoInicialGuia); -- Legajo de guía entre 1 y cantidad de guías
 
 
     -- Generar una fecha de inicio aleatoria en el rango del año actual
@@ -105,6 +109,7 @@ BEGIN
 
     SET @cantidadTours -= 1;
 END
+
 
 SELECT * FROM Actividades.tipoActividad;
 SELECT * FROM Actividades.actividad;

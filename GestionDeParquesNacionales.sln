@@ -52,7 +52,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "06_seed", "06_seed", "{1670470B-4B64-725C-D0F7-3206B6B2A88E}"
 	ProjectSection(SolutionItems) = preProject
 		scripts\06_seed\script_importacion.sql = scripts\06_seed\script_importacion.sql
-		Seed_Actividades.sql = Seed_Actividades.sql
+		scripts\06_seed\Seed_Actividades.sql = scripts\06_seed\Seed_Actividades.sql
+		scripts\06_seed\Seed_Actividades_Actividades.sql = scripts\06_seed\Seed_Actividades_Actividades.sql
 		scripts\06_seed\Seed_Gestion_Concesiones.sql = scripts\06_seed\Seed_Gestion_Concesiones.sql
 		scripts\06_seed\Seed_Personal.sql = scripts\06_seed\Seed_Personal.sql
 		scripts\06_seed\Seed_Ventas_Entradas_Actividades.sql = scripts\06_seed\Seed_Ventas_Entradas_Actividades.sql
@@ -70,7 +71,7 @@ Global
 		Default|Default = Default|Default
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2EF41D78-414D-484D-B890-22BD14BA08BC}.Default|Default.ActiveCfg = Default
+		{929CEB98-024A-4CCC-8CFA-3E4E996C8EE9}.Default|Default.ActiveCfg = Default
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
