@@ -22,9 +22,6 @@
 USE GestionParquesNacionales
 GO
 
-TRUNCATE TABLE Actividades.tour;
-TRUNCATE TABLE Actividades.actividad;
-TRUNCATE TABLE Actividades.tipoActividad;
 -- Insertar al menos 10 tipos de actividades
 
 EXEC Actividades.tipoActividadAlta @descripcion = 'Senderismo';

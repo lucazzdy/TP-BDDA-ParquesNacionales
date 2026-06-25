@@ -66,12 +66,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "07_reportes", "07_reportes"
 		scripts\07_reportes\SP_Reportes_VisitasParques.sql = scripts\07_reportes\SP_Reportes_VisitasParques.sql
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "08_seguridad", "08_seguridad", "{B8B22326-4D65-49B0-98FA-4542787963AE}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\08_seguridad\SP_Roles_Seguridad.sql = scripts\08_seguridad\SP_Roles_Seguridad.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Default|Default = Default|Default
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{929CEB98-024A-4CCC-8CFA-3E4E996C8EE9}.Default|Default.ActiveCfg = Default
+		{72C8522B-FB9F-4867-B435-449B0C6B76EA}.Default|Default.ActiveCfg = Default
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
