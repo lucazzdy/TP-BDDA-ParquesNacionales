@@ -47,3 +47,19 @@ BEGIN
     );
 END
 GO
+
+-- TABLA registroClima
+
+IF OBJECT_ID('Gestion.registroClima', 'U') IS NULL
+    CREATE TABLE Gestion.registroClima (
+        idRegistro      INT IDENTITY(1,1) PRIMARY KEY,
+        idParque        INT NOT NULL REFERENCES Gestion.parque(idParque),
+        fechaConsulta   DATETIME NOT NULL DEFAULT GETDATE(),
+        temperatura     DECIMAL(5,1) NULL,
+        velocidadViento DECIMAL(6,1) NULL,
+        direccionViento INT NULL,
+        weatherCode     INT NULL,
+        esDeDia         BIT NULL,
+        descripcion     VARCHAR(100) NULL
+    );
+GO
