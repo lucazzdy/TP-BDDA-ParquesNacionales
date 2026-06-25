@@ -29,7 +29,7 @@ EXEC Ventas.tipoVisitante_Alta @descripcion = 'Estudiante';
 EXEC Ventas.tipoVisitante_Alta @descripcion = 'Jubilado';
 EXEC Ventas.tipoVisitante_Alta @descripcion = 'Menor';
 
-SELECT * FROM Ventas.visitante
+SELECT * FROM Ventas.tipoVisitante
 
 -- ====================================================================
 -- FORMAS DE PAGO

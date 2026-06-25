@@ -67,3 +67,46 @@ BEGIN
     );
 END
 GO
+
+DROP TABLE Personal.stagingCsvGuias
+DROP TABLE Personal.stagingTitulos
+DROP TABLE Personal.stagingGuias
+IF OBJECT_ID('Personal.stagingCsvGuias') IS NULL
+BEGIN
+    CREATE TABLE Personal.stagingCsvGuias (
+        leg VARCHAR(50),
+        apellidoYNombre VARCHAR(150),
+        domicilio VARCHAR(150),
+        localidad VARCHAR(100),
+        telefonos VARCHAR(100),
+        titulo VARCHAR(100),
+        doc VARCHAR(50),
+        resol VARCHAR(50),
+        actualizac VARCHAR(50),
+        anoInscri VARCHAR(50),
+        resolReinscrip VARCHAR(50),
+        email VARCHAR(100)
+    );
+    END;
+GO
+
+IF OBJECT_ID('Personal.stagingTitulos') IS NULL
+    BEGIN
+    CREATE TABLE Personal.stagingTitulos (
+        nombre VARCHAR(100)
+    );
+    END
+GO
+
+IF OBJECT_ID('Personal.stagingGuias') IS NULL
+BEGIN
+    CREATE TABLE Personal.stagingGuias (
+        documento CHAR(8),
+        nombre VARCHAR(50),
+        apellido VARCHAR(50),
+        fechaNacimiento DATE,
+        nombreTitulo VARCHAR(100),
+        codEspecialidad INT
+    )
+END;
+GO

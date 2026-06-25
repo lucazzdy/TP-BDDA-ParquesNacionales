@@ -18,39 +18,131 @@
 
 */
 
+USE GestionParquesNacionales
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Gestion.parque)
+BEGIN
+    ;THROW 50801, 'No hay parques cargados. Ejecutar primero script_importacion.sql para importar desde SIB.', 1;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Ventas.visitante)
+BEGIN
+    ;THROW 50802, 'No hay visitantes cargados. Ejecutar primero Seed_Ventas_visitantes.sql', 1;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Actividades.actividad)
+BEGIN
+    ;THROW 50801, 'No hay actividades cargadas. Ejecutar primero Seed_Actividades_Actividades.sql', 1;
+END
+GO
+
+
+/* ===========================
+    ALTA DE PRECIOS DE PARQUE
+   ===========================*/
+
+
 DECLARE @idParque INT = 1;
 
 WHILE @idParque <= 51
 BEGIN
 
-    INSERT INTO Ventas.preciosParque
-    (
-        idParque,
-        idTipoVisitante,
-        fechaDesde,
-        precio
-    )
-    VALUES
-    (@idParque,1,'2025-01-01',12000),
-    (@idParque,2,'2025-01-01',9000),
-    (@idParque,3,'2025-01-01',15000),
-    (@idParque,4,'2025-01-01',45000),
-    (@idParque,5,'2025-01-01',6000),
-    (@idParque,6,'2025-01-01',7000),
-    (@idParque,7,'2025-01-01',0),
+    EXEC Ventas.preciosParque_Alta 
+        @idParque = @idParque,
+        @idTipoVisitante = 1,
+        @fechaDesde ='2025-01-01',
+        @precio = 12000
 
-    (@idParque,1,'2026-01-01',15000),
-    (@idParque,2,'2026-01-01',12000),
-    (@idParque,3,'2026-01-01',18000),
-    (@idParque,4,'2026-01-01',55000),
-    (@idParque,5,'2026-01-01',8000),
-    (@idParque,6,'2026-01-01',9000),
-    (@idParque,7,'2026-01-01',0);
+    EXEC Ventas.preciosParque_Alta 
+        @idParque = @idParque,
+        @idTipoVisitante = 2,
+        @fechaDesde = '2025-01-01',
+        @precio = 9000
+
+    EXEC Ventas.preciosParque_Alta 
+        @idParque = @idParque,
+        @idTipoVisitante = 3,
+        @fechaDesde = '2025-01-01',
+        @precio = 45000
+
+    EXEC Ventas.preciosParque_Alta 
+        @idParque = @idParque,
+        @idTipoVisitante = 4,
+        @fechaDesde ='2025-01-01',
+        @precio = 15000
+
+
+    EXEC Ventas.preciosParque_Alta 
+        @idParque = @idParque,
+        @idTipoVisitante = 5,
+        @fechaDesde ='2025-01-01',
+        @precio = 6000
+
+    EXEC Ventas.preciosParque_Alta 
+        @idParque = @idParque,
+        @idTipoVisitante = 6,
+        @fechaDesde = '2025-01-01',
+        @precio = 7000
+
+    EXEC Ventas.preciosParque_Alta 
+        @idParque = @idParque,
+        @idTipoVisitante = 7,
+        @fechaDesde ='2025-01-01',
+        @precio = 0
+
+    EXEC Ventas.preciosParque_Alta 
+        @idParque = @idParque,
+        @idTipoVisitante = 1,
+        @fechaDesde ='2025-01-01',
+        @precio = 15000
+
+    EXEC Ventas.preciosParque_Alta 
+        @idParque = @idParque,
+        @idTipoVisitante = 2,
+        @fechaDesde = '2025-01-01',
+        @precio = 12000
+
+    EXEC Ventas.preciosParque_Alta 
+        @idParque = @idParque,
+        @idTipoVisitante = 3,
+        @fechaDesde = '2025-01-01',
+        @precio = 55000
+
+    EXEC Ventas.preciosParque_Alta 
+        @idParque = @idParque,
+        @idTipoVisitante = 4,
+        @fechaDesde ='2025-01-01',
+        @precio = 18000
+
+
+    EXEC Ventas.preciosParque_Alta 
+        @idParque = @idParque,
+        @idTipoVisitante = 5,
+        @fechaDesde ='2025-01-01',
+        @precio = 8000
+
+    EXEC Ventas.preciosParque_Alta 
+        @idParque = @idParque,
+        @idTipoVisitante = 6,
+        @fechaDesde = '2025-01-01',
+        @precio = 9000
+
+    EXEC Ventas.preciosParque_Alta 
+        @idParque = @idParque,
+        @idTipoVisitante = 7,
+        @fechaDesde ='2025-01-01',
+        @precio = 0
 
     SET @idParque += 1;
 
 END
 
+/* ===========================
+    ALTA DE VENTAS
+   ===========================*/
 
 DECLARE @i INT = 1;
 DECLARE @codigoEntrada CHAR(10);
@@ -81,23 +173,19 @@ BEGIN
 
     -- Forma pago
 
-    SET @idFormaPago =
-        1 + ABS(CHECKSUM(NEWID())) % 5;
+    SET @idFormaPago = 1 + ABS(CHECKSUM(NEWID())) % 5;
 
 
     -- Fecha acceso
 
-    SET @fechaAcceso =
-        DATEADD(DAY, ABS(CHECKSUM(NEWID())) % 365, '2026-01-01');
+    SET @fechaAcceso = DATEADD(DAY, ABS(CHECKSUM(NEWID())) % 365, '2026-01-01');
 
     -- Factura
 
-    SET @puntoVenta =
-        1 + ABS(CHECKSUM(NEWID())) % 5;
+    SET @puntoVenta = 1 + ABS(CHECKSUM(NEWID())) % 5;
 
 
-    SET @numeroFactura =
-        500000 + @i;
+    SET @numeroFactura = 500000 + @i;
 
 
     -- Codigo entrada
@@ -228,3 +316,12 @@ BEGIN
 
     SET @i += 1;
 END
+
+/* =======================
+    VERIFICACION
+   =======================*/
+
+SELECT * FROM Ventas.preciosParque
+SELECT * FROM Ventas.venta
+SELECT * FROM Ventas.entrada
+SELECT * FROM Ventas.entradaActividad

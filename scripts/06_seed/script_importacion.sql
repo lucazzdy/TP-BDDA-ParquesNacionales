@@ -13,6 +13,7 @@
 
     - SIB:  https://sib.gob.ar/areas-protegidas    (XLSX nativo via OPENROWSET)
     - CIAM: https://ciam.ambiente.gob.ar/repositorio.php?tid=5
+    - GUIAS:https://datosabiertos.mendoza.gov.ar/dataset/guias-turisticos/archivo/d81872d8-890d-42c3-8624-34117bc88f53
 
     PREREQUISITOS:
     1. Driver Microsoft.ACE.OLEDB.12.0 instalado.
@@ -35,6 +36,7 @@ DECLARE @rutaBase VARCHAR(500) = 'C:\Users\Lucas\Desktop\facu\bda\TP\TP-BDDA-Par
 
 DECLARE @rutaSib VARCHAR(500) = @rutaBase + 'sib_areas_protegidas.xlsx';
 DECLARE @rutaCiam VARCHAR(500) = @rutaBase + 'aprn_h_ubicacion_superycatint_ha.csv';
+DECLARE @rutaGuias VARCHAR(500) = @rutaBase + 'guias-a-julio-2019.csv';
 DECLARE @sql NVARCHAR(MAX);
 
 
@@ -44,7 +46,7 @@ DECLARE @sql NVARCHAR(MAX);
 TRUNCATE TABLE Gestion.stagingSib;
 TRUNCATE TABLE Gestion.stagingCiam;
 TRUNCATE TABLE Gestion.logImportacion;
-
+TRUNCATE TABLE Personal.stagingCsvGuias;
 
 -- ===========================================================
 -- PASO 1: leer el XLSX del SIB con OPENROWSET y cargar en staging
@@ -99,17 +101,37 @@ EXEC sp_executesql @sql;
 
 SELECT TOP 5 * FROM Gestion.stagingCiam;
 
+-- ===========================================================
+-- PASO 3: cargar el CSV de guias en su staging
+-- ===========================================================
+
+BULK INSERT Personal.stagingCsvGuias
+FROM 'C:\Users\Lucas\Desktop\facu\bda\TP\TP-BDDA-ParquesNacionales\scripts\06_seed\datasets\guias-a-julio-2019.csv' -- Tu ruta física real
+WITH (
+    FIRSTROW = 2,
+    FIELDTERMINATOR = ';',
+    ROWTERMINATOR = '\n',
+    CODEPAGE = '65001' -- UTF-8 para caracteres especiales
+);
+
 
 -- ===========================================================
--- PASO 3: procesar la importacion del SIB
+-- PASO 4: procesar la importacion del SIB
 -- ===========================================================
 EXEC Gestion.procesarImportacionSib;
 
 
 -- ===========================================================
--- PASO 4: procesar la actualizacion del CIAM
+-- PASO 5: procesar la actualizacion del CIAM
 -- ===========================================================
 EXEC Gestion.procesarImportacionCiam;
+
+
+-- ===========================================================
+-- PASO 6: procesar la actualizacion del CIAM
+-- ===========================================================
+
+EXEC Personal.procesarImportacionGuiasCsv;
 
 
 -- ===========================================================
@@ -137,3 +159,6 @@ SELECT
 FROM Gestion.parque p
 INNER JOIN Gestion.tipoParque tp ON tp.idTipoParque = p.idTipoParque
 ORDER BY p.idParque;
+
+SELECT g.legajo, g.nombre, g.apellido, t.Nombre  FROM Personal.guias g
+INNER JOIN Personal.titulos t ON t.codTitulo = g.legajo

@@ -292,3 +292,177 @@ BEGIN
            (@ok + @err + @saltados) AS total;
 END
 GO
+
+
+CREATE OR ALTER PROCEDURE Personal.procesarImportacionGuiasCsv
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @origen VARCHAR(20) = 'CSV_GUIAS';
+
+    
+    DECLARE @tituloNombre VARCHAR(50);
+    DECLARE @vCodTitulo INT;
+
+    
+    DECLARE @guiaDocumento CHAR(8);
+    DECLARE @guiaNombre VARCHAR(50);
+    DECLARE @guiaApellido VARCHAR(50);
+    DECLARE @guiaFechaNac DATE;
+    DECLARE @guiaNombreTitulo VARCHAR(50);
+    DECLARE @guiaCodEspecialidad INT;
+    DECLARE @vLegajo INT;
+
+    
+    DECLARE @nombreCompletoLog VARCHAR(200);
+    DECLARE @estadoLog VARCHAR(20);
+    DECLARE @mensajeLog VARCHAR(500);
+
+    -- aseguramos que las tablas de staging interno estén vacías
+    TRUNCATE TABLE Personal.stagingTitulos;
+    TRUNCATE TABLE Personal.stagingGuias;
+
+    -- 1. PROCESAMIENTO Y TRASPASO EN STAGING
+
+    INSERT INTO Personal.stagingTitulos (nombre)
+    SELECT DISTINCT RTRIM(LTRIM(titulo))
+    FROM Personal.stagingCsvGuias
+    WHERE titulo IS NOT NULL AND titulo <> '';
+
+    INSERT INTO Personal.stagingGuias (documento, nombre, apellido, fechaNacimiento, nombreTitulo, codEspecialidad)
+    SELECT 
+        RIGHT('00000000' + LTRIM(RTRIM(doc)), 8) AS documento, --normalizo el documento
+        LTRIM(RTRIM(SUBSTRING(apellidoYNombre, CHARINDEX(',', apellidoYNombre) + 1, LEN(apellidoYNombre)))) AS nombre,
+        LTRIM(RTRIM(SUBSTRING(apellidoYNombre, 1, CHARINDEX(',', apellidoYNombre) - 1))) AS apellido,
+        '1900-01-01' AS fechaNacimiento,
+        RTRIM(LTRIM(titulo)) AS nombreTitulo,
+        1 AS codEspecialidad
+    FROM Personal.stagingCsvGuias
+    WHERE apellidoYNombre LIKE '%,%';
+
+    -- 2. PROCESAMIENTO FILA POR FILA: TITULOS
+    
+    DECLARE cursorTitulos CURSOR LOCAL FAST_FORWARD FOR
+    SELECT nombre FROM Personal.stagingTitulos WHERE nombre IS NOT NULL;
+
+    OPEN cursorTitulos;
+    FETCH NEXT FROM cursorTitulos INTO @tituloNombre;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        SELECT @vCodTitulo = codTitulo FROM Personal.titulos WHERE nombre = @tituloNombre;
+
+        BEGIN TRY
+            IF @vCodTitulo IS NOT NULL
+            BEGIN
+                -- Si ya existe, lo modificamos
+                EXEC Personal.modificarTitulo @codTitulo = @vCodTitulo, @nombre = @tituloNombre, @descripcion = 'Actualizado vía SP';
+            END
+            ELSE
+            BEGIN
+                -- Si no existe, lo damos de alta
+                EXEC Personal.altaTitulo @nombre = @tituloNombre, @descripcion = 'Alta vía SP';
+            END
+        END TRY
+        BEGIN CATCH
+            -- Si falla un título individual, se registra en el log pero el proceso continúa
+            SET @mensajeLog = 'Error procesando título ' + @tituloNombre + ': ' + SUBSTRING(ERROR_MESSAGE(), 1, 400);
+            INSERT INTO Gestion.logImportacion (origen, nombreCompleto, estado, mensaje)
+            VALUES (@origen, @tituloNombre, 'ERROR', @mensajeLog);
+        END CATCH;
+
+        FETCH NEXT FROM cursorTitulos INTO @tituloNombre;
+    END;
+
+    CLOSE cursorTitulos;
+    DEALLOCATE cursorTitulos;
+
+    -- 3. PROCESAMIENTO FILA POR FILA: GUIAS (CON LOGS INDIVIDUALES)
+
+    DECLARE cursorGuias CURSOR LOCAL FAST_FORWARD FOR
+    SELECT documento, nombre, apellido, fechaNacimiento, nombreTitulo, codEspecialidad
+    FROM Personal.stagingGuias;
+
+    OPEN cursorGuias;
+    FETCH NEXT FROM cursorGuias INTO @guiaDocumento, @guiaNombre, @guiaApellido, @guiaFechaNac, @guiaNombreTitulo, @guiaCodEspecialidad;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        SET @nombreCompletoLog = @guiaApellido + ', ' + @guiaNombre;
+        SET @vCodTitulo = NULL;
+        SET @vLegajo = NULL;
+
+        -- Resolvemos el id del título para pasarlo como parámetro
+        SELECT @vCodTitulo = codTitulo FROM Personal.titulos WHERE nombre = @guiaNombreTitulo;
+
+        IF @vCodTitulo IS NOT NULL
+        BEGIN
+            -- Verificamos si el guía ya existe por documento para obtener su legajo
+            SELECT @vLegajo = legajo FROM Personal.guias WHERE documento = @guiaDocumento;
+
+            -- Cada operación individual corre bajo su propia transacción atómica
+            BEGIN TRANSACTION;
+            BEGIN TRY
+                IF @vLegajo IS NOT NULL
+                BEGIN
+                    -- UPDATE usando tu SP modificarGuia
+                    EXEC Personal.modificarGuia 
+                        @legajo = @vLegajo, 
+                        @nombre = @guiaNombre, 
+                        @apellido = @guiaApellido, 
+                        @fechaNacimiento = @guiaFechaNac, 
+                        @codTitulo = @vCodTitulo, 
+                        @codEspecialidad = @guiaCodEspecialidad;
+
+                    SET @mensajeLog = 'Guía actualizado correctamente. Legajo: ' + CAST(@vLegajo AS VARCHAR(10));
+                    SET @estadoLog = 'OK';
+                END
+                ELSE
+                BEGIN
+                    -- INSERT usando tu SP altaGuia
+                    EXEC Personal.altaGuia 
+                        @documento = @guiaDocumento, 
+                        @nombre = @guiaNombre, 
+                        @apellido = @guiaApellido, 
+                        @fechaNacimiento = @guiaFechaNac, 
+                        @codTitulo = @vCodTitulo, 
+                        @codEspecialidad = @guiaCodEspecialidad;
+
+                    SET @mensajeLog = 'Guía dado de alta correctamente. Doc: ' + @guiaDocumento;
+                    SET @estadoLog = 'OK';
+                END
+
+                COMMIT TRANSACTION;
+            END TRY
+            BEGIN CATCH
+                ROLLBACK TRANSACTION;
+                SET @mensajeLog = 'Fallo al procesar guía: ' + SUBSTRING(ERROR_MESSAGE(), 1, 400);
+                SET @estadoLog = 'ERROR';
+            END CATCH;
+        END
+        ELSE
+        BEGIN
+            SET @mensajeLog = 'Saltado: No se encontró un ID válido para el título: ' + ISNULL(@guiaNombreTitulo, 'NULO');
+            SET @estadoLog = 'SALTADO';
+        END
+
+        -- Escribimos el resultado de la fila en tu tabla de logs
+        INSERT INTO Gestion.logImportacion (origen, nombreCompleto, estado, mensaje)
+        VALUES (@origen, @nombreCompletoLog, @estadoLog, @mensajeLog);
+
+        FETCH NEXT FROM cursorGuias INTO @guiaDocumento, @guiaNombre, @guiaApellido, @guiaFechaNac, @guiaNombreTitulo, @guiaCodEspecialidad;
+    END;
+
+    CLOSE cursorGuias;
+    DEALLOCATE cursorGuias;
+
+    -- 4. LIMPIEZA FINAL DE LAS TABLAS DE STAGING
+    TRUNCATE TABLE Personal.stagingCsvGuias;
+    TRUNCATE TABLE Personal.stagingTitulos;
+    TRUNCATE TABLE Personal.stagingGuias;
+
+    INSERT INTO Gestion.logImportacion (origen, nombreCompleto, estado, mensaje)
+    VALUES (@origen, 'PROCESO_GLOBAL', 'OK', 'Finalizó la ejecución completa del Stored Procedure.');
+END;
+GO

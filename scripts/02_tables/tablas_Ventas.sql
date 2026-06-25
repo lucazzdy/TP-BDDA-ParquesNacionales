@@ -157,7 +157,7 @@ BEGIN
         codigoEntrada CHAR(10) NOT NULL,
         idActividad INT NOT NULL,
         CONSTRAINT PK_Entrada_Actividad PRIMARY KEY (codigoEntrada, idActividad),
-        CONSTRAINT FK_Entrada_Actividad_Ent FOREIGN KEY (CodigoEntrada) REFERENCES Ventas.entrada(codigoEntrada),
-        CONSTRAINT FK_Entrada_Actividad_Act FOREIGN KEY (idActividad) REFERENCES Actividades.Actividad(idActividad)
+        CONSTRAINT FK_Entrada_Actividad_Ent FOREIGN KEY (codigoEntrada) REFERENCES Ventas.entrada(codigoEntrada),
+        CONSTRAINT FK_Entrada_Actividad_Act FOREIGN KEY (idActividad) REFERENCES Actividades.actividad(idActividad)
     );
 END
