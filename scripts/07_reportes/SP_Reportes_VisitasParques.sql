@@ -115,8 +115,9 @@ BEGIN
     EXEC sp_executesql @queryDinamica;
 END;
 GO
-
+/*
 SELECT * FROM Ventas.venta
 EXEC Gestion.reporteVisitas;
 EXEC Gestion.reporteIngresos;
 EXEC Gestion.reporteVisitasPorPeriodo;
+*/

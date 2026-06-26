@@ -130,7 +130,17 @@ BEGIN
     DECLARE @idTipoParque INT, @errorMsg VARCHAR(500);
     DECLARE @ok INT = 0, @err INT = 0;
 
-    DECLARE c CURSOR LOCAL FAST_FORWARD FOR
+    DECLARE @rows TABLE (
+        id INT IDENTITY(1,1),
+        nombreCompleto VARCHAR(200),
+        provincia VARCHAR(100),
+        region VARCHAR(100),
+        superficie DECIMAL(12, 2),
+        latitud DECIMAL(9, 6),
+        longitud DECIMAL(9, 6)
+    );
+
+    INSERT INTO @rows (nombreCompleto, provincia, region, superficie, latitud, longitud)
         SELECT nombreCompleto, 
                provincia, 
                region, 
@@ -140,12 +150,14 @@ BEGIN
         FROM Gestion.stagingSib
         WHERE nombreCompleto IS NOT NULL;
 
-    OPEN c;
-    FETCH NEXT FROM c INTO @nombreCompleto, @provincia, @region,
-                           @superficie, @latitud, @longitud;
+    DECLARE @i INT = 1, @max INT;
+    SELECT @max = COUNT(*) FROM @rows;
 
-    WHILE @@FETCH_STATUS = 0
+    WHILE @i <= @max
     BEGIN
+        SELECT @nombreCompleto = nombreCompleto, @provincia = provincia, @region = region,
+               @superficie = superficie, @latitud = latitud, @longitud = longitud
+        FROM @rows WHERE id = @i;
         BEGIN TRY
             -- Parseo del nombre
             EXEC Gestion.parsearNombreParque 
@@ -202,12 +214,8 @@ BEGIN
         END CATCH
 
         NextRow:
-        FETCH NEXT FROM c INTO @nombreCompleto, @provincia, @region,
-                               @superficie, @latitud, @longitud;
+        SET @i = @i + 1;
     END
-
-    CLOSE c;
-    DEALLOCATE c;
 
     -- Resumen del proceso
     SELECT @ok AS importadosOk, @err AS importadosConError, (@ok + @err) AS total;
@@ -231,17 +239,25 @@ BEGIN
     DECLARE @idParque INT, @errorMsg VARCHAR(500);
     DECLARE @ok INT = 0, @err INT = 0, @saltados INT = 0;
 
-    DECLARE c CURSOR LOCAL FAST_FORWARD FOR
+    DECLARE @rows TABLE (
+        id INT IDENTITY(1,1),
+        nombreCompleto VARCHAR(200),
+        hectareas DECIMAL(12, 2)
+    );
+
+    INSERT INTO @rows (nombreCompleto, hectareas)
         SELECT REPLACE(REPLACE(nombreCompleto, '"', ''), CHAR(13), ''),
                TRY_CAST(REPLACE(hectareas, '"', '') AS DECIMAL(12, 2))
         FROM Gestion.stagingCiam
         WHERE nombreCompleto IS NOT NULL;
 
-    OPEN c;
-    FETCH NEXT FROM c INTO @nombreCompleto, @hectareas;
+    DECLARE @i INT = 1, @max INT;
+    SELECT @max = COUNT(*) FROM @rows;
 
-    WHILE @@FETCH_STATUS = 0
+    WHILE @i <= @max
     BEGIN
+        SELECT @nombreCompleto = nombreCompleto, @hectareas = hectareas
+        FROM @rows WHERE id = @i;
         BEGIN TRY
             -- Parseo del nombre para obtener nombre limpio
             EXEC Gestion.parsearNombreParque 
@@ -281,11 +297,8 @@ BEGIN
         END CATCH
 
         NextRow:
-        FETCH NEXT FROM c INTO @nombreCompleto, @hectareas;
+        SET @i = @i + 1;
     END
-
-    CLOSE c;
-    DEALLOCATE c;
 
     -- Resumen
     SELECT @ok AS actualizadosOk, @err AS conError, @saltados AS saltados, 
@@ -314,7 +327,7 @@ BEGIN
     DECLARE @origen VARCHAR(20) = 'CSV_GUIAS';
 
     
-    DECLARE @tituloNombre VARCHAR(50);
+    DECLARE @tituloNombre VARCHAR(100);
     DECLARE @vCodTitulo INT;
 
     
@@ -322,7 +335,7 @@ BEGIN
     DECLARE @guiaNombre VARCHAR(50);
     DECLARE @guiaApellido VARCHAR(50);
     DECLARE @guiaFechaNac DATE;
-    DECLARE @guiaNombreTitulo VARCHAR(50);
+    DECLARE @guiaNombreTitulo VARCHAR(100);
     DECLARE @guiaCodEspecialidad INT;
     DECLARE @vLegajo INT;
 
@@ -355,14 +368,17 @@ BEGIN
 
     -- 2. PROCESAMIENTO FILA POR FILA: TITULOS
     
-    DECLARE cursorTitulos CURSOR LOCAL FAST_FORWARD FOR
-    SELECT nombre FROM Personal.stagingTitulos WHERE nombre IS NOT NULL;
+    DECLARE @rowsTitulos TABLE (id INT IDENTITY(1,1), nombre VARCHAR(100));
+    INSERT INTO @rowsTitulos (nombre)
+        SELECT nombre FROM Personal.stagingTitulos WHERE nombre IS NOT NULL;
 
-    OPEN cursorTitulos;
-    FETCH NEXT FROM cursorTitulos INTO @tituloNombre;
+    DECLARE @iT INT = 1, @maxT INT;
+    SELECT @maxT = COUNT(*) FROM @rowsTitulos;
 
-    WHILE @@FETCH_STATUS = 0
+    WHILE @iT <= @maxT
     BEGIN
+        SELECT @tituloNombre = nombre FROM @rowsTitulos WHERE id = @iT;
+
         SELECT @vCodTitulo = codTitulo FROM Personal.titulos WHERE nombre = @tituloNombre;
 
         BEGIN TRY
@@ -384,23 +400,33 @@ BEGIN
             VALUES (@origen, @tituloNombre, 'ERROR', @mensajeLog);
         END CATCH;
 
-        FETCH NEXT FROM cursorTitulos INTO @tituloNombre;
+        SET @iT = @iT + 1;
     END;
-
-    CLOSE cursorTitulos;
-    DEALLOCATE cursorTitulos;
 
     -- 3. PROCESAMIENTO FILA POR FILA: GUIAS (CON LOGS INDIVIDUALES)
 
-    DECLARE cursorGuias CURSOR LOCAL FAST_FORWARD FOR
-    SELECT documento, nombre, apellido, fechaNacimiento, nombreTitulo, codEspecialidad
-    FROM Personal.stagingGuias;
+    DECLARE @rowsGuias TABLE (
+        id INT IDENTITY(1,1),
+        documento CHAR(8),
+        nombre VARCHAR(50),
+        apellido VARCHAR(50),
+        fechaNacimiento DATE,
+        nombreTitulo VARCHAR(100),
+        codEspecialidad INT
+    );
+    INSERT INTO @rowsGuias (documento, nombre, apellido, fechaNacimiento, nombreTitulo, codEspecialidad)
+        SELECT documento, nombre, apellido, fechaNacimiento, nombreTitulo, codEspecialidad
+        FROM Personal.stagingGuias;
 
-    OPEN cursorGuias;
-    FETCH NEXT FROM cursorGuias INTO @guiaDocumento, @guiaNombre, @guiaApellido, @guiaFechaNac, @guiaNombreTitulo, @guiaCodEspecialidad;
+    DECLARE @iG INT = 1, @maxG INT;
+    SELECT @maxG = COUNT(*) FROM @rowsGuias;
 
-    WHILE @@FETCH_STATUS = 0
+    WHILE @iG <= @maxG
     BEGIN
+        SELECT @guiaDocumento = documento, @guiaNombre = nombre, @guiaApellido = apellido,
+               @guiaFechaNac = fechaNacimiento, @guiaNombreTitulo = nombreTitulo, @guiaCodEspecialidad = codEspecialidad
+        FROM @rowsGuias WHERE id = @iG;
+
         SET @nombreCompletoLog = @guiaApellido + ', ' + @guiaNombre;
         SET @vCodTitulo = NULL;
         SET @vLegajo = NULL;
@@ -463,11 +489,8 @@ BEGIN
         INSERT INTO Gestion.logImportacion (origen, nombreCompleto, estado, mensaje)
         VALUES (@origen, @nombreCompletoLog, @estadoLog, @mensajeLog);
 
-        FETCH NEXT FROM cursorGuias INTO @guiaDocumento, @guiaNombre, @guiaApellido, @guiaFechaNac, @guiaNombreTitulo, @guiaCodEspecialidad;
+        SET @iG = @iG + 1;
     END;
-
-    CLOSE cursorGuias;
-    DEALLOCATE cursorGuias;
 
     -- 4. LIMPIEZA FINAL DE LAS TABLAS DE STAGING
     TRUNCATE TABLE Personal.stagingCsvGuias;

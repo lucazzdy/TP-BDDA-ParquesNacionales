@@ -80,15 +80,13 @@ BEGIN
 END
 
 DECLARE @cantidadTours INT = 50,
-        @cantidadActividadesExistentes INT = (SELECT COUNT(*) FROM Actividades.actividad),
-        @cantidadGuiasExistentes INT = (SELECT COUNT(*) FROM Personal.guias),
-        @legajoInicialGuia INT = (SELECT MIN(legajo) FROM Personal.guias);
+        @cantidadActividadesExistentes INT = (SELECT COUNT(*) FROM Actividades.actividad);
 
 WHILE @cantidadTours > 0
 BEGIN
     DECLARE @idActividad INT = (ABS(CHECKSUM(NEWID())) % @cantidadActividadesExistentes + 1); -- ID de actividad entre 1 y cantidad de actividades
 
-    DECLARE @legajoGuia INT = (ABS(CHECKSUM(NEWID())) % @cantidadGuiasExistentes + @legajoInicialGuia); -- Legajo de guía entre 1 y cantidad de guías
+    DECLARE @legajoGuia INT = (SELECT TOP 1 legajo FROM Personal.guias ORDER BY NEWID()); -- Legajo de guía entre 1 y cantidad de guías
 
 
     -- Generar una fecha de inicio aleatoria en el rango del año actual
