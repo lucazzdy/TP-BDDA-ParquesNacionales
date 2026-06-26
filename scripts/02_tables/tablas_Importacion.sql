@@ -68,9 +68,10 @@ BEGIN
 END
 GO
 
-DROP TABLE Personal.stagingCsvGuias
-DROP TABLE Personal.stagingTitulos
-DROP TABLE Personal.stagingGuias
+IF OBJECT_ID('Personal.stagingCsvGuias', 'U') IS NOT NULL DROP TABLE Personal.stagingCsvGuias;
+IF OBJECT_ID('Personal.stagingTitulos', 'U') IS NOT NULL DROP TABLE Personal.stagingTitulos;
+IF OBJECT_ID('Personal.stagingGuias', 'U') IS NOT NULL DROP TABLE Personal.stagingGuias;
+
 IF OBJECT_ID('Personal.stagingCsvGuias') IS NULL
 BEGIN
     CREATE TABLE Personal.stagingCsvGuias (

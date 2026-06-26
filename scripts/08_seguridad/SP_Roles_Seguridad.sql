@@ -58,6 +58,7 @@ GRANT SELECT ON SCHEMA::Ventas TO rol_consultor;
 GRANT EXECUTE ON Gestion.reporte_parquesConConcesiones TO rol_consultor;
 GRANT EXECUTE ON Gestion.reporteIngresos TO rol_consultor;
 GRANT EXECUTE ON Gestion.reporteVisitas TO rol_consultor;
+GRANT EXECUTE ON Gestion.reporteVisitasPorPeriodo TO rol_consultor;
 GRANT EXECUTE ON Concesiones.reporte_deudores TO rol_consultor;
 
 -- SPs de consulta (no modifican datos)
@@ -109,6 +110,8 @@ GRANT EXECUTE ON Ventas.visitante_Alta TO rol_operador;
 GRANT EXECUTE ON Ventas.visitante_Modificar TO rol_operador;
 GRANT EXECUTE ON Ventas.entrada_Alta TO rol_operador;
 GRANT EXECUTE ON Ventas.entrada_Modificar TO rol_operador;
+GRANT EXECUTE ON Ventas.ticketFactura_Alta TO rol_operador;
+GRANT EXECUTE ON Ventas.ticketFactura_Modificar TO rol_operador;
 GRANT EXECUTE ON Ventas.entradaActividad_Alta TO rol_operador;
 GRANT EXECUTE ON Ventas.pago_Alta TO rol_operador;
 

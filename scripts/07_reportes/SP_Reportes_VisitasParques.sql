@@ -52,12 +52,13 @@ BEGIN
 
     SELECT 
         p.nombre AS Parque,
-        SUM(v.total) AS TotalIngresos,
+        SUM(tf.montoTotal) AS TotalIngresos,
         pg.fecha AS FechaPago
     FROM 
         Ventas.venta v
         INNER JOIN Gestion.parque p ON v.idParque = p.idParque
         INNER JOIN Ventas.pago pg ON v.idVenta = pg.idVenta
+        INNER JOIN Ventas.ticketFactura tf ON v.idVenta = tf.idVenta
         WHERE pg.fecha <= DATEADD(DAY, +1, GETDATE()) AND pg.estado = 'Aprobado'
     GROUP BY p.nombre, pg.fecha
     ORDER BY pg.fecha;
