@@ -20,14 +20,16 @@ GO
 -- ====================================================================
 -- TIPOS DE VISITANTES
 -- ====================================================================
-
-EXEC Ventas.tipoVisitante_Alta @descripcion = 'Nacional';
-EXEC Ventas.tipoVisitante_Alta @descripcion = 'Residente Provincial';
-EXEC Ventas.tipoVisitante_Alta @descripcion = 'Extranjero';
-EXEC Ventas.tipoVisitante_Alta @descripcion = 'No Residente';
-EXEC Ventas.tipoVisitante_Alta @descripcion = 'Estudiante';
-EXEC Ventas.tipoVisitante_Alta @descripcion = 'Jubilado';
-EXEC Ventas.tipoVisitante_Alta @descripcion = 'Menor';
+IF NOT EXISTS (SELECT 1 FROM Ventas.tipoVisitante)
+BEGIN
+    EXEC Ventas.tipoVisitante_Alta @descripcion = 'Nacional';
+    EXEC Ventas.tipoVisitante_Alta @descripcion = 'Residente Provincial';
+    EXEC Ventas.tipoVisitante_Alta @descripcion = 'Extranjero';
+    EXEC Ventas.tipoVisitante_Alta @descripcion = 'No Residente';
+    EXEC Ventas.tipoVisitante_Alta @descripcion = 'Estudiante';
+    EXEC Ventas.tipoVisitante_Alta @descripcion = 'Jubilado';
+    EXEC Ventas.tipoVisitante_Alta @descripcion = 'Menor';
+END
 
 SELECT * FROM Ventas.tipoVisitante
 
@@ -35,11 +37,14 @@ SELECT * FROM Ventas.tipoVisitante
 -- FORMAS DE PAGO
 -- ====================================================================
 
-EXEC Ventas.formaPago_Alta @descripcion = 'Efectivo';
-EXEC Ventas.formaPago_Alta @descripcion = 'Tarjeta Debito';
-EXEC Ventas.formaPago_Alta @descripcion = 'Tarjeta Credito';
-EXEC Ventas.formaPago_Alta @descripcion = 'Transferencia';
-EXEC Ventas.formaPago_Alta @descripcion = 'Mercado Pago';
+IF NOT EXISTS (SELECT 1 FROM Ventas.formaPago)
+BEGIN
+    EXEC Ventas.formaPago_Alta @descripcion = 'Efectivo';
+    EXEC Ventas.formaPago_Alta @descripcion = 'Tarjeta Debito';
+    EXEC Ventas.formaPago_Alta @descripcion = 'Tarjeta Credito';
+    EXEC Ventas.formaPago_Alta @descripcion = 'Transferencia';
+    EXEC Ventas.formaPago_Alta @descripcion = 'Mercado Pago';
+END
 
 SELECT * FROM Ventas.formaPago
 

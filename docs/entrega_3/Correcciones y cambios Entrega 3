@@ -34,3 +34,10 @@ Cambios Realizados
 
 .Se agregan de atributos Nombre, Apellido, FechaNacimiento, TipoDocumento, NumeroDocumento y se elimina el campo Descripcion en visitante, con el proposito de mejorar la identificacion y diferenciacion de los visitantes.
 .Se elimino el atributo estado en la relacion compra, porque este ya se encuentra en pago.
+
+Fecha 26/06/2026
+
+Cambios Realizados
+
+Eliminacion de atributos en entidad Venta, solo quedaron IDventa y fecha.
+Agregado de atributos montototal, fechaEmision, tipoFactura,PuntoVenta y NumeroFactura en entidad ticket 

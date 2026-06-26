@@ -417,56 +417,39 @@ GO
 
 CREATE OR ALTER PROCEDURE Ventas.venta_Alta
     @idParque INT,
-    @numeroFactura INT,
-    @puntoVenta INT,
-    @total DECIMAL(10,2),
     @idVenta INT OUTPUT
 AS
 BEGIN
-    DECLARE @errorMsg VARCHAR(300) = '';
+    SET NOCOUNT ON;
+    DECLARE @errorMsg VARCHAR(100) = '';
     DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
 
-
+    -- Validación unificada
     IF NOT EXISTS (SELECT 1 FROM Gestion.parque WHERE idParque = @idParque)
         SET @errorMsg = @errorMsg + '- El ID de Parque especificado no existe.' + @saltoLinea;
-
-
-    IF @numeroFactura IS NULL OR @numeroFactura <= 0
-        SET @errorMsg = @errorMsg + '- El número de factura debe ser mayor a cero.'  + @saltoLinea;
-
-    IF @puntoVenta IS NULL OR @puntoVenta <= 0
-        SET @errorMsg = @errorMsg + '- El punto de venta debe ser mayor a cero.'  + @saltoLinea;
-
-
-    IF @total IS NULL OR @total < 0
-        SET @errorMsg = @errorMsg + '- El total de la venta no puede ser un valor negativo.'  + @saltoLinea;
-
-
-    IF EXISTS (SELECT 1 FROM Ventas.venta WHERE puntoVenta = @puntoVenta AND numeroFactura = @numeroFactura)
-        SET @errorMsg = @errorMsg + '- Ya existe un ticket registrado con ese Punto de Venta y Número de Factura.'  + @saltoLinea;
 
     IF LEN(@errorMsg) > 0
     BEGIN
         ;THROW 50412, @errorMsg, 1;
     END
 
-    INSERT INTO Ventas.venta (idParque, numeroFactura, puntoVenta, total)
-    VALUES (@idParque, @numeroFactura, @puntoVenta, @total);
+    -- Inserción limpia (fechaVenta se genera por DEFAULT GETDATE())
+    INSERT INTO Ventas.venta (idParque)
+    VALUES (@idParque);
 
     SET @idVenta = SCOPE_IDENTITY();
 END
+GO
 GO
 
 --SP ABM de Ventas.venta_Modificar
 
 CREATE OR ALTER PROCEDURE Ventas.venta_Modificar
     @idVenta INT,
-    @idParque INT,
-    @numeroFactura INT,
-    @puntoVenta INT,
-    @total DECIMAL(10,2)
+    @idParque INT
 AS
 BEGIN
+    SET NOCOUNT ON;
     DECLARE @errorMsg VARCHAR(300) = '';
     DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
 
@@ -474,20 +457,7 @@ BEGIN
         SET @errorMsg = @errorMsg + '- El ID de Venta especificado no existe.' + @saltoLinea;
 
     IF @idParque IS NOT NULL AND NOT EXISTS (SELECT 1 FROM Gestion.parque WHERE idParque = @idParque)
-        SET @errorMsg = @errorMsg + '- El ID de Parque especificado no existe.'  + @saltoLinea;
-
-    IF @numeroFactura IS NOT NULL AND @numeroFactura <= 0
-        SET @errorMsg = @errorMsg + '- El número de factura debe ser mayor a cero.'  + @saltoLinea;
-
-    IF @puntoVenta IS NOT NULL AND @puntoVenta <= 0
-        SET @errorMsg = @errorMsg + '- El punto de venta debe ser mayor a cero.'  + @saltoLinea;
-
-    IF @Total IS NOT NULL AND @Total < 0
-        SET @errorMsg = @errorMsg + '- El total no puede ser un valor negativo.'  + @saltoLinea;
-
-    -- Validar que la combinación fiscal no choque con otra venta diferente
-    IF EXISTS (SELECT 1 FROM Ventas.venta WHERE puntoVenta = @puntoVenta AND numeroFactura = @numeroFactura AND idVenta <> @idVenta)
-        SET @errorMsg = @errorMsg + '- La combinación de Punto de Venta y Factura ya está asignada a otro ticket.'  + @saltoLinea;
+        SET @errorMsg = @errorMsg + '- El ID de Parque especificado no existe.' + @saltoLinea;
 
     IF LEN(@errorMsg) > 0
     BEGIN
@@ -495,10 +465,7 @@ BEGIN
     END
 
     UPDATE Ventas.venta
-    SET idParque = ISNULL(@idParque, idParque),
-        numeroFactura = ISNULL(@numeroFactura, numeroFactura),
-        puntoVenta = ISNULL(@puntoVenta, puntoVenta),
-        Total = ISNULL(@total, total)
+    SET idParque = ISNULL(@idParque, idParque)
     WHERE idVenta = @idVenta;
 END
 GO
@@ -509,22 +476,26 @@ CREATE OR ALTER PROCEDURE Ventas.venta_Baja
     @idVenta INT
 AS
 BEGIN
-    DECLARE @errorMsg VARCHAR(100) = '';
+    SET NOCOUNT ON;
+    DECLARE @errorMsg VARCHAR(300) = '';
     DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
 
     IF NOT EXISTS (SELECT 1 FROM Ventas.venta WHERE idVenta = @idVenta)
     BEGIN
-        SET @errorMsg = @errorMsg + '- El ID de Venta especificado no existe. ';
+        SET @errorMsg = @errorMsg + '- El ID de Venta especificado no existe.' + @saltoLinea;
     END
     ELSE
     BEGIN
-        -- valido que no tenga líneas de detalle asociadas en ItemVenta
+        -- Regla estricta: No se borra la cabecera si tiene dependencias
         IF EXISTS (SELECT 1 FROM Ventas.itemVenta WHERE idVenta = @idVenta)
             SET @errorMsg = @errorMsg + '- No se puede eliminar la venta porque contiene ítems de detalle asociados.' + @saltoLinea;
             
-        -- Valdo que no tenga pagos asociados
         IF EXISTS (SELECT 1 FROM Ventas.pago WHERE idVenta = @idVenta)
             SET @errorMsg = @errorMsg + '- No se puede eliminar la venta porque registra transacciones de pago asociadas.' + @saltoLinea;
+
+        -- Nueva validación: Tampoco si ya tiene un ticket factura emitido
+        IF EXISTS (SELECT 1 FROM Ventas.ticketFactura WHERE idVenta = @idVenta)
+            SET @errorMsg = @errorMsg + '- No se puede eliminar la venta porque ya posee un Ticket Factura emitido.' + @saltoLinea;
     END
 
     IF LEN(@errorMsg) > 0
@@ -1008,5 +979,122 @@ BEGIN
 
     DELETE FROM Ventas.entradaActividad
     WHERE codigoEntrada = @codigoEntrada AND idActividad = @idActividad;
+END
+GO
+
+CREATE OR ALTER PROCEDURE Ventas.ticketFactura_Alta
+    @idVenta INT,
+    @puntoVenta INT,
+    @numeroFactura INT,
+    @tipoFactura CHAR(1) = 'B', -- Mapea con el DEFAULT 'B' de la tabla
+    @montoTotal DECIMAL(10,2)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @errorMsg VARCHAR(300) = '';
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
+
+    -- 1. Validaciones de Existencia e Integridad
+    IF NOT EXISTS (SELECT 1 FROM Ventas.venta WHERE idVenta = @idVenta)
+        SET @errorMsg = @errorMsg + '- El ID de Venta especificado no existe.' + @saltoLinea;
+
+    IF EXISTS (SELECT 1 FROM Ventas.ticketFactura WHERE idVenta = @idVenta)
+        SET @errorMsg = @errorMsg + '- Esta venta ya cuenta con un Ticket/Factura asociado.' + @saltoLinea;
+
+    IF @numeroFactura IS NULL OR @numeroFactura <= 0
+        SET @errorMsg = @errorMsg + '- El número de factura debe ser mayor a cero.' + @saltoLinea;
+
+    IF @puntoVenta IS NULL OR @puntoVenta <= 0
+        SET @errorMsg = @errorMsg + '- El punto de venta debe ser mayor a cero.' + @saltoLinea;
+
+    IF @montoTotal IS NULL OR @montoTotal < 0
+        SET @errorMsg = @errorMsg + '- El monto total no puede ser un valor negativo.' + @saltoLinea;
+
+    IF @tipoFactura NOT IN ('A', 'B', 'C')
+        SET @errorMsg = @errorMsg + '- Tipo de factura inválido (Debe ser A, B o C).' + @saltoLinea;
+
+    -- 2. Validación de punto de venta y numero de facutra
+    IF EXISTS (SELECT 1 FROM Ventas.ticketFactura WHERE puntoVenta = @puntoVenta AND numeroFactura = @numeroFactura)
+        SET @errorMsg = @errorMsg + '- Ya existe un comprobante registrado con ese Punto de Venta y Número de Factura.' + @saltoLinea;
+
+    -- Lanzar errores acumulados
+    IF LEN(@errorMsg) > 0
+    BEGIN
+        ;THROW 50427, @errorMsg, 1;
+    END
+
+    INSERT INTO Ventas.ticketFactura (idVenta, puntoVenta, numeroFactura, tipoFactura, montoTotal)
+    VALUES (@idVenta, @puntoVenta, @numeroFactura, @tipoFactura, @montoTotal);
+END
+GO
+
+CREATE OR ALTER PROCEDURE Ventas.ticketFactura_Modificar
+    @idTicket INT,
+    @puntoVenta INT = NULL,
+    @numeroFactura INT = NULL,
+    @tipoFactura CHAR(1) = NULL,
+    @montoTotal DECIMAL(10,2) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @errorMsg VARCHAR(300) = '';
+    DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
+
+    -- Variables para almacenar el estado actual del registro antes del cambio
+    DECLARE @puaActual INT, @numActual INT;
+
+    SELECT @puaActual = puntoVenta, @numActual = numeroFactura
+    FROM Ventas.ticketFactura 
+    WHERE idTicket = @idTicket;
+
+    -- Validaciones de reglas de negocio individuales
+    IF @puaActual IS NULL
+        SET @errorMsg = @errorMsg + '- El ID de Ticket especificado no existe.' + @saltoLinea;
+
+    IF @numeroFactura IS NOT NULL AND @numeroFactura <= 0
+        SET @errorMsg = @errorMsg + '- El número de factura debe ser mayor a cero.' + @saltoLinea;
+
+    IF @puntoVenta IS NOT NULL AND @puntoVenta <= 0
+        SET @errorMsg = @errorMsg + '- El punto de venta debe ser mayor a cero.' + @saltoLinea;
+
+    IF @montoTotal IS NOT NULL AND @montoTotal < 0
+        SET @errorMsg = @errorMsg + '- El monto total no puede ser negativo.' + @saltoLinea;
+
+    IF @tipoFactura IS NOT NULL AND @tipoFactura NOT IN ('A', 'B', 'C')
+        SET @errorMsg = @errorMsg + '- Tipo de factura inválido.' + @saltoLinea;
+
+    -- Validación para evitar violar la restricción de que no se deben repetir la combinacion de punto de venta y numero de factura
+    IF EXISTS (SELECT 1 FROM Ventas.ticketFactura WHERE puntoVenta = ISNULL(@puntoVenta, @puaActual) AND numeroFactura = ISNULL(@numeroFactura, @numActual) AND idTicket <> @idTicket)
+        SET @errorMsg = @errorMsg + '- La combinación de punto de venta y numero de factura ya está asignada a otro comprobante.' + @saltoLinea;
+
+    IF LEN(@errorMsg) > 0
+    BEGIN
+        ;THROW 50428, @errorMsg, 1;
+    END
+
+    UPDATE Ventas.ticketFactura
+    SET puntoVenta = ISNULL(@puntoVenta, puntoVenta),
+        numeroFactura = ISNULL(@numeroFactura, numeroFactura),
+        tipoFactura = ISNULL(@tipoFactura, tipoFactura),
+        montoTotal = ISNULL(@montoTotal, montoTotal)
+    WHERE idTicket = @idTicket;
+END
+GO
+
+CREATE OR ALTER PROCEDURE Ventas.ticketFactura_Baja
+    @idTicket INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @errorMsg VARCHAR(300) = '';
+
+    IF NOT EXISTS (SELECT 1 FROM Ventas.ticketFactura WHERE idTicket = @idTicket)
+    BEGIN
+        SET @errorMsg = '- El ID de Ticket especificado no existe.';
+        ;THROW 50429, @errorMsg, 1;
+    END
+
+    DELETE FROM Ventas.ticketFactura 
+    WHERE idTicket = @idTicket;
 END
 GO

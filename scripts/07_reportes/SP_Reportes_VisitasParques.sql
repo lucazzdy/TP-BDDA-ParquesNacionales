@@ -70,10 +70,7 @@ GO
   visitas por mes y parque.
   =========================================================*/
 
-USE GestionParquesNacionales;
-GO
-
-CREATE OR ALTER PROCEDURE Ventas.reporteVisitasPorPeriodo
+CREATE OR ALTER PROCEDURE Gestion.reporteVisitasPorPeriodo
 AS
 BEGIN
     SET NOCOUNT ON;

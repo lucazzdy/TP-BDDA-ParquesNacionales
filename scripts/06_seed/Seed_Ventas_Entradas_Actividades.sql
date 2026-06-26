@@ -234,9 +234,10 @@ BEGIN
 END
 GO
 
-SELECT * FROM Ventas.preciosParque
-SELECT * FROM Ventas.pagos
-SELECT * FROM Ventas.venta
-SELECT * FROM Ventas.itemVenta
-SELECT * FROM Ventas.entrada
-SELECT * FROM Ventas.entradaActividad
+SELECT * FROM Ventas.preciosParque;
+SELECT * FROM Ventas.pago;
+SELECT * FROM Ventas.ticketFactura;
+SELECT * FROM Ventas.venta;
+SELECT * FROM Ventas.itemVenta;
+SELECT * FROM Ventas.entrada;
+SELECT * FROM Ventas.entradaActividad;

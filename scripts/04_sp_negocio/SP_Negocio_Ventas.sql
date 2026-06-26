@@ -13,6 +13,7 @@ CREATE OR ALTER PROCEDURE Ventas.procesarVentaIndividual
     @jsonActividades NVARCHAR(400) = NULL -- Recibe todo el carrito de actividades estructurado
 AS
 BEGIN
+    SET NOCOUNT ON;
     DECLARE @errorMsg VARCHAR(300) = '';
     DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
     DECLARE @idTipoVisitante INT;
@@ -59,6 +60,10 @@ BEGIN
             SET @errorMsg = @errorMsg + '- Alguna de las actividades/tours seleccionados no existe.' + @saltoLinea;
     END
 
+    -- validación preventiva para cumplir la restricción UNIQUE del ticket factura antes de operar
+    IF EXISTS (SELECT 1 FROM Ventas.ticketFactura WHERE puntoVenta = @puntoVenta AND numeroFactura = @numeroFactura)
+        SET @errorMsg = @errorMsg + '- Ya existe un ticket registrado con ese Punto de Venta y Número de Factura.' + @saltoLinea;
+
     IF LEN(@errorMsg) > 0
     BEGIN
         ;THROW 60001, @errorMsg, 1;
@@ -72,9 +77,6 @@ BEGIN
 
             EXEC Ventas.venta_Alta
                 @idParque = @idParque,
-                @numeroFactura = @numeroFactura,
-                @puntoVenta = @puntoVenta,
-                @total = @total,
                 @idVenta = @idVentaGenerado OUTPUT
 
             EXEC Ventas.entrada_Alta
@@ -125,17 +127,15 @@ BEGIN
                 SET @idItemVenta += 1;
             END
 
-            IF @cantActividadesAComprar > 0
-            BEGIN
-                SET @total = (SELECT SUM(PrecioUnitario) FROM Ventas.ItemVenta WHERE idVenta = @idVentaGenerado)
+            -- Calculamos el total final consolidado en base a los items cargados
+            SET @total = (SELECT SUM(PrecioUnitario * cantidad) FROM Ventas.ItemVenta WHERE idVenta = @idVentaGenerado)
 
-                EXEC Ventas.venta_Modificar 
+            EXEC Ventas.ticketFactura_Alta
                 @idVenta = @idVentaGenerado,
-                @idParque = NULL,
-                @numeroFactura = NULL,
-                @puntoVenta = NULL,
-                @total = @total
-            END
+                @puntoVenta = @puntoVenta,
+                @numeroFactura = @numeroFactura,
+                @tipoFactura = 'B',
+                @montoTotal = @total
 
             EXEC Ventas.pago_Alta 
                 @idVenta = @idVentaGenerado,
@@ -167,6 +167,7 @@ CREATE OR ALTER PROCEDURE Ventas.procesarVentaMasiva
     @jsonCompra NVARCHAR(MAX) -- Recibe todo el carrito estructurado
 AS
 BEGIN
+    SET NOCOUNT ON;
     DECLARE @errorMsg VARCHAR(300) = '';
     DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
     
@@ -276,6 +277,10 @@ BEGIN
     IF EXISTS (SELECT 1 FROM Ventas.Entrada E INNER JOIN @entradas Ent ON E.CodigoEntrada = Ent.codigoEntrada)
         SET @errorMsg = @errorMsg + '- Uno o más códigos de entrada ya fueron emitidos.' + @saltoLinea;
 
+    -- validación de control fiscal sobre la nueva tabla de tickets para evitar violar el UNIQUE
+    IF EXISTS (SELECT 1 FROM Ventas.ticketFactura WHERE puntoVenta = @puntoVenta AND numeroFactura = @numeroFactura)
+        SET @errorMsg = @errorMsg + '- Ya existe un ticket registrado con ese Punto de Venta y Número de Factura.' + @saltoLinea;
+
     UPDATE entAComprar
     SET entAComprar.idTipoVisitante = v.IDTipoVisitante
     FROM @entradas entAComprar
@@ -315,9 +320,6 @@ BEGIN
 
             EXEC Ventas.venta_Alta
                 @idParque = @idParque,
-                @numeroFactura = @numeroFactura,
-                @puntoVenta = @puntoVenta,
-                @total = @totalFactura,
                 @idVenta = @idVentaGenerado OUTPUT
 
             -- Detalle ItemVenta de entradas
@@ -439,6 +441,14 @@ BEGIN
                 DEALLOCATE curEntradaActividad;
             END
 
+            -- ALTA DEL TICKET FISCAL 
+            EXEC Ventas.ticketFactura_Alta
+                @idVenta = @idVentaGenerado,
+                @puntoVenta = @puntoVenta,
+                @numeroFactura = @numeroFactura,
+                @tipoFactura = 'B',
+                @montoTotal = @totalFactura;
+
             -- Registrar el pago final unificado
 
             EXEC Ventas.pago_Alta 
@@ -480,7 +490,7 @@ BEGIN
 
         
 
-        SET @errorMsg = @errorMsg + '- Fallo de la venta masiva.' + @saltoLinea
+        SET @errorMsg = @errorMsg + '- Fallo de la venta masiva. Error: ' + ERROR_MESSAGE() + @saltoLinea
 
         ;THROW 60002, @errorMsg,1;
     END CATCH

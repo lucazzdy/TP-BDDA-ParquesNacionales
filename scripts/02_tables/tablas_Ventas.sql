@@ -17,6 +17,7 @@ GO
 IF OBJECT_ID('Ventas.entradaActividad', 'U') IS NOT NULL DROP TABLE Ventas.entradaActividad;
 IF OBJECT_ID('Ventas.entrada', 'U') IS NOT NULL DROP TABLE Ventas.entrada;
 IF OBJECT_ID('Ventas.pago', 'U') IS NOT NULL DROP TABLE ventas.pago;
+IF OBJECT_ID('Ventas.ticketFactura', 'U') IS NOT NULL DROP TABLE ventas.ticketFactura;
 IF OBJECT_ID('Ventas.itemVenta', 'U') IS NOT NULL DROP TABLE ventas.itemVenta;
 IF OBJECT_ID('Ventas.venta', 'U') IS NOT NULL DROP TABLE ventas.venta;
 IF OBJECT_ID('Ventas.preciosParque', 'U') IS NOT NULL DROP TABLE ventas.preciosParque;
@@ -85,12 +86,9 @@ BEGIN
     CREATE TABLE Ventas.venta(
         idVenta INT IDENTITY(1,1),
         idParque INT NOT NULL,
-        numeroFactura INT NOT NULL CHECK (numeroFactura > 0),
-        puntoVenta INT NOT NULL CHECK (puntoVenta > 0),
-        total DECIMAL(10,2) NOT NULL,
+        fechaVenta DATETIME NOT NULL DEFAULT GETDATE(),
         CONSTRAINT PK_Venta PRIMARY KEY (idVenta),
-        CONSTRAINT FK_Venta_Parque FOREIGN KEY (idParque) REFERENCES Gestion.parque (idParque),
-        CONSTRAINT UQ_Venta_PuntoVenta_NumeroFactura UNIQUE (puntoVenta, numeroFactura)
+        CONSTRAINT FK_Venta_Parque FOREIGN KEY (idParque) REFERENCES Gestion.parque (idParque)
     );
 END
 GO
@@ -114,6 +112,19 @@ BEGIN
     );
 END
 GO
+
+CREATE TABLE Ventas.ticketFactura (
+    idTicket INT IDENTITY(1,1),
+    idVenta INT NOT NULL UNIQUE, 
+    puntoVenta INT NOT NULL,
+    numeroFactura INT NOT NULL,
+    tipoFactura CHAR(1) NOT NULL DEFAULT 'B',
+    fechaEmision DATETIME NOT NULL DEFAULT GETDATE(),
+    montoTotal DECIMAL(10,2) NOT NULL,
+    CONSTRAINT PK_TicketFactura PRIMARY KEY (idTicket),
+    CONSTRAINT FK_TicketFactura_Venta FOREIGN KEY (idVenta) REFERENCES Ventas.venta(idVenta),
+    CONSTRAINT UQ_TicketFactura_Venta UNIQUE (puntoVenta,numeroFactura)
+);
 
 IF OBJECT_ID('Ventas.pago', 'U') IS NULL
 BEGIN
