@@ -57,6 +57,12 @@ BEGIN
     -- Generar una duración aleatoria entre 1 y 10 horas con un decimal
     DECLARE @duracion DECIMAL(3,1) = ROUND(ABS(CHECKSUM(NEWID())) % 9 + 1, 1);
 
+    -- Checkear si ya existe una actividad con el mismo nombre y agregar un sufijo numérico si es necesario para evitar duplicados
+    WHILE EXISTS (SELECT 1 FROM Actividades.actividad WHERE nombre = @nombreActividad)
+    BEGIN
+       SET @nombreActividad = CONCAT(@nombreActividad, '#');
+    END
+
     EXEC Actividades.actividadAlta 
         @nombre = @nombreActividad,
         @costo = @costo,
