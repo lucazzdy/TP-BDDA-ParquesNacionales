@@ -143,6 +143,35 @@ EXEC Personal.altaHabilitacion 'Avistaje';
 GO
 
 /*=======================================================
+SEED GUIAS
+=======================================================*/
+
+EXEC Personal.altaGuia '20000001','Ana','Sosa','1990-01-01',1,1;
+EXEC Personal.altaGuia '20000002','Maria','Perez','1991-01-01',2,2;
+EXEC Personal.altaGuia '20000003','Laura','Gomez','1992-01-01',3,3;
+EXEC Personal.altaGuia '20000004','Sofia','Lopez','1990-02-01',4,4;
+EXEC Personal.altaGuia '20000005','Julieta','Ruiz','1991-02-01',5,5;
+
+EXEC Personal.altaGuia '20000006','Valeria','Diaz','1992-02-01',1,2;
+EXEC Personal.altaGuia '20000007','Carla','Silva','1990-03-01',2,3;
+EXEC Personal.altaGuia '20000008','Paula','Castro','1991-03-01',3,4;
+EXEC Personal.altaGuia '20000009','Florencia','Ramos','1992-03-01',4,5;
+EXEC Personal.altaGuia '20000010','Natalia','Torres','1990-04-01',5,1;
+
+EXEC Personal.altaGuia '20000011','Camila','Suarez','1991-04-01',1,3;
+EXEC Personal.altaGuia '20000012','Lucia','Fernandez','1992-04-01',2,4;
+EXEC Personal.altaGuia '20000013','Micaela','Acosta','1990-05-01',3,5;
+EXEC Personal.altaGuia '20000014','Rocio','Vega','1991-05-01',4,1;
+EXEC Personal.altaGuia '20000015','Milagros','Paz','1992-05-01',5,2;
+
+EXEC Personal.altaGuia '20000016','Brenda','Luna','1990-06-01',1,4;
+EXEC Personal.altaGuia '20000017','Agustina','Mendez','1991-06-01',2,5;
+EXEC Personal.altaGuia '20000018','Daniela','Godoy','1992-06-01',3,1;
+EXEC Personal.altaGuia '20000019','Melina','Navarro','1990-07-01',4,2;
+EXEC Personal.altaGuia '20000020','Victoria','Martinez','1991-07-01',5,3;
+GO
+
+/*=======================================================
 SEED HABILITACIONES DE CADA GUIA
 =======================================================*/
 

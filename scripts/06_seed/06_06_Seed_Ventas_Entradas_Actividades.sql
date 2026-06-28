@@ -147,97 +147,124 @@ GO
     ALTA DE VENTAS
    ===========================*/
 
-DECLARE @i INT = 1;
-DECLARE @codigoEntrada CHAR(10);
-DECLARE @idVisitante INT;
-DECLARE @idParque INT;
-DECLARE @idTipoVisitante INT;
-DECLARE @idFormaPago INT;
-DECLARE @fechaAcceso DATE;
-DECLARE @puntoVenta INT;
-DECLARE @numeroFactura INT;
-DECLARE @json NVARCHAR(400);
-
-
-WHILE @i <= 1000
+IF NOT EXISTS (SELECT 1 FROM Ventas.venta)
 BEGIN
-
-    -- Visitante aleatorio
-
-    SELECT TOP 1 
-        @idParque = IDParque, 
-        @idTipoVisitante = IDTipoVisitante 
-    FROM Ventas.PreciosParque 
-    ORDER BY NEWID();
-
-    -- Luego busco un visitante que tenga ese @idTipoVisitante
-    SELECT TOP 1 @idVisitante = idVisitante 
-    FROM Ventas.visitante 
-    WHERE idTipoVisitante = @idTipoVisitante
-    ORDER BY NEWID();
-
-    -- Forma pago
-
-    SELECT TOP 1 @idFormaPago = IDFormaPago FROM Ventas.FormaPago ORDER BY NEWID();
-
-    -- Fecha acceso
-
-    SET @fechaAcceso = DATEADD(DAY, ABS(CHECKSUM(NEWID())) % 365, '2026-06-01');
-
-    -- Factura
-
-    SET @puntoVenta = 1 + ABS(CHECKSUM(NEWID())) % 5;
+    DECLARE @i INT = 1;
+    DECLARE @codigoEntrada CHAR(10);
+    DECLARE @idVisitante INT;
+    DECLARE @idParque INT;
+    DECLARE @idTipoVisitante INT;
+    DECLARE @idFormaPago INT;
+    DECLARE @fechaAcceso DATE;
+    DECLARE @puntoVenta INT;
+    DECLARE @numeroFactura INT;
+    DECLARE @tipoFactura CHAR(1);
+    DECLARE @estadoPago VARCHAR(9);
+    DECLARE @rnd INT;
+    DECLARE @json NVARCHAR(400);
 
 
-    SET @numeroFactura = 500000 + @i;
-
-
-    -- Codigo entrada
-
-    SET @codigoEntrada = CONCAT(CHAR(65 + ABS(CHECKSUM(NEWID())) % 26), '-', RIGHT('000000' + CAST(@i AS VARCHAR(6)),6), '-', CHAR(65 + ABS(CHECKSUM(NEWID())) % 26));
-
-    -- Actividades JSON
-    -- algunas ventas sin actividades
-
-    IF ABS(CHECKSUM(NEWID())) % 100 < 40
+    WHILE @i <= 1000
     BEGIN
 
-        SET @json = NULL;
+        -- Visitante aleatorio
+
+        SELECT TOP 1 
+            @idParque = IDParque, 
+            @idTipoVisitante = IDTipoVisitante 
+        FROM Ventas.preciosParque 
+        ORDER BY NEWID();
+
+        -- Luego busco un visitante que tenga ese @idTipoVisitante
+        SELECT TOP 1 @idVisitante = idVisitante 
+        FROM Ventas.visitante 
+        WHERE idTipoVisitante = @idTipoVisitante
+        ORDER BY NEWID();
+
+        -- Forma pago
+
+        SELECT TOP 1 @idFormaPago = idFormaPago FROM Ventas.formaPago ORDER BY NEWID();
+
+        -- Fecha acceso
+
+        SET @fechaAcceso = DATEADD(DAY, ABS(CHECKSUM(NEWID())) % 365, '2026-06-01');
+
+        -- Factura
+
+        SET @puntoVenta = 1 + ABS(CHECKSUM(NEWID())) % 5;
+
+        SET @numeroFactura = 500000 + @i;
+
+        -- Codigo entrada
+
+        SET @codigoEntrada = CONCAT(CHAR(65 + ABS(CHECKSUM(NEWID())) % 26), '-', RIGHT('000000' + CAST(@i AS VARCHAR(6)),6), '-', CHAR(65 + ABS(CHECKSUM(NEWID())) % 26));
+
+        -- estado de pago
+
+        SET @rnd = ABS(CHECKSUM(NEWID())) % 100 + 1;
+
+        IF @rnd <= 70
+            SET @estadoPago = 'Aprobado';
+        ELSE
+            SET @estadoPago = 'Pendiente';
+
+        
+        -- tipo de factura
+
+        SET @rnd = ABS(CHECKSUM(NEWID())) % 100 + 1;
+
+        SET @tipoFactura = 
+        CASE
+            WHEN @rnd < 20 THEN 'A' -- 20% son A
+            WHEN @rnd < 95 THEN 'B' -- 75% son B
+            ELSE 'C'                -- 5%  son C
+        END
+
+        -- Actividades JSON
+        -- algunas ventas sin actividades
+
+        IF ABS(CHECKSUM(NEWID())) % 100 < 40
+        BEGIN
+
+            SET @json = NULL;
+
+        END
+        ELSE
+        BEGIN
+
+            SET @json =
+            (
+                SELECT TOP( 1 + ABS(CHECKSUM(NEWID())) % 3) idActividad FROM Actividades.actividad
+                ORDER BY NEWID() FOR JSON PATH
+            );
+
+        END
+
+
+
+        EXEC Ventas.procesarVentaIndividual
+            @codigoEntrada = @codigoEntrada,
+            @idVisitante = @idVisitante,
+            @fechaAcceso = @fechaAcceso,
+            @idParque = @idParque,
+            @idFormaPago = @idFormaPago,
+            @puntoVenta = @puntoVenta,
+            @numeroFactura = @numeroFactura,
+            @tipoFactura = @tipoFactura,
+            @estadoPago = @estadoPago,
+            @jsonActividades = @json;
+
+
+        SET @i += 1;
 
     END
-    ELSE
-    BEGIN
-
-        SET @json =
-        (
-            SELECT TOP( 1 + ABS(CHECKSUM(NEWID())) % 3) idActividad FROM Actividades.actividad
-            ORDER BY NEWID() FOR JSON PATH
-        );
-
-    END
-
-
-
-    EXEC Ventas.procesarVentaIndividual
-        @codigoEntrada = @codigoEntrada,
-        @idVisitante = @idVisitante,
-        @fechaAcceso = @fechaAcceso,
-        @idParque = @idParque,
-        @idFormaPago = @idFormaPago,
-        @puntoVenta = @puntoVenta,
-        @numeroFactura = @numeroFactura,
-        @jsonActividades = @json;
-
-
-    SET @i += 1;
-
-END
+END;
 GO
 
 SELECT * FROM Ventas.preciosParque;
 SELECT * FROM Ventas.pago;
 SELECT * FROM Ventas.ticketFactura;
 SELECT * FROM Ventas.venta;
-SELECT * FROM Ventas.itemVenta;
+SELECT * FROM Ventas.itemVenta ORDER BY idVenta ASC, idItemVenta ASC;
 SELECT * FROM Ventas.entrada;
 SELECT * FROM Ventas.entradaActividad;

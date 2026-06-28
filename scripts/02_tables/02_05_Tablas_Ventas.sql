@@ -113,6 +113,8 @@ BEGIN
 END
 GO
 
+IF OBJECT_ID('Ventas.ticketFactura', 'U') IS NULL
+BEGIN
 CREATE TABLE Ventas.ticketFactura (
     idTicket INT IDENTITY(1,1),
     idVenta INT NOT NULL UNIQUE, 
@@ -125,6 +127,8 @@ CREATE TABLE Ventas.ticketFactura (
     CONSTRAINT FK_TicketFactura_Venta FOREIGN KEY (idVenta) REFERENCES Ventas.venta(idVenta),
     CONSTRAINT UQ_TicketFactura_Venta UNIQUE (puntoVenta,numeroFactura)
 );
+END
+GO
 
 IF OBJECT_ID('Ventas.pago', 'U') IS NULL
 BEGIN
@@ -133,7 +137,7 @@ BEGIN
         idVenta INT NOT NULL,
         idFormaPago INT NOT NULL,
         fecha DATETIME DEFAULT GETDATE(),
-        estado NVARCHAR(9) NOT NULL,
+        estado VARCHAR(9) NOT NULL,
         importe DECIMAL (10,2) CHECK(importe >= 0),
         CONSTRAINT PK_Pago PRIMARY KEY (idPago),
         CONSTRAINT FK_Pago_Venta FOREIGN KEY (idVenta) REFERENCES Ventas.Venta (idVenta),

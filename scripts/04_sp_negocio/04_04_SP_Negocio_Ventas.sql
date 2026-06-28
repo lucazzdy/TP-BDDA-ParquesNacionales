@@ -1,3 +1,18 @@
+/* 
+    Script generado el 
+
+Grupo n°7
+Integrantes:    - Acuña, Lucas Daniel
+                - Alesina, Alan
+                - Gutierrez, Lucas Leonel
+                - Zambrana, Mijael
+
+Descripción del Script:  Stored procedures de logica de negocio de venta de entradas
+                         del esquema Ventas. Contiene venta individual y masiva, utilizando
+                         los SPs ABM para generar lo necesario y un insert to para agregar
+                         varias filas.
+*/
+
 USE GestionParquesNacionales
 GO
 
@@ -10,6 +25,8 @@ CREATE OR ALTER PROCEDURE Ventas.procesarVentaIndividual
     @idFormaPago INT,
     @puntoVenta INT,
     @numeroFactura INT,
+    @tipoFactura CHAR(1),
+    @estadoPago VARCHAR(9),
     @jsonActividades NVARCHAR(400) = NULL -- Recibe todo el carrito de actividades estructurado
 AS
 BEGIN
@@ -71,9 +88,6 @@ BEGIN
 
     BEGIN TRY
         BEGIN TRANSACTION
-            DECLARE @idItemVenta INT = 1;
-            DECLARE @idActividad INT;
-            DECLARE @costoActividad DECIMAL(10,2);
 
             EXEC Ventas.venta_Alta
                 @idParque = @idParque,
@@ -89,43 +103,31 @@ BEGIN
                 @idTipoVisitante = @idTipoVisitante,
                 @precio = @total
 
-            EXEC Ventas.itemVenta_Alta
-                @idVenta = @idVentaGenerado,
-                @idItemVenta = @idItemVenta,
-                @idTipoVisitante = @idTipoVisitante,
-                @idActividad = NULL, -- es null porque es una entrada
-                @tipoItem = 'Entrada',
-                @cantidad = 1, -- es una venta individual
-                @precioUnitario = @total
-
-            
-
-            SET @idItemVenta = 2;
-
-            WHILE EXISTS(SELECT 1 FROM @actividades)
-            BEGIN
+            -- Con row_number se genera automáticamente 1 para la Entrada, y 2, 3... para las actividades
+            INSERT INTO Ventas.ItemVenta (idVenta, idItemVenta, idTipoVisitante, idActividad, tipoItem, cantidad, precioUnitario)
+            SELECT @idVentaGenerado, ROW_NUMBER() OVER (ORDER BY tipoItem DESC, idActividad), idTipoVisitante, idActividad, tipoItem, cantidad, precioUnitario
+            FROM (
+                -- Registro base único de la Entrada
+                SELECT @idTipoVisitante AS idTipoVisitante, NULL AS idActividad, 'Entrada' AS tipoItem, 1 AS cantidad, @total AS precioUnitario
                 
+                UNION ALL
+                
+                -- Registros correspondientes a las Actividades asociadas del JSON
+                SELECT NULL AS idTipoVisitante, actRegistradas.idActividad, 'Actividad' AS tipoItem, 1 AS cantidad, actRegistradas.costo AS precioUnitario
+                FROM Actividades.Actividad actRegistradas 
+                INNER JOIN @actividades actAComprar ON actAComprar.idActividad = actRegistradas.idActividad
+            ) AS ItemsUnificados;
 
-                SELECT TOP 1 @idActividad = actRegistradas.idActividad, @costoActividad = actRegistradas.costo  FROM Actividades.Actividad actRegistradas 
-                INNER JOIN @actividades actAComprar ON actAComprar.idActividad = actRegistradas.idActividad ORDER BY actRegistradas.idActividad;
 
-                EXEC Ventas.itemVenta_Alta
-                    @idVenta = @idVentaGenerado,
-                    @idItemVenta = @idItemVenta,
-                    @idTipoVisitante = NULL,
-                    @idActividad = @idActividad,
-                    @tipoItem = 'Actividad',
-                    @cantidad = 1,
-                    @precioUnitario = @costoActividad
-
-                EXEC Ventas.entradaActividad_Alta
-                    @codigoEntrada = @codigoEntrada,
-                    @idActividad = @idActividad
-
-                DELETE FROM @actividades WHERE idActividad = @idActividad; --la borro asi registro la siguiente actividad
-
-                SET @idItemVenta += 1;
+            IF @cantActividadesAComprar > 0
+            BEGIN
+                INSERT INTO Ventas.EntradaActividad (CodigoEntrada, IDActividad)
+                SELECT 
+                    @codigoEntrada,
+                    idActividad
+                FROM @actividades;
             END
+
 
             -- Calculamos el total final consolidado en base a los items cargados
             SET @total = (SELECT SUM(PrecioUnitario * cantidad) FROM Ventas.ItemVenta WHERE idVenta = @idVentaGenerado)
@@ -134,14 +136,14 @@ BEGIN
                 @idVenta = @idVentaGenerado,
                 @puntoVenta = @puntoVenta,
                 @numeroFactura = @numeroFactura,
-                @tipoFactura = 'B',
+                @tipoFactura = @tipoFactura,
                 @montoTotal = @total
 
             EXEC Ventas.pago_Alta 
                 @idVenta = @idVentaGenerado,
                 @idFormaPago = @idFormaPago,
                 @fecha = NULL, -- se asigna en el sp
-                @estado = 'Aprobado',
+                @estado = @estadoPago,
                 @importe = @total
 
         COMMIT TRANSACTION
@@ -164,6 +166,8 @@ CREATE OR ALTER PROCEDURE Ventas.procesarVentaMasiva
     @idFormaPago INT,
     @puntoVenta INT,
     @numeroFactura INT,
+    @tipoFactura CHAR(1),
+    @estadoPago VARCHAR(9),
     @jsonCompra NVARCHAR(MAX) -- Recibe todo el carrito estructurado
 AS
 BEGIN
@@ -175,24 +179,6 @@ BEGIN
     DECLARE @totalFactura DECIMAL(10,2) = 0;
     DECLARE @subtotalEntradas DECIMAL(10,2) = 0;
     DECLARE @subtotalActividades DECIMAL(10,2) = 0;
-    DECLARE @idItemVenta INT;
-
-    -- variables de los cursores
-    DECLARE @idTipoVisitante INT;
-    DECLARE @cantidad INT;
-    DECLARE @precioUnitario DECIMAL(10,2);
-
-    DECLARE @idActividad INT;
-
-    DECLARE @codigoEntrada CHAR(10);
-    DECLARE @idVisitanteCursor INT;
-    DECLARE @fechaAccesoCursor DATE;
-    DECLARE @idTipoVisitanteCursor INT;
-    DECLARE @precioCursor DECIMAL(10,2);
-
-    DECLARE @codigoEntradaAct CHAR(10);
-    DECLARE @idActividadAct INT;
-
 
     -- 1. tablas en memoria para guardar los datos del json
     DECLARE @entradas TABLE (
@@ -229,37 +215,6 @@ BEGIN
         codigoEntrada CHAR(10) '$.codigoEntrada',
         idActividad INT '$.idActividad'
     );
-
-    DECLARE curEntradas CURSOR FOR
-    SELECT
-        idTipoVisitante,
-        COUNT(*) AS Cantidad,
-        AVG(precioCalculado) AS PrecioUnitario
-    FROM @entradas
-    GROUP BY idTipoVisitante;
-
-    DECLARE curActividades CURSOR FOR
-    SELECT
-        idActividad,
-        COUNT(*) AS Cantidad,
-        AVG(precioActividad) AS PrecioUnitario
-    FROM @actividades
-    GROUP BY idActividad;
-
-    DECLARE curRegistroEntradas CURSOR FOR
-    SELECT
-        codigoEntrada,
-        idVisitante,
-        fechaAcceso,
-        idTipoVisitante,
-        precioCalculado
-    FROM @entradas;
-
-    DECLARE curEntradaActividad CURSOR FOR
-    SELECT codigoEntrada, idActividad
-    FROM @actividades;
-
-
 
     -- 3. Validaciones
 
@@ -303,6 +258,9 @@ BEGIN
     IF EXISTS (SELECT 1 FROM @entradas WHERE precioCalculado IS NULL)
         SET @errorMsg += '- No existe precio configurado para alguna entrada.' + @saltoLinea;
 
+    IF EXISTS (SELECT 1 FROM @actividades WHERE precioActividad IS NULL)
+        SET @errorMsg += '- No existe alguna de las actividades ingresadas.'+ @saltoLinea;
+
     -- Despacho de errores preventivos
     IF LEN(@errorMsg) > 0
     BEGIN
@@ -323,122 +281,34 @@ BEGIN
                 @idVenta = @idVentaGenerado OUTPUT
 
             -- Detalle ItemVenta de entradas
-
-            SET @idItemVenta = 1;
-
-            OPEN curEntradas;
-
-            FETCH NEXT FROM curEntradas
-            INTO @idTipoVisitante, @cantidad, @precioUnitario;
-
-            WHILE @@FETCH_STATUS = 0
-            BEGIN
-                EXEC Ventas.itemVenta_Alta
-                    @idVenta = @idVentaGenerado,
-                    @idItemVenta = @idItemVenta,
-                    @idTipoVisitante = @idTipoVisitante,
-                    @idActividad = NULL,
-                    @tipoItem = 'Entrada',
-                    @cantidad = @cantidad,
-                    @precioUnitario = @precioUnitario
-
-                SET @idItemVenta += 1;
-
-                FETCH NEXT FROM curEntradas
-                INTO @idTipoVisitante, @cantidad, @precioUnitario;
-            END
-
-            CLOSE curEntradas;
-            DEALLOCATE curEntradas;
-
             -- Detalle ItemVenta de actividades agrupadas (si existen)
-            IF EXISTS (SELECT 1 FROM @actividades)
-            BEGIN
-                OPEN curActividades;
-
-                FETCH NEXT FROM curActividades
-                INTO @idActividad, @cantidad, @precioUnitario;
-
-                WHILE @@FETCH_STATUS = 0
-                BEGIN
-
-                    EXEC Ventas.itemVenta_Alta
-                        @idVenta = @idVentaGenerado,
-                        @idItemVenta = @idItemVenta,
-                        @idTipoVisitante = NULL,
-                        @idActividad = @idActividad,
-                        @tipoItem = 'Actividad',
-                        @cantidad = @cantidad,
-                        @precioUnitario = @precioUnitario;
-
-                    SET @idItemVenta += 1;
-
-                    FETCH NEXT FROM curActividades
-                    INTO @idActividad, @cantidad, @precioUnitario;
-                END
-
-                CLOSE curActividades;
-                DEALLOCATE curActividades;
-            END
-
-            OPEN curRegistroEntradas;
-
-            FETCH NEXT FROM curRegistroEntradas
-            INTO
-                @codigoEntrada,
-                @idVisitanteCursor,
-                @fechaAccesoCursor,
-                @idTipoVisitanteCursor,
-                @precioCursor;
+            INSERT INTO Ventas.itemVenta (idVenta, idItemVenta, idTipoVisitante, idActividad, tipoItem, cantidad, precioUnitario)
+            SELECT @idVentaGenerado, ROW_NUMBER() OVER (ORDER BY tipoItem DESC, idAgrupado), idTipoVisitante, idActividad, tipoItem, cantidad, precioUnitario
+            FROM (
+                SELECT idTipoVisitante, NULL AS idActividad, 'Entrada' AS tipoItem, COUNT(*) AS cantidad, AVG(precioCalculado) AS precioUnitario, idTipoVisitante AS idAgrupado
+                FROM @entradas
+                GROUP BY idTipoVisitante
+                
+                UNION ALL
+                
+                SELECT NULL AS idTipoVisitante, idActividad, 'Actividad' AS tipoItem, COUNT(*) AS cantidad, AVG(precioActividad) AS precioUnitario, idActividad AS idAgrupado
+                FROM @actividades
+                GROUP BY idActividad
+            ) AS ItemsUnificados;
 
             -- Registrar los pases físicos masivos
-
-            WHILE @@FETCH_STATUS = 0
-            BEGIN
-
-                EXEC Ventas.entrada_Alta
-                    @codigoEntrada = @codigoEntrada,
-                    @idVenta = @idVentaGenerado,
-                    @fechaAcceso = @fechaAccesoCursor,
-                    @fechaCompra = NULL,
-                    @idVisitante = @idVisitanteCursor,
-                    @idParque = @idParque,
-                    @idTipoVisitante = @idTipoVisitanteCursor,
-                    @precio = @precioCursor;
-
-                FETCH NEXT FROM curRegistroEntradas
-                INTO
-                    @codigoEntrada,
-                    @idVisitanteCursor,
-                    @fechaAccesoCursor,
-                    @idTipoVisitanteCursor,
-                    @precioCursor;
-            END
-
-            CLOSE curRegistroEntradas;
-            DEALLOCATE curRegistroEntradas;
+            INSERT INTO Ventas.entrada (codigoEntrada, idVenta, fechaAcceso, fechaCompra, idVisitante, idParque, idTipoVisitante, precio)
+            SELECT codigoEntrada, @idVentaGenerado, fechaAcceso, GETDATE(), idVisitante, @idParque, idTipoVisitante, precioCalculado
+            FROM @entradas;
 
             -- Registrar relaciones intermedias N:M de actividades
             IF EXISTS (SELECT 1 FROM @actividades)
             BEGIN
-                OPEN curEntradaActividad;
-
-                FETCH NEXT FROM curEntradaActividad
-                INTO @codigoEntradaAct, @idActividadAct;
-
-                WHILE @@FETCH_STATUS = 0
-                BEGIN
-
-                    EXEC Ventas.entradaActividad_Alta
-                        @codigoEntrada = @codigoEntradaAct,
-                        @idActividad = @idActividadAct;
-
-                    FETCH NEXT FROM curEntradaActividad
-                    INTO @codigoEntradaAct, @idActividadAct;
-                END
-
-                CLOSE curEntradaActividad;
-                DEALLOCATE curEntradaActividad;
+                INSERT INTO Ventas.EntradaActividad (codigoEntrada, idActividad)
+                SELECT 
+                    codigoEntrada,
+                    idActividad
+                FROM @actividades;
             END
 
             -- ALTA DEL TICKET FISCAL 
@@ -446,16 +316,15 @@ BEGIN
                 @idVenta = @idVentaGenerado,
                 @puntoVenta = @puntoVenta,
                 @numeroFactura = @numeroFactura,
-                @tipoFactura = 'B',
+                @tipoFactura = @tipoFactura,
                 @montoTotal = @totalFactura;
 
             -- Registrar el pago final unificado
-
             EXEC Ventas.pago_Alta 
                 @idVenta = @idVentaGenerado,
                 @idFormaPago = @idFormaPago,
                 @fecha = NULL,
-                @estado = 'Aprobado',
+                @estado = @estadoPago,
                 @importe = @totalFactura
 
         COMMIT TRANSACTION
@@ -464,35 +333,9 @@ BEGIN
         IF @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
 
-        IF CURSOR_STATUS('local','curEntradas') >= -1
-        BEGIN
-            CLOSE curEntradas;
-            DEALLOCATE curEntradas;
-        END
-
-        IF CURSOR_STATUS('local','curActividades') >= -1
-        BEGIN
-            CLOSE curActividades;
-            DEALLOCATE curActividades;
-        END
-
-        IF CURSOR_STATUS('local','curRegistroEntradas') >= -1
-        BEGIN
-            CLOSE curRegistroEntradas;
-            DEALLOCATE curRegistroEntradas;
-        END
-
-        IF CURSOR_STATUS('local','curEntradaActividad') >= -1
-        BEGIN
-            CLOSE curEntradaActividad;
-            DEALLOCATE curEntradaActividad;
-        END
-
-        
-
         SET @errorMsg = @errorMsg + '- Fallo de la venta masiva. Error: ' + ERROR_MESSAGE() + @saltoLinea
 
-        ;THROW 60002, @errorMsg,1;
+        ;THROW 60002, @errorMsg, 1;
     END CATCH
 END
 GO
