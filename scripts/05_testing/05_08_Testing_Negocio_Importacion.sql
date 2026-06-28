@@ -10,7 +10,7 @@
     Descripción del Script: Testing de los SP de importacion masiva.
 */
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 

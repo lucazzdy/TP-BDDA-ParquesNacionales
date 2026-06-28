@@ -1,4 +1,4 @@
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 /*=========================================================
@@ -86,7 +86,7 @@ GO
 /*=======================================================
 TEST 5
 Resultado esperado:
-Error - Debe ser mayor de 18 años.
+Error - Debe ser mayor de 18 aï¿½os.
 =======================================================*/
 
 EXEC Personal.altaGuardaparques
@@ -186,7 +186,7 @@ TESTING STORE PROCEDURE TABLA HISTORIAL GUARDAPARQUES
 /*=======================================================
 TEST 12
 Resultado esperado:
-Asignación realizada correctamente.
+Asignaciï¿½n realizada correctamente.
 =======================================================*/
 
 --PUEDE FALLAR SI NO HAY UN PARQUE CREADO
@@ -228,7 +228,7 @@ GO
 /*=======================================================
 TEST 15
 Resultado esperado:
-Error - Ya posee una asignación activa.
+Error - Ya posee una asignaciï¿½n activa.
 =======================================================*/
 
 EXEC Personal.asignarGuardaparqueParque
@@ -244,7 +244,7 @@ GO
 /*=======================================================
 TEST 16
 Resultado esperado:
-Se cierra la asignación actual y se crea una nueva.
+Se cierra la asignaciï¿½n actual y se crea una nueva.
 =======================================================*/
 
 --PUEDE FALLAR SI NO HAY MAS PARQUES CREADOS O OTRO GUIA
@@ -307,7 +307,7 @@ TESTING STORE PROCEDURE TABLA TITULOS GUIAS
 /*=======================================================
 TEST 20
 Resultado esperado:
-Se crean correctamente 3 títulos.
+Se crean correctamente 3 tï¿½tulos.
 =======================================================*/
 
 EXEC Personal.altaTitulo
@@ -319,8 +319,8 @@ EXEC Personal.altaTitulo
     @descripcion = 'Especialista en fauna';
 
 EXEC Personal.altaTitulo
-    @nombre = 'Guia de Montaña',
-    @descripcion = 'Especialista en montaña';
+    @nombre = 'Guia de Montaï¿½a',
+    @descripcion = 'Especialista en montaï¿½a';
 
 SELECT *
 FROM Personal.titulos;
@@ -329,7 +329,7 @@ GO
 /*=======================================================
 TEST 21
 Resultado esperado:
-Error - Ya existe un título con ese nombre.
+Error - Ya existe un tï¿½tulo con ese nombre.
 =======================================================*/
 
 EXEC Personal.altaTitulo
@@ -343,7 +343,7 @@ GO
 /*=======================================================
 TEST 22
 Resultado esperado:
-Se modifica correctamente el título.
+Se modifica correctamente el tï¿½tulo.
 =======================================================*/
 
 EXEC Personal.modificarTitulo
@@ -374,7 +374,7 @@ GO
 /*=======================================================
 TEST 24
 Resultado esperado:
-Se elimina correctamente el título.
+Se elimina correctamente el tï¿½tulo.
 =======================================================*/
 
 EXEC Personal.bajaTitulo
@@ -387,7 +387,7 @@ GO
 /*=======================================================
 TEST 25
 Resultado esperado:
-Error - No se puede eliminar el titulo porque está asignado a uno o más guias.
+Error - No se puede eliminar el titulo porque estï¿½ asignado a uno o mï¿½s guias.
 =======================================================*/
 
 EXEC Personal.bajaTitulo
@@ -413,11 +413,11 @@ EXEC Personal.altaEspecialidad
 
 EXEC Personal.altaEspecialidad
     @nombre = 'Flora',
-    @descripcion = 'Especialista en vegetación';
+    @descripcion = 'Especialista en vegetaciï¿½n';
 
 EXEC Personal.altaEspecialidad
     @nombre = 'Geologia',
-    @descripcion = 'Especialista en geología';
+    @descripcion = 'Especialista en geologï¿½a';
 
 SELECT *
 FROM Personal.especialidad;
@@ -492,7 +492,7 @@ TESTING STORE PROCEDURE TABLA GUIAS
 /*=======================================================
 TEST 31
 Resultado esperado:
-Se crean correctamente 3 guías.
+Se crean correctamente 3 guï¿½as.
 =======================================================*/
 
 EXEC Personal.altaGuia
@@ -525,7 +525,7 @@ GO
 /*=======================================================
 TEST 33
 Resultado esperado:
-Se modifica correctamente el guía.
+Se modifica correctamente el guï¿½a.
 =======================================================*/
 
 EXEC Personal.modificarGuia
@@ -547,7 +547,7 @@ GO
 /*=======================================================
 TEST 34
 Resultado esperado:
-Se elimina correctamente el guía.
+Se elimina correctamente el guï¿½a.
 =======================================================*/
 
 EXEC Personal.bajaGuia
@@ -574,12 +574,12 @@ EXEC Personal.altaHabilitacion
     'Recorridos de senderos';
 
 EXEC Personal.altaHabilitacion
-    'Montañismo',
-    'Actividades de montaña';
+    'Montaï¿½ismo',
+    'Actividades de montaï¿½a';
 
 EXEC Personal.altaHabilitacion
     'Avistaje',
-    'Observación de fauna';
+    'Observaciï¿½n de fauna';
 
 SELECT *
 FROM Personal.habilitaciones;
@@ -590,7 +590,7 @@ GO
 /*=======================================================
 TEST 36
 Resultado esperado:
-Se modifica correctamente la habilitación.
+Se modifica correctamente la habilitaciï¿½n.
 =======================================================*/
 
 EXEC Personal.modificarHabilitacion
@@ -606,7 +606,7 @@ GO
 /*=======================================================
 TEST 37
 Resultado esperado:
-Error - La habilitación no existe.
+Error - La habilitaciï¿½n no existe.
 =======================================================*/
 
 EXEC Personal.modificarHabilitacion
@@ -621,7 +621,7 @@ GO
 /*=======================================================
 TEST 38
 Resultado esperado:
-Se elimina correctamente la habilitación.
+Se elimina correctamente la habilitaciï¿½n.
 =======================================================*/
 
 EXEC Personal.bajaHabilitacion
@@ -634,7 +634,7 @@ GO
 /*=======================================================
 TEST 39
 Resultado esperado:
-Error - No se puede eliminar la habilitación porque está asociada a guías.
+Error - No se puede eliminar la habilitaciï¿½n porque estï¿½ asociada a guï¿½as.
 =======================================================*/
 
 EXEC Personal.bajaHabilitacion
@@ -644,7 +644,7 @@ GO
 /*=======================================================
 TEST 40
 Resultado esperado:
-Error - La habilitación no existe.
+Error - La habilitaciï¿½n no existe.
 =======================================================*/
 
 EXEC Personal.bajaHabilitacion
@@ -660,7 +660,7 @@ STORE PROCEDURE TABLA HABILITACIONES GUIAS POR PARQUE
 /*=======================================================
 TEST 41
 Resultado esperado:
-Se crea correctamente la habilitación de guía.
+Se crea correctamente la habilitaciï¿½n de guï¿½a.
 =======================================================*/
 
 EXEC Personal.altaHabilitacionGuia
@@ -682,7 +682,7 @@ GO
 /*=======================================================
 TEST 42
 Resultado esperado:
-Se modifica correctamente la habilitación de guía.
+Se modifica correctamente la habilitaciï¿½n de guï¿½a.
 =======================================================*/
 
 EXEC Personal.modificarHabilitacionGuia
@@ -701,7 +701,7 @@ GO
 /*=======================================================
 TEST 43
 Resultado esperado:
-Error - La habilitación del guía no existe.
+Error - La habilitaciï¿½n del guï¿½a no existe.
 =======================================================*/
 
 EXEC Personal.modificarHabilitacionGuia
@@ -720,7 +720,7 @@ GO
 /*=======================================================
 TEST 44
 Resultado esperado:
-Se elimina correctamente la habilitación del guía.
+Se elimina correctamente la habilitaciï¿½n del guï¿½a.
 =======================================================*/
 
 EXEC Personal.bajaHabilitacionGuia
@@ -733,7 +733,7 @@ GO
 /*=======================================================
 TEST 45
 Resultado esperado:
-Error - La habilitación del guía no existe.
+Error - La habilitaciï¿½n del guï¿½a no existe.
 =======================================================*/
 
 EXEC Personal.bajaHabilitacionGuia

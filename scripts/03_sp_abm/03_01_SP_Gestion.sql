@@ -12,7 +12,7 @@
     Descripción del Script: Stored procedures ABM del esquema Gestion.
 */
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 /*=========================================================

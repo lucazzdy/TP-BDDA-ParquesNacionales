@@ -13,7 +13,7 @@ Descripción del Script:  Stored procedures de logica de negocio de venta de ent
                          varias filas.
 */
 
-USE GestionParquesNacionales
+USE GestionParquesNacionales_Com5600_Grupo07
 GO
 
 

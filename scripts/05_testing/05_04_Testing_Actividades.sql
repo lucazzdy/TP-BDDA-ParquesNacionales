@@ -9,7 +9,7 @@ Integrantes:    - Acuña, Lucas Daniel
 
 Descripción del Script: Este script es de testing para los procedimientos almacenados del esquema Actividades.
 */
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 go
 
 SET NOCOUNT ON;

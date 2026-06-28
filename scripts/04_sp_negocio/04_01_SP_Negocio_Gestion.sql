@@ -11,7 +11,7 @@
                             del esquema Gestion.
 */
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 

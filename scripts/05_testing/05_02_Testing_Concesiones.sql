@@ -9,7 +9,7 @@
     Descripción del Script: Testing de los SP del esquema Concesiones.
 */
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 

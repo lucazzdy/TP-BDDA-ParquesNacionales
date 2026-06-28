@@ -1,16 +1,16 @@
 /* 
     Script generado el 13/06/26
 
-Grupo n°7
-Integrantes:    - Acuña, Lucas Daniel
+Grupo nï¿½7
+Integrantes:    - Acuï¿½a, Lucas Daniel
                 - Alesina, Alan
                 - Gutierrez, Lucas Leonel
                 - Zambrana, Mijael
 
-Descripción del Script: Este script crea la encriptaicon de datos sensibles en la base de datos
+Descripciï¿½n del Script: Este script crea la encriptaicon de datos sensibles en la base de datos
 */
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 
@@ -33,9 +33,9 @@ GO
 /*=======================================================
 CREACION CERTIFICADO DEL DNI
 =======================================================*/
--- El certificado protege la clave simétrica.
+-- El certificado protege la clave simï¿½trica.
 -- No cifra el DNI.
--- Protege la llave que sí lo hará.
+-- Protege la llave que sï¿½ lo harï¿½.
 
 IF NOT EXISTS (
     SELECT *
@@ -55,7 +55,7 @@ CREACION CLAVE SIMETRICA
 -- AES_256 es el algoritmo que se utilizara para cifrar
 --      es muy seguro;
 --      es el algoritmo recomendado por Microsoft;
---      es estándar en la industria.
+--      es estï¿½ndar en la industria.
 
 IF NOT EXISTS (
     SELECT *
@@ -171,13 +171,13 @@ BEGIN
 
     IF @documento IS NOT NULL
        AND @documento NOT LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
-        SET @errorMsg += '- El documento debe contener exactamente 8 dígitos numéricos.' + CHAR(13) + CHAR(10);
+        SET @errorMsg += '- El documento debe contener exactamente 8 dï¿½gitos numï¿½ricos.' + CHAR(13) + CHAR(10);
 
     IF @fechaNacimiento >= DATEADD(YEAR,-18,GETDATE())
-        SET @errorMsg += '- La fecha de nacimiento es inválida. Debe ser mayor de 18 años.' + CHAR(13) + CHAR(10);
+        SET @errorMsg += '- La fecha de nacimiento es invï¿½lida. Debe ser mayor de 18 aï¿½os.' + CHAR(13) + CHAR(10);
 
     IF @estado NOT IN ('ACTIVO','INACTIVO','SUSPENDIDO','LICENCIA')
-        SET @errorMsg += '- El estado es inválido.' + CHAR(13) + CHAR(10);
+        SET @errorMsg += '- El estado es invï¿½lido.' + CHAR(13) + CHAR(10);
 
     IF LEN(@errorMsg) > 0
         THROW 50401,@errorMsg,1;
@@ -258,21 +258,21 @@ BEGIN
 
     IF @nuevoDocumento IS NOT NULL
        AND @nuevoDocumento NOT LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
-        SET @errorMsg += '- El documento debe contener exactamente 8 dígitos.' + CHAR(13) + CHAR(10);
+        SET @errorMsg += '- El documento debe contener exactamente 8 dï¿½gitos.' + CHAR(13) + CHAR(10);
 
     IF @nuevaFechaNacimiento IS NOT NULL
        AND @nuevaFechaNacimiento >= DATEADD(YEAR,-18,GETDATE())
-        SET @errorMsg += '- La fecha de nacimiento es inválida. Debe ser mayor de 18 años.' + CHAR(13) + CHAR(10);
+        SET @errorMsg += '- La fecha de nacimiento es invï¿½lida. Debe ser mayor de 18 aï¿½os.' + CHAR(13) + CHAR(10);
 
     IF @nuevoEstado IS NOT NULL
        AND @nuevoEstado NOT IN ('ACTIVO','INACTIVO','SUSPENDIDO','LICENCIA')
-        SET @errorMsg += '- El estado es inválido.' + CHAR(13) + CHAR(10);
+        SET @errorMsg += '- El estado es invï¿½lido.' + CHAR(13) + CHAR(10);
 
     IF LEN(@errorMsg) > 0
         THROW 50403,@errorMsg,1;
 
    
-    -- Modificación
+    -- Modificaciï¿½n
   
 
     BEGIN TRY
@@ -433,13 +433,13 @@ BEGIN
 
     IF @documento IS NOT NULL
        AND @documento NOT LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
-        SET @errorMsg += '- El documento debe contener exactamente 8 dígitos.' + CHAR(13) + CHAR(10);
+        SET @errorMsg += '- El documento debe contener exactamente 8 dï¿½gitos.' + CHAR(13) + CHAR(10);
 
     IF @fechaNacimiento >= DATEADD(YEAR,-18,GETDATE())
-        SET @errorMsg += '- La fecha de nacimiento es inválida. Debe ser mayor de 18 años.' + CHAR(13) + CHAR(10);
+        SET @errorMsg += '- La fecha de nacimiento es invï¿½lida. Debe ser mayor de 18 aï¿½os.' + CHAR(13) + CHAR(10);
 
     IF NOT EXISTS (SELECT 1 FROM Personal.titulos WHERE codTitulo = @codTitulo)
-        SET @errorMsg += '- El título indicado no existe.' + CHAR(13) + CHAR(10);
+        SET @errorMsg += '- El tï¿½tulo indicado no existe.' + CHAR(13) + CHAR(10);
 
     IF NOT EXISTS (SELECT 1 FROM Personal.especialidad WHERE codEspecialidad = @codEspecialidad)
         SET @errorMsg += '- La especialidad indicada no existe.' + CHAR(13) + CHAR(10);
@@ -448,7 +448,7 @@ BEGIN
         THROW 50410, @errorMsg, 1;
 
     ---------------------------------------------------------
-    -- Inserción
+    -- Inserciï¿½n
     ---------------------------------------------------------
 
     BEGIN TRY
@@ -486,7 +486,7 @@ BEGIN
             CLOSE SYMMETRIC KEY ClaveDNI;
 
         IF ERROR_NUMBER() IN (2601,2627)
-            THROW 50411,'Ya existe un guía con ese documento.',1;
+            THROW 50411,'Ya existe un guï¿½a con ese documento.',1;
 
         THROW;
 
@@ -527,15 +527,15 @@ BEGIN
 
     IF @nuevoDocumento IS NOT NULL
        AND @nuevoDocumento NOT LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
-        SET @errorMsg += '- El documento debe contener exactamente 8 dígitos.' + CHAR(13)+CHAR(10);
+        SET @errorMsg += '- El documento debe contener exactamente 8 dï¿½gitos.' + CHAR(13)+CHAR(10);
 
     IF @fechaNacimiento IS NOT NULL
        AND @fechaNacimiento >= DATEADD(YEAR,-18,GETDATE())
-        SET @errorMsg += '- La fecha de nacimiento es inválida. Debe ser mayor de 18 años.' + CHAR(13)+CHAR(10);
+        SET @errorMsg += '- La fecha de nacimiento es invï¿½lida. Debe ser mayor de 18 aï¿½os.' + CHAR(13)+CHAR(10);
 
     IF @codTitulo IS NOT NULL
        AND NOT EXISTS(SELECT 1 FROM Personal.titulos WHERE codTitulo=@codTitulo)
-        SET @errorMsg += '- El título indicado no existe.' + CHAR(13)+CHAR(10);
+        SET @errorMsg += '- El tï¿½tulo indicado no existe.' + CHAR(13)+CHAR(10);
 
     IF @codEspecialidad IS NOT NULL
        AND NOT EXISTS(SELECT 1 FROM Personal.especialidad WHERE codEspecialidad=@codEspecialidad)
@@ -545,7 +545,7 @@ BEGIN
         THROW 50412,@errorMsg,1;
 
     ---------------------------------------------------------
-    -- Actualización
+    -- Actualizaciï¿½n
     ---------------------------------------------------------
 
     BEGIN TRY
@@ -584,7 +584,7 @@ BEGIN
             CLOSE SYMMETRIC KEY ClaveDNI;
 
         IF ERROR_NUMBER() IN (2601,2627)
-            THROW 50413,'Ya existe un guía con ese documento.',1;
+            THROW 50413,'Ya existe un guï¿½a con ese documento.',1;
 
         THROW;
 

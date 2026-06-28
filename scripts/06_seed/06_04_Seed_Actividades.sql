@@ -19,7 +19,7 @@
 
 */
 
-USE GestionParquesNacionales
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 -- Insertar al menos 10 tipos de actividades

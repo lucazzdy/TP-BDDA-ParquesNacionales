@@ -25,7 +25,7 @@
        El path debe terminar con barra invertida.
 */
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 

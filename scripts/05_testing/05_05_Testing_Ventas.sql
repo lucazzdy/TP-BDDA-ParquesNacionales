@@ -9,7 +9,7 @@ Integrantes:    - Acuña, Lucas Daniel
 
 Descripción del Script: Testing de los SP del esquema Ventas.
 */
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 --  ================================    Pruebas para Ventas.tipoVisitante   ================================

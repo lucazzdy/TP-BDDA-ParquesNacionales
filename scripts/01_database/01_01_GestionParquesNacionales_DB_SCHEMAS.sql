@@ -14,11 +14,11 @@ Descripción del Script: Este script crea la base de datos y los esquemas
 USE master;
 GO
 
-IF DB_ID('GestionParquesNacionales') IS NULL
-	CREATE DATABASE GestionParquesNacionales COLLATE Latin1_GENERAL_CI_AS
+IF DB_ID('GestionParquesNacionales_Com5600_Grupo07') IS NULL
+	CREATE DATABASE GestionParquesNacionales_Com5600_Grupo07 COLLATE Latin1_GENERAL_CI_AS
 go
 
-USE GestionParquesNacionales
+USE GestionParquesNacionales_Com5600_Grupo07
 go
 
 IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'Personal')

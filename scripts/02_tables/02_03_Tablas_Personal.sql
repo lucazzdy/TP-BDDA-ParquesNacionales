@@ -10,7 +10,7 @@ Integrantes:    - Acu�a, Lucas Daniel
 Descripci�n del Script: Este script genera todas las tablas del esquema Personal
 =======================================================*/
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 /*=======================================================

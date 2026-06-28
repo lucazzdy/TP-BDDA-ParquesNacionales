@@ -4,14 +4,14 @@
 Grupo n°7
 Integrantes:    - Acuña, Lucas Daniel
                 - Alesina, Alan
-                - Gutierrez, Lucas Leone
+                - Gutierrez, Lucas Leonel
                 - Zambrana, Mijael
  
 Descripción del Script: Este script genera todas las tablas del esquema Gestion
 */
 
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 -- Tipos de parque: nacional, reserva, monumento, etc

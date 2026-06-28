@@ -14,7 +14,7 @@
                             retornar XML en algunos reportes.
 */
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 

@@ -10,7 +10,7 @@ Integrantes:    - Acuña, Lucas Daniel
 Descripción del Script: Stored procedures ABM del esquema Ventas
 */
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 --SP ABM de Ventas.tipoVisitante ALTA

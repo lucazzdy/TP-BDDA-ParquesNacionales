@@ -11,7 +11,7 @@ Descripción del Script: Este script genera los stored procedures ABM
                         para el esquema de Actividades y sus tablas.
 */
 
-USE GestionParquesNacionales
+USE GestionParquesNacionales_Com5600_Grupo07
 go
 
 ------ SPs para tabla Actividades.tipoActividad ------

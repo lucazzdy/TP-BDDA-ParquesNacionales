@@ -12,7 +12,7 @@
                             Staging tables + log de errores.
 */
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 -- Staging para el dataset SIB (areas protegidas con datos completos)

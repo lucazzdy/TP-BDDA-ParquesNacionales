@@ -11,7 +11,7 @@
                             Gestion + Concesiones (Entrega 7).
 */
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 

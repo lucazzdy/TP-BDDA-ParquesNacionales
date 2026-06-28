@@ -10,7 +10,7 @@ Integrantes:    - Acuña, Lucas Daniel
 Descripción del Script: Este script genera todas las tablas del esquema Ventas
 */
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 -- VALIDACION Y ELIMINACION DE TABLAS PREVIAS (en orden inverso por las FK)

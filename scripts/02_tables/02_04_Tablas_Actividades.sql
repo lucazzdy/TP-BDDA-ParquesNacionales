@@ -10,7 +10,7 @@ Integrantes:    - Acuña, Lucas Daniel
 Descripción del Script: Este script genera todas las tablas del esquema Actividades
 */
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 --- Este script crea/regenera todas las tablas de actividades ---

@@ -10,7 +10,7 @@ Integrantes:    - Acu�a, Lucas Daniel
 Descripci�n del Script: Este script genera los stored procedures ABM para el esquema de Personal y sus tablas.
 =======================================================*/
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 /*=======================================================

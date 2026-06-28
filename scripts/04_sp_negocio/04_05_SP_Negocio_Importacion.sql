@@ -18,7 +18,7 @@
                             si una fila falla, las demas siguen.
 */
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 

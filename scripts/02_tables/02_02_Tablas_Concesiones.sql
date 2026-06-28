@@ -10,7 +10,7 @@ Integrantes:    - Acuña, Lucas Daniel
 Descripción del Script: Este script genera todas las tablas del esquema Concesiones
 */
 
-USE GestionParquesNacionales;
+USE GestionParquesNacionales_Com5600_Grupo07;
 GO
  
 -- Tipos de concesion: comercio, restaurante, empresa de turismo, etc.

@@ -18,7 +18,7 @@
 
 */
 
-USE GestionParquesNacionales
+USE GestionParquesNacionales_Com5600_Grupo07
 GO
 
 IF NOT EXISTS (SELECT 1 FROM Gestion.parque)
