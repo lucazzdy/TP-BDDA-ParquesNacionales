@@ -40,7 +40,7 @@ GO
 
 CREATE TABLE Personal.guardaparques(
 	legajo INT IDENTITY(1,1),
-	documento CHAR(8) UNIQUE NOT NULL,
+	documento CHAR(8) NOT NULL,
 
 	nombre VARCHAR(50) NOT NULL,
 	apellido VARCHAR(50) NOT NULL,
@@ -52,6 +52,8 @@ CREATE TABLE Personal.guardaparques(
 	CONSTRAINT PK_guardaparques PRIMARY KEY ( legajo ),
 
 	CONSTRAINT CK_documentos_Guardaparques CHECK ( documento LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]' ),
+
+	CONSTRAINT UQ_documento_Guardaparques UNIQUE (documento),
 
 	CONSTRAINT CK_fechaNacimiento_Guardaparques CHECK ( fechaNacimiento <= DATEADD( YEAR, -18, GETDATE() ) ),
 
@@ -140,7 +142,7 @@ GO
 
 CREATE TABLE Personal.guias(
 	legajo INT IDENTITY(1,1),
-	documento CHAR(8) UNIQUE NOT NULL,
+	documento CHAR(8) NOT NULL,
 
 	nombre VARCHAR(50) NOT NULL,
 	apellido VARCHAR(50) NOT NULL,
@@ -152,7 +154,9 @@ CREATE TABLE Personal.guias(
 
 	CONSTRAINT PK_Guias  PRIMARY KEY (legajo),
 
-	CONSTRAINT CK_Documentos_Guias CHECK ( documento LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]' ),
+	CONSTRAINT CK_documentos_Guias CHECK ( documento LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]' ),
+
+	CONSTRAINT UQ_documento_Guias UNIQUE (documento),
 
 	CONSTRAINT FK_Guias_Titulos FOREIGN KEY (codTitulo)
 		REFERENCES Personal.Titulos(codTitulo),

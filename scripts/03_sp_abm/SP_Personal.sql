@@ -73,7 +73,6 @@ BEGIN
         RETURN;
     END;
 
-    -- Inserci�n
     INSERT INTO Personal.guardaparques
     (
         documento,
@@ -151,6 +150,8 @@ GO
 -- BAJA DE GUARDAPARQUES
 ---------------------------------------------------------
 
+-- nota: modificado (despues ver los otros)
+
 CREATE OR ALTER PROCEDURE Personal.bajaGuardaparque
 (
     @legajo INT
@@ -158,34 +159,33 @@ CREATE OR ALTER PROCEDURE Personal.bajaGuardaparque
 AS
 BEGIN
 
+    SET NOCOUNT ON;
+
+    DECLARE @errorMsg VARCHAR(MAX)='';
+
     IF NOT EXISTS
     (
         SELECT 1
         FROM Personal.guardaparques
-        WHERE legajo = @legajo
+        WHERE legajo=@legajo
     )
-    BEGIN
-        RAISERROR('El legajo no existe.',16,1);
-        RETURN;
-    END;
+        SET @errorMsg+='- El legajo no existe.'+CHAR(13)+CHAR(10);
 
     IF EXISTS
     (
         SELECT 1
         FROM Personal.guardaparques
-        WHERE legajo = @legajo
-          AND estado = 'INACTIVO'
+        WHERE legajo=@legajo
+        AND estado='INACTIVO'
     )
-    BEGIN
-        RAISERROR('El guardaparque ya se encuentra inactivo.',16,1);
-        RETURN;
-    END;
+        SET @errorMsg+='- El guardaparque ya se encuentra inactivo.'+CHAR(13)+CHAR(10);
+
+    IF LEN(@errorMsg)>0
+        THROW 50405,@errorMsg,1;
 
     UPDATE Personal.guardaparques
-    SET estado = 'INACTIVO'
-    WHERE legajo = @legajo;
-
-    PRINT 'Guardaparque dado de baja correctamente.';
+    SET estado='INACTIVO'
+    WHERE legajo=@legajo;
 
 END;
 GO
@@ -422,15 +422,31 @@ GO
 -- BAJA GUIA
 ---------------------------------------------------------
 
+-- nota: ya modificado
+
 CREATE OR ALTER PROCEDURE Personal.bajaGuia
 (
     @legajo INT
 )
 AS
 BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @errorMsg VARCHAR(MAX)='';
+
+    IF NOT EXISTS
+    (
+        SELECT 1
+        FROM Personal.guias
+        WHERE legajo=@legajo
+    )
+        SET @errorMsg += '- El legajo indicado no existe.' + CHAR(13)+CHAR(10);
+
+    IF LEN(@errorMsg)>0
+        THROW 50414,@errorMsg,1;
 
     DELETE FROM Personal.guias
-    WHERE legajo = @legajo;
+    WHERE legajo=@legajo;
 
 END;
 GO
