@@ -37,6 +37,11 @@ PRINT '';
 -- ========================================
 -- 1. PROCEDIMIENTO: tipoActividadAlta
 -- ========================================
+-- Obtengo el ultimo id de cada tabla en la que se insertan datos de prueba para luego eliminarlos correctamente
+DECLARE @ultimaIdTipoActividad INT = (SELECT TOP 1 idTipoActividad FROM Actividades.tipoActividad ORDER BY idTipoActividad DESC)
+DECLARE @ultimaIdActividad INT = (SELECT TOP 1 idActividad FROM Actividades.actividad ORDER BY idActividad DESC)
+
+
 PRINT '1. Probando tipoActividadAlta...';
 BEGIN TRY
     -- Caso 1: Alta exitosa con todos los parámetros
@@ -254,6 +259,8 @@ BEGIN TRY
         @nombre = 'Senderismo en Montaña',
         @costo = 450.50,
         @duracion = 8.0,
+        @turno = 'MANANA',
+        @diaDisponible = 'LUN',
         @idTipoActividad = @idTipoActividadParaActividad;
     
     INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
@@ -274,6 +281,8 @@ BEGIN TRY
         @nombre = 'Fotografía de Fauna',
         @costo = NULL,
         @duracion = 4.5,
+        @turno = 'TARDE',
+        @diaDisponible = 'VIE',
         @idTipoActividad = @idTipoActividadParaActividad;
     
     INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
@@ -294,6 +303,8 @@ BEGIN TRY
         @nombre = 'Observación de Aves',
         @costo = 150.00,
         @duracion = NULL,
+        @turno = 'NOCHE',
+        @diaDisponible = 'MIE',
         @idTipoActividad = @idTipoActividadParaActividad;
     
     INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
@@ -314,6 +325,8 @@ BEGIN TRY
         @nombre = 'Actividad Inválida',
         @costo = 100.00,
         @duracion = 2.0,
+        @turno = 'TARDE',
+        @diaDisponible = 'MAR',
         @idTipoActividad = 9999;
     
     INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
@@ -328,6 +341,27 @@ BEGIN CATCH
     PRINT 'Caso 4: FK validada correctamente';
 END CATCH
 
+BEGIN TRY
+    -- Caso 5: Alta con turno y dia disponible invalido (debe fallar)
+    EXEC Actividades.actividadAlta
+        @nombre = 'Actividad Inválida',
+        @costo = 0.0,
+        @duracion = 1.5,
+        @turno = 'SIN TURNO',
+        @diaDisponible = 'NOP',
+        @idTipoActividad = @idTipoActividadTest
+
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Alta - turno y diaDisponible inválido', 'actividadAlta', 'ERROR', 
+            'Se esperaba error por turno y diaDisponible inválido pero el procedimiento fue exitoso');
+    PRINT 'Caso 5: Validación de Turno y Dia disponible (como se esperaba)';
+END TRY
+BEGIN CATCH
+    INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
+    VALUES ('Alta - turno y diaDisponible inválido', 'actividadAlta', 'EXITOSO', 
+            'Error capturado correctamente: ' + ERROR_MESSAGE());
+    PRINT 'Caso 5: turno y diaDisponible validado correctamente';
+END CATCH
 PRINT '';
 
 -- ========================================
@@ -390,6 +424,8 @@ BEGIN CATCH
     PRINT 'Caso 2: Validación de ID funcionando';
 END CATCH
 
+
+
 PRINT '';
 
 -- ========================================
@@ -404,6 +440,8 @@ BEGIN TRY
         @nombre = 'Actividad Para Prueba Baja',
         @costo = 100.00,
         @duracion = 1.0,
+        @turno = 'TARDE',
+        @diaDisponible = 'MAR',
         @idTipoActividad = @idTipoActividadParaActividad;
     
     -- Obtener el ID recién insertado
@@ -598,10 +636,13 @@ BEGIN CATCH
     PRINT 'Caso 5: Validación de CHECK funcionando';
 END CATCH
 
+PRINT('')
+
 -- ========================================
 -- 2. PROCEDIMIENTO: tourModificar
 -- ========================================
 
+PRINT '2. Probando tourModificar...';
 BEGIN TRY
     -- Caso 1: Modificación exitosa de todos los campos
     EXEC Actividades.tourModificar
@@ -665,15 +706,17 @@ BEGIN CATCH
     PRINT 'Caso 3: Validación de CHECK funcionando';
 END CATCH
 
+PRINT('')
 -- ========================================
 -- 3. PROCEDIMIENTO: tourBaja
 -- ========================================
-
+PRINT '3. Probando tourBaja...';
 BEGIN TRY
     -- Caso 1: Baja exitosa
     EXEC Actividades.tourBaja
         @idActividad = @idActividadTest,
-        @legajo = @legajoPrueba;
+        @legajo = @legajoPrueba,
+        @fechaInicio = '2026-07-01';
     
     INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
     VALUES ('Baja - Eliminación exitosa', 'tourBaja', 'EXITOSO', 
@@ -691,7 +734,8 @@ BEGIN TRY
     -- Caso 2: Baja de ID inexistente
     EXEC Actividades.tourBaja
         @idActividad = 99999,
-        @legajo = 99999;
+        @legajo = 99999,
+        @fechaInicio = '2099-12-31';
     
     INSERT INTO #TestResultados (NombreTest, Procedimiento, Estado, Mensaje)
     VALUES ('Baja - ID inexistente (validación)', 'tourBaja', 'ERROR', 
@@ -741,19 +785,15 @@ PRINT 'PRUEBAS COMPLETADAS';
 PRINT '========================================';
 
 -- Limpieza de datos de prueba en tablas tipoActividad y actividad.
-DELETE FROM Actividades.actividad 
-    WHERE idActividad IN (
-        SELECT TOP 3 idActividad 
-        FROM Actividades.actividad 
-        ORDER BY idActividad DESC
-        );
+SET @ultimaIdActividad = ISNULL(@ultimaIdActividad, 0)
+SET @ultimaIdTipoActividad = ISNULL(@ultimaIdTipoActividad, 0)
 
-DELETE FROM Actividades.tipoActividad 
-    WHERE idTipoActividad IN (
-        SELECT TOP 4 idTipoActividad 
-        FROM Actividades.tipoActividad 
-        ORDER BY idTipoActividad DESC
-        );
+DELETE FROM Actividades.tour WHERE idActividad = @idActividadTest AND legajo = @legajoPrueba;
 
-DELETE FROM Actividades.tour 
-    WHERE idActividad = @idActividadTest AND legajo = @legajoPrueba;
+DELETE FROM Actividades.actividad WHERE idActividad > @ultimaIdActividad
+DBCC CHECKIDENT('Actividades.actividad', RESEED, @ultimaIdActividad) 
+
+DELETE FROM Actividades.tipoActividad WHERE idTipoActividad > @ultimaIdTipoActividad
+DBCC CHECKIDENT('Actividades.tipoActividad', RESEED, @ultimaIdTipoActividad)
+
+

@@ -26,6 +26,8 @@ CREATE OR ALTER PROCEDURE Actividades.importarActividad(
     @nombre VARCHAR(100),
     @costo DECIMAL(8, 2),
     @duracion DECIMAL(5, 2),
+    @turno VARCHAR(10),
+    @diaDisponible VARCHAR(3),
     @idTipoActividad INT
     )
     
@@ -46,6 +48,8 @@ BEGIN
             @nombre = @nombre,
             @costo = @costo,
             @duracion = @duracion,
+            @turno = @turno,
+            @diaDisponible = @diaDisponible,
             @idTipoActividad = @idTipoActividad
             
     END
@@ -56,6 +60,8 @@ BEGIN
             @idActividad = @idActividadExistente,
             @costo = @costo,
             @duracion = @duracion,
+            @turno = @turno,
+            @diaDisponible = @diaDisponible,
             @idTipoActividad = @idTipoActividad
     END
 END

@@ -44,7 +44,9 @@ CREATE TABLE Actividades.actividad (
         idActividad INT IDENTITY(1,1) NOT NULL,
         nombre VARCHAR(100) NOT NULL UNIQUE,
         costo DECIMAL(8,2) NULL CHECK(costo >= 0),
-        duracion DECIMAL(3,1) NULL CHECK(Duracion > 0), 
+        duracion DECIMAL(3,1) NULL CHECK(duracion > 0),
+        turno VARCHAR(10) NULL CHECK(turno IN ('MANANA','TARDE','NOCHE')),
+        diaDisponible VARCHAR(3) NULL CHECK(diaDisponible IN ('LUN','MAR','MIE','JUE','VIE','SAB','DOM')),
         idTipoActividad INT NOT NULL,
         CONSTRAINT PK_Actividad PRIMARY KEY (idActividad),
         -- FK al tipo de actividad

@@ -22,6 +22,17 @@
 USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
+-- Si se quiere borrar todos los datos de actividades ejecutar:
+/*
+    DELETE FROM Actividades.tour;
+    DELETE FROM Actividades.actividad;
+    DELETE FROM Actividades.tipoActividad;
+    DBCC CHECKIDENT ('Actividades.tipoActividad', RESEED, 0);
+    DBCC CHECKIDENT ('Actividades.actividad', RESEED, 0);
+*/
+
+
+
 -- Insertar al menos 10 tipos de actividades
 
 EXEC Actividades.tipoActividadAlta @descripcion = 'Senderismo';
@@ -56,7 +67,23 @@ BEGIN
 
     -- Generar una duración aleatoria entre 1 y 10 horas con un decimal
     DECLARE @duracion DECIMAL(3,1) = ROUND(ABS(CHECKSUM(NEWID())) % 9 + 1, 1);
+        
+    DECLARE @turno VARCHAR(10) = CASE (ABS(CHECKSUM(NEWID())) % 3 + 1)
+                                    WHEN 1 THEN 'MANANA'
+                                    WHEN 2 THEN 'TARDE'
+                                    ELSE 'NOCHE'
+                                 END
 
+    DECLARE @diaDisponible VARCHAR(3) = CASE (ABS(CHECKSUM(NEWID())) % 7 + 1)
+                                            WHEN 1 THEN 'LUN'
+                                            WHEN 2 THEN 'MAR'
+                                            WHEN 3 THEN 'MIE'
+                                            WHEN 4 THEN 'JUE'
+                                            WHEN 5 THEN 'VIE'
+                                            WHEN 6 THEN 'SAB'
+                                            ELSE 'DOM'
+                                        END
+ 
     -- Checkear si ya existe una actividad con el mismo nombre y agregar un sufijo numérico si es necesario para evitar duplicados
     WHILE EXISTS (SELECT 1 FROM Actividades.actividad WHERE nombre = @nombreActividad)
     BEGIN
@@ -67,6 +94,8 @@ BEGIN
         @nombre = @nombreActividad,
         @costo = @costo,
         @duracion = @duracion,
+        @turno = @turno,
+        @diaDisponible = @diaDisponible,
         @idTipoActividad = @idTipoActividad;
 
     SET @cantidadActividades -= 1;

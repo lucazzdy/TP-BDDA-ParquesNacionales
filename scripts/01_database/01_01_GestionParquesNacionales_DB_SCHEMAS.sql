@@ -110,11 +110,11 @@ FIN DEL SCRIPT
 USE master;
 GO
 
-ALTER DATABASE GestionParquesNacionales
+ALTER DATABASE GestionParquesNacionales_Com5600_Grupo07
 SET SINGLE_USER
 WITH ROLLBACK IMMEDIATE;
 GO
 
-DROP DATABASE GestionParquesNacionales;
+DROP DATABASE GestionParquesNacionales_Com5600_Grupo07;
 GO
 */
