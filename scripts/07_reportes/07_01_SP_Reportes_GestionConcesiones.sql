@@ -23,7 +23,7 @@ REPORTE: DEUDORES
 Lista las concesiones que tienen al menos un pago en estado
 Atrasado, con el detalle de meses y montos especificos.
 =========================================================*/
-CREATE OR ALTER PROCEDURE Concesiones.reporte_deudores
+CREATE OR ALTER PROCEDURE Concesiones.reporteDeudores
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -64,7 +64,7 @@ Lista todos los parques con sus concesiones anidadas.
 Si un parque no tiene concesiones, el nodo Concesiones no aparece.
 El estado de cada concesion (Vigente/Vencida) se calcula comparando con la fecha actual.
 =========================================================*/
-CREATE OR ALTER PROCEDURE Gestion.reporte_parquesConConcesiones
+CREATE OR ALTER PROCEDURE Gestion.reporteParquesConConcesiones
 AS
 BEGIN
     SET NOCOUNT ON;

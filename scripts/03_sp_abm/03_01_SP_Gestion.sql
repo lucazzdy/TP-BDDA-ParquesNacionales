@@ -19,7 +19,7 @@ GO
 ALTA TIPO PARQUE
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Gestion.tipoParque_Alta
+CREATE OR ALTER PROCEDURE Gestion.tipoParqueAlta
     @nombre VARCHAR(50),
     @descripcion VARCHAR(200) = NULL
 AS
@@ -47,7 +47,7 @@ GO
 MODIFICAR TIPO PARQUE
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Gestion.tipoParque_Modificar
+CREATE OR ALTER PROCEDURE Gestion.tipoParqueModificar
     @idTipoParque INT,
     @nombre VARCHAR(50) = NULL,
     @descripcion VARCHAR(200) = NULL
@@ -84,7 +84,7 @@ GO
 BAJA TIPO PARQUE
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Gestion.tipoParque_Baja
+CREATE OR ALTER PROCEDURE Gestion.tipoParqueBaja
     @idTipoParque INT
 AS
 BEGIN
@@ -111,7 +111,7 @@ GO
 ALTA PARQUE
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Gestion.parque_Alta
+CREATE OR ALTER PROCEDURE Gestion.parqueAlta
     @nombre VARCHAR(100),
     @superficie DECIMAL(12, 2),
     @idTipoParque INT,
@@ -161,7 +161,7 @@ GO
 MODIFICAR PARQUE
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Gestion.parque_Modificar
+CREATE OR ALTER PROCEDURE Gestion.parqueModificar
     @idParque INT,
     @nombre VARCHAR(100) = NULL,
     @superficie DECIMAL(12, 2) = NULL,
@@ -224,7 +224,7 @@ GO
 BAJA PARQUE
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Gestion.parque_Baja
+CREATE OR ALTER PROCEDURE Gestion.parqueBaja
     @idParque INT
 AS
 BEGIN

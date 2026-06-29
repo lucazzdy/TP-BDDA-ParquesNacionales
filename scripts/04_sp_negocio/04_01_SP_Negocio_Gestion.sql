@@ -19,7 +19,7 @@ GO
 IMPORTAR PARQUE
 Upsert: si existe un parque con el mismo nombre, actualiza
 sus datos. Si no existe, lo crea. Delega las validaciones
-y la persistencia a los SPs ABM (parque_Alta, parque_Modificar).
+y la persistencia a los SPs ABM (parqueAlta, parqueModificar).
 =========================================================*/
 CREATE OR ALTER PROCEDURE Gestion.importarParque
     @nombre VARCHAR(100),
@@ -44,7 +44,7 @@ BEGIN
     IF @idParqueExistente IS NULL
     BEGIN
         -- No existe: alta delegada al SP ABM
-        EXEC Gestion.parque_Alta 
+        EXEC Gestion.parqueAlta 
             @nombre = @nombre,
             @superficie = @superficie,
             @idTipoParque = @idTipoParque,
@@ -58,7 +58,7 @@ BEGIN
     ELSE
     BEGIN
         -- Ya existe: modificacion delegada al SP ABM
-        EXEC Gestion.parque_Modificar
+        EXEC Gestion.parqueModificar
             @idParque = @idParqueExistente,
             @superficie = @superficie,
             @idTipoParque = @idTipoParque,

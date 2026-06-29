@@ -55,11 +55,11 @@ GRANT SELECT ON SCHEMA::Actividades TO rol_consultor;
 GRANT SELECT ON SCHEMA::Ventas TO rol_consultor;
 
 -- Reportes
-GRANT EXECUTE ON Gestion.reporte_parquesConConcesiones TO rol_consultor;
+GRANT EXECUTE ON Gestion.reporteParquesConConcesiones TO rol_consultor;
 GRANT EXECUTE ON Gestion.reporteIngresos TO rol_consultor;
 GRANT EXECUTE ON Gestion.reporteVisitas TO rol_consultor;
 GRANT EXECUTE ON Gestion.reporteVisitasPorPeriodo TO rol_consultor;
-GRANT EXECUTE ON Concesiones.reporte_deudores TO rol_consultor;
+GRANT EXECUTE ON Concesiones.reporteDeudores TO rol_consultor;
 
 -- SPs de consulta (no modifican datos)
 GRANT EXECUTE ON Gestion.consultarParqueConConcesiones TO rol_consultor;
@@ -122,8 +122,8 @@ GRANT EXECUTE ON Concesiones.marcarPagosAtrasados TO rol_operador;
 GRANT EXECUTE ON Concesiones.cerrarConcesion TO rol_operador;
 GRANT EXECUTE ON Concesiones.consultarProximasAVencer TO rol_operador;
 GRANT EXECUTE ON Concesiones.consultarAtrasadas TO rol_operador;
-GRANT EXECUTE ON Concesiones.empresa_Alta TO rol_operador;
-GRANT EXECUTE ON Concesiones.empresa_Modificar TO rol_operador;
+GRANT EXECUTE ON Concesiones.empresaAlta TO rol_operador;
+GRANT EXECUTE ON Concesiones.empresaModificar TO rol_operador;
 
 -- Personal (asignacion de guardaparques y guias)
 GRANT EXECUTE ON Personal.asignarGuardaparqueParque TO rol_operador;

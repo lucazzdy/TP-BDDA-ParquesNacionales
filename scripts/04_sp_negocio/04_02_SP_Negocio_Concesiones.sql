@@ -42,7 +42,7 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        EXEC Concesiones.concesion_Alta
+        EXEC Concesiones.concesionAlta
             @idEmpresa = @idEmpresa,
             @idParque = @idParque,
             @idTipoConcesion = @idTipoConcesion,
@@ -59,7 +59,7 @@ BEGIN
         BEGIN
             SET @periodo = FORMAT(@fechaActual, 'yyyy-MM');
 
-            EXEC Concesiones.pagoCanon_Alta
+            EXEC Concesiones.pagoCanonAlta
                 @idConcesion = @idConcesion,
                 @fecha = @fechaActual,
                 @monto = @montoCanonMensual,
@@ -87,7 +87,7 @@ REGISTRAR PAGO CANON
 Upsert de pago: si existe un pago para ese periodo en estado 
 Pendiente o Atrasado, lo marca como Pagado.
 Si no existe, lo crea como Pagado. Delega persistencia a 
-pagoCanon_Alta y pagoCanon_Modificar.
+pagoCanonAlta y pagoCanonModificar.
 =========================================================*/
 CREATE OR ALTER PROCEDURE Concesiones.registrarPagoCanon
     @idConcesion INT,
@@ -116,7 +116,7 @@ BEGIN
     IF @idPagoCanonExistente IS NULL
     BEGIN
         -- No existe: alta delegada al SP ABM
-        EXEC Concesiones.pagoCanon_Alta
+        EXEC Concesiones.pagoCanonAlta
             @idConcesion = @idConcesion,
             @fecha = @fecha,
             @monto = @monto,
@@ -126,7 +126,7 @@ BEGIN
     ELSE
     BEGIN
         -- Existia como Pendiente o Atrasado: modificacion delegada al SP ABM
-        EXEC Concesiones.pagoCanon_Modificar
+        EXEC Concesiones.pagoCanonModificar
             @idPagoCanon = @idPagoCanonExistente,
             @fecha = @fecha,
             @monto = @monto,
@@ -141,7 +141,7 @@ MARCAR PAGOS ATRASADOS
 Recorre los pagos en estado Pendiente cuyo periodo ya 
 paso (anterior al mes actual) y los marca como Atrasado.
 Operacion masiva: por performance se hace UPDATE directo
-en lugar de iterar pagoCanon_Modificar fila por fila.
+en lugar de iterar pagoCanonModificar fila por fila.
 =========================================================*/
 CREATE OR ALTER PROCEDURE Concesiones.marcarPagosAtrasados
 AS
@@ -166,7 +166,7 @@ CERRAR CONCESION
 Termina una concesion antes de la fechaFin original.
 Elimina los pagos pendientes futuros (posteriores a 
 fechaCierre). Todo en transaccion. Delega persistencia
-a los SPs ABM (concesion_Modificar y pagoCanon_Baja).
+a los SPs ABM (concesionModificar y pagoCanonBaja).
 =========================================================*/
 CREATE OR ALTER PROCEDURE Concesiones.cerrarConcesion
     @idConcesion INT,
@@ -211,7 +211,7 @@ BEGIN
         BEGIN TRANSACTION;
 
         -- Actualizar fechaFin via SP ABM
-        EXEC Concesiones.concesion_Modificar
+        EXEC Concesiones.concesionModificar
             @idConcesion = @idConcesion,
             @fechaFin = @fechaCierre;
 
@@ -229,7 +229,7 @@ BEGIN
               AND estado = 'Pendiente' 
               AND periodo > @periodoCierre;
 
-            EXEC Concesiones.pagoCanon_Baja @idPagoCanon = @idPagoCanonBaja;
+            EXEC Concesiones.pagoCanonBaja @idPagoCanon = @idPagoCanonBaja;
         END
 
         COMMIT TRANSACTION;

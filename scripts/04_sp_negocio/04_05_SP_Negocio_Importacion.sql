@@ -180,7 +180,7 @@ BEGIN
 
             IF @idTipoParque IS NULL
             BEGIN
-                EXEC Gestion.tipoParque_Alta @nombre = @tipoParque;
+                EXEC Gestion.tipoParqueAlta @nombre = @tipoParque;
 
                 SELECT @idTipoParque = idTipoParque 
                 FROM Gestion.tipoParque 
@@ -278,8 +278,8 @@ BEGIN
                 GOTO NextRow;
             END
 
-            -- Actualizar via parque_Modificar
-            EXEC Gestion.parque_Modificar
+            -- Actualizar via parqueModificar
+            EXEC Gestion.parqueModificar
                 @idParque = @idParque,
                 @superficie = @hectareas;
 

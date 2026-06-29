@@ -15,10 +15,10 @@ USE GestionParquesNacionales_Com5600_Grupo07;
 GO
 
 
--- reporte_deudores
+-- reporteDeudores
 
 -- OK: ejecutar el reporte y verificar que devuelve XML
-EXEC Concesiones.reporte_deudores;
+EXEC Concesiones.reporteDeudores;
 
 -- OK: el contenido del XML debe coincidir con esta query
 SELECT 
@@ -35,10 +35,10 @@ WHERE pc.estado = 'Atrasado'
 GROUP BY c.idConcesion, e.nombre, p.nombre;
 
 
--- reporte_parquesConConcesiones
+-- reporteParquesConConcesiones
 
 -- OK: ejecutar el reporte y verificar que devuelve XML
-EXEC Gestion.reporte_parquesConConcesiones;
+EXEC Gestion.reporteParquesConConcesiones;
 
 -- OK: el XML debe incluir TODOS los parques (con y sin concesiones)
 SELECT COUNT(*) AS totalParques FROM Gestion.parque;

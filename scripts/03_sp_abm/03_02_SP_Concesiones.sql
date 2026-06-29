@@ -19,7 +19,7 @@ GO
 ALTA TIPO CONCESION
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Concesiones.tipoConcesion_Alta
+CREATE OR ALTER PROCEDURE Concesiones.tipoConcesionAlta
     @descripcion VARCHAR(100)
 AS
 BEGIN
@@ -46,7 +46,7 @@ GO
 MODIFICAR TIPO CONCESION
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Concesiones.tipoConcesion_Modificar
+CREATE OR ALTER PROCEDURE Concesiones.tipoConcesionModificar
     @idTipoConcesion INT,
     @descripcion VARCHAR(100)
 AS
@@ -81,7 +81,7 @@ GO
 BAJA TIPO CONCESION
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Concesiones.tipoConcesion_Baja
+CREATE OR ALTER PROCEDURE Concesiones.tipoConcesionBaja
     @idTipoConcesion INT
 AS
 BEGIN
@@ -108,7 +108,7 @@ GO
 ALTA EMPRESA
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Concesiones.empresa_Alta
+CREATE OR ALTER PROCEDURE Concesiones.empresaAlta
     @nombre VARCHAR(100)
 AS
 BEGIN
@@ -135,7 +135,7 @@ GO
 MODIFICAR EMPRESA
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Concesiones.empresa_Modificar
+CREATE OR ALTER PROCEDURE Concesiones.empresaModificar
     @idEmpresa INT,
     @nombre VARCHAR(100)
 AS
@@ -170,7 +170,7 @@ GO
 BAJA EMPRESA
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Concesiones.empresa_Baja
+CREATE OR ALTER PROCEDURE Concesiones.empresaBaja
     @idEmpresa INT
 AS
 BEGIN
@@ -197,7 +197,7 @@ GO
 ALTA CONCESION
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Concesiones.concesion_Alta
+CREATE OR ALTER PROCEDURE Concesiones.concesionAlta
     @idEmpresa INT,
     @idParque INT,
     @idTipoConcesion INT,
@@ -241,7 +241,7 @@ GO
 MODIFICAR CONCESION
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Concesiones.concesion_Modificar
+CREATE OR ALTER PROCEDURE Concesiones.concesionModificar
     @idConcesion INT,
     @idEmpresa INT = NULL,
     @idParque INT = NULL,
@@ -299,7 +299,7 @@ GO
 BAJA CONCESION
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Concesiones.concesion_Baja
+CREATE OR ALTER PROCEDURE Concesiones.concesionBaja
     @idConcesion INT
 AS
 BEGIN
@@ -326,7 +326,7 @@ GO
 ALTA PAGO CANON
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Concesiones.pagoCanon_Alta
+CREATE OR ALTER PROCEDURE Concesiones.pagoCanonAlta
     @idConcesion INT,
     @fecha DATE,
     @monto DECIMAL(12, 2),
@@ -372,7 +372,7 @@ GO
 MODIFICAR PAGO CANON
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Concesiones.pagoCanon_Modificar
+CREATE OR ALTER PROCEDURE Concesiones.pagoCanonModificar
     @idPagoCanon INT,
     @fecha DATE = NULL,
     @monto DECIMAL(12, 2) = NULL,
@@ -408,7 +408,7 @@ GO
 BAJA PAGO CANON
 =========================================================*/
 
-CREATE OR ALTER PROCEDURE Concesiones.pagoCanon_Baja
+CREATE OR ALTER PROCEDURE Concesiones.pagoCanonBaja
     @idPagoCanon INT
 AS
 BEGIN
