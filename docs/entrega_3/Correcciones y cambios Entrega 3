@@ -2,13 +2,13 @@ Primeras Correcciones Entrega 3
 
 Fecha 12/06/2026
 
-Correcciones Profe
+Correcciones Profe:
 
 .ubicación de parque que sea atributo compuesto o entidad con atributos
 .titulo de los guías que sea entidad débil o multivaluada
 .atributo fecha en compra
 
-Correcciones Realizadas
+Correcciones Realizadas:
 
 .Ubicacion de parque como atributo multivaluado con los atributos Provincia, calle, nro y codigo Postal
 .titulo, especialidad, tipo concesion, tipo parque, tipo visitante como entidad con atributos propios
@@ -18,7 +18,7 @@ Correcciones Realizadas
 
 Fecha 17/06/2026
 
-Cambios Realizados
+Cambios Realizados:
 
 .Agregado de atributos PuntoVenta y NumeroFactura en la entidad Venta, para mejorar la trazabilidad.
 .Agregado de entidad debil itemVenta relacionado con Venta, permitiendo que multiples item se agrupen de forma ordenada en el ticket.
@@ -30,14 +30,20 @@ Cambios Realizados
 
 Fecha 18/06/2026
 
-Cambios Realizados
+Cambios Realizados:
 
 .Se agregan de atributos Nombre, Apellido, FechaNacimiento, TipoDocumento, NumeroDocumento y se elimina el campo Descripcion en visitante, con el proposito de mejorar la identificacion y diferenciacion de los visitantes.
 .Se elimino el atributo estado en la relacion compra, porque este ya se encuentra en pago.
 
 Fecha 26/06/2026
 
-Cambios Realizados
+Cambios Realizados:
 
 Eliminacion de atributos en entidad Venta, solo quedaron IDventa y fecha.
 Agregado de atributos montototal, fechaEmision, tipoFactura,PuntoVenta y NumeroFactura en entidad ticket 
+
+Fecha 29/06/2026
+
+Cambio Realizados:
+
+Cambio de nombre de atributo idItem por nroItem, esto con el objetivo de dejar en claro que itemVenta es una entidad debil.

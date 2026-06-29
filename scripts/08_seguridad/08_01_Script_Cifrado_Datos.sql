@@ -624,6 +624,10 @@ DROP CONSTRAINT UQ_Visitante_TipoDocumento_NumeroDocumento;
 GO
 
 ALTER TABLE Ventas.visitante
+DROP CONSTRAINT CK_Visitante_numeroDocumento; 
+GO
+
+ALTER TABLE Ventas.visitante
 DROP COLUMN numeroDocumento;
 GO
 
@@ -643,7 +647,7 @@ GO
 
 -- Cargo el Hash concatenando los valores originales (Tratando de replicar el estado inicial)
 UPDATE Ventas.visitante
-SET documentoHash = HASHBYTES('SHA2_256', UPPER(TRIM(tipoDocumento)) + CAST(numeroDocumento AS VARCHAR(20)));
+SET documentoHash = HASHBYTES('SHA2_256', UPPER(TRIM(tipoDocumento)) + CAST(numeroDocumento AS VARCHAR(MAX)));
 GO
 
 ALTER TABLE Ventas.visitante
@@ -652,13 +656,12 @@ GO
 
 -- Recreo la restricción UNIQUE sobre el Hash
 ALTER TABLE Ventas.visitante
-ADD CONSTRAINT UQ_visitante_documentoHash
-UNIQUE (documentoHash);
+ADD CONSTRAINT UQ_visitante_documentoHash UNIQUE (documentoHash);
 GO
 
 -- Modifico SP de alta de visitante
 
-CREATE OR ALTER PROCEDURE Ventas.visitante_Alta
+CREATE OR ALTER PROCEDURE Ventas.visitanteAlta
     @idTipoVisitante INT,
     @nombre VARCHAR(50),
     @apellido VARCHAR(50),
@@ -731,7 +734,7 @@ GO
 
 -- Modifico SP de baja de visitante
 
-CREATE OR ALTER PROCEDURE Ventas.visitante_Modificar
+CREATE OR ALTER PROCEDURE Ventas.visitanteModificar
     @idVisitante INT,
     @idTipoVisitante INT = NULL,
     @nombre VARCHAR(50) = NULL,
@@ -805,7 +808,7 @@ BEGIN
     -- Bloque transaccional de actualización con cifrado dinámico
     BEGIN TRY
         OPEN SYMMETRIC KEY claveDNI
-        DECRYPTION BY CERTIFICATE CertificadoDNI;
+        DECRYPTION BY CERTIFICATE certificadoDNI;
 
         UPDATE Ventas.visitante 
         SET idTipoVisitante = ISNULL(@idTipoVisitante, idTipoVisitante),

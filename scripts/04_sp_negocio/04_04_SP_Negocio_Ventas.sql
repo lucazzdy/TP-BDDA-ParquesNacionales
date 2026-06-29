@@ -51,11 +51,11 @@ BEGIN
         idActividad INT '$.idActividad'
     );
     
-    SELECT @idTipoVisitante = idTipoVisitante FROM Ventas.Visitante WHERE idVisitante = @idVisitante;
+    SELECT @idTipoVisitante = idTipoVisitante FROM Ventas.visitante WHERE idVisitante = @idVisitante;
 
     IF @idTipoVisitante IS NOT NULL AND @idParque IS NOT NULL
     BEGIN
-        SELECT TOP 1 @total = Precio FROM Ventas.PreciosParque
+        SELECT TOP 1 @total = precio FROM Ventas.preciosParque
         WHERE idParque = @idParque AND idTipoVisitante = @idTipoVisitante AND fechaDesde <= @fechaAcceso ORDER BY fechaDesde DESC;
 
         IF @total IS NULL
@@ -71,7 +71,7 @@ BEGIN
     BEGIN
         -- hago un join y para ver que cantidad de actividades seleccionadas encuentro
         SELECT @cantActividadesEncontradas = COUNT(1) FROM @actividades actAComprar
-        INNER JOIN Actividades.Actividad actRegistradas ON actRegistradas.idActividad = actAComprar.idActividad
+        INNER JOIN Actividades.actividad actRegistradas ON actRegistradas.idActividad = actAComprar.idActividad
 
         IF @cantActividadesAComprar <> @cantActividadesEncontradas
             SET @errorMsg = @errorMsg + '- Alguna de las actividades/tours seleccionados no existe.' + @saltoLinea;
@@ -89,11 +89,11 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION
 
-            EXEC Ventas.venta_Alta
+            EXEC Ventas.ventaAlta
                 @idParque = @idParque,
                 @idVenta = @idVentaGenerado OUTPUT
 
-            EXEC Ventas.entrada_Alta
+            EXEC Ventas.entradaAlta
                 @codigoEntrada = @codigoEntrada,
                 @idVenta = @idVentaGenerado,
                 @fechaAcceso = @fechaAcceso,
@@ -104,7 +104,7 @@ BEGIN
                 @precio = @total
 
             -- Con row_number se genera automáticamente 1 para la Entrada, y 2, 3... para las actividades
-            INSERT INTO Ventas.ItemVenta (idVenta, idItemVenta, idTipoVisitante, idActividad, tipoItem, cantidad, precioUnitario)
+            INSERT INTO Ventas.itemVenta (idVenta, nroItem, idTipoVisitante, idActividad, tipoItem, cantidad, precioUnitario)
             SELECT @idVentaGenerado, ROW_NUMBER() OVER (ORDER BY tipoItem DESC, idActividad), idTipoVisitante, idActividad, tipoItem, cantidad, precioUnitario
             FROM (
                 -- Registro base único de la Entrada
@@ -114,14 +114,14 @@ BEGIN
                 
                 -- Registros correspondientes a las Actividades asociadas del JSON
                 SELECT NULL AS idTipoVisitante, actRegistradas.idActividad, 'Actividad' AS tipoItem, 1 AS cantidad, actRegistradas.costo AS precioUnitario
-                FROM Actividades.Actividad actRegistradas 
+                FROM Actividades.actividad actRegistradas 
                 INNER JOIN @actividades actAComprar ON actAComprar.idActividad = actRegistradas.idActividad
-            ) AS ItemsUnificados;
+            ) AS itemsUnificados;
 
 
             IF @cantActividadesAComprar > 0
             BEGIN
-                INSERT INTO Ventas.EntradaActividad (CodigoEntrada, IDActividad)
+                INSERT INTO Ventas.entradaActividad (CodigoEntrada, IDActividad)
                 SELECT 
                     @codigoEntrada,
                     idActividad
@@ -130,16 +130,16 @@ BEGIN
 
 
             -- Calculamos el total final consolidado en base a los items cargados
-            SET @total = (SELECT SUM(PrecioUnitario * cantidad) FROM Ventas.ItemVenta WHERE idVenta = @idVentaGenerado)
+            SET @total = (SELECT SUM(precioUnitario * cantidad) FROM Ventas.itemVenta WHERE idVenta = @idVentaGenerado)
 
-            EXEC Ventas.ticketFactura_Alta
+            EXEC Ventas.ticketFacturaAlta
                 @idVenta = @idVentaGenerado,
                 @puntoVenta = @puntoVenta,
                 @numeroFactura = @numeroFactura,
                 @tipoFactura = @tipoFactura,
                 @montoTotal = @total
 
-            EXEC Ventas.pago_Alta 
+            EXEC Ventas.pagoAlta 
                 @idVenta = @idVentaGenerado,
                 @idFormaPago = @idFormaPago,
                 @fecha = NULL, -- se asigna en el sp
@@ -237,15 +237,15 @@ BEGIN
         SET @errorMsg = @errorMsg + '- Ya existe un ticket registrado con ese Punto de Venta y Número de Factura.' + @saltoLinea;
 
     UPDATE entAComprar
-    SET entAComprar.idTipoVisitante = v.IDTipoVisitante
+    SET entAComprar.idTipoVisitante = v.idTipoVisitante
     FROM @entradas entAComprar
-    INNER JOIN Ventas.Visitante v ON entAComprar.idVisitante = v.IDVisitante 
+    INNER JOIN Ventas.visitante v ON entAComprar.idVisitante = v.idVisitante 
 
     -- 4. busco los precios de cada entrada y actividad
     UPDATE ent
-    SET ent.precioCalculado = ( SELECT TOP 1 pp.Precio FROM Ventas.PreciosParque pp
-    WHERE pp.IDParque = @idParque AND pp.IDTipoVisitante = ent.idTipoVisitante AND pp.FechaDesde <= ent.fechaAcceso
-    ORDER BY pp.FechaDesde DESC)
+    SET ent.precioCalculado = ( SELECT TOP 1 pp.precio FROM Ventas.preciosParque pp
+    WHERE pp.idParque = @idParque AND pp.idTipoVisitante = ent.idTipoVisitante AND pp.fechaDesde <= ent.fechaAcceso
+    ORDER BY pp.fechaDesde DESC)
     FROM @entradas ent
 
     UPDATE actAComprar
@@ -276,13 +276,13 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-            EXEC Ventas.venta_Alta
+            EXEC Ventas.ventaAlta
                 @idParque = @idParque,
                 @idVenta = @idVentaGenerado OUTPUT
 
             -- Detalle ItemVenta de entradas
             -- Detalle ItemVenta de actividades agrupadas (si existen)
-            INSERT INTO Ventas.itemVenta (idVenta, idItemVenta, idTipoVisitante, idActividad, tipoItem, cantidad, precioUnitario)
+            INSERT INTO Ventas.itemVenta (idVenta, nroItem, idTipoVisitante, idActividad, tipoItem, cantidad, precioUnitario)
             SELECT @idVentaGenerado, ROW_NUMBER() OVER (ORDER BY tipoItem DESC, idAgrupado), idTipoVisitante, idActividad, tipoItem, cantidad, precioUnitario
             FROM (
                 SELECT idTipoVisitante, NULL AS idActividad, 'Entrada' AS tipoItem, COUNT(*) AS cantidad, AVG(precioCalculado) AS precioUnitario, idTipoVisitante AS idAgrupado
@@ -294,7 +294,7 @@ BEGIN
                 SELECT NULL AS idTipoVisitante, idActividad, 'Actividad' AS tipoItem, COUNT(*) AS cantidad, AVG(precioActividad) AS precioUnitario, idActividad AS idAgrupado
                 FROM @actividades
                 GROUP BY idActividad
-            ) AS ItemsUnificados;
+            ) AS itemsUnificados;
 
             -- Registrar los pases físicos masivos
             INSERT INTO Ventas.entrada (codigoEntrada, idVenta, fechaAcceso, fechaCompra, idVisitante, idParque, idTipoVisitante, precio)
@@ -304,7 +304,7 @@ BEGIN
             -- Registrar relaciones intermedias N:M de actividades
             IF EXISTS (SELECT 1 FROM @actividades)
             BEGIN
-                INSERT INTO Ventas.EntradaActividad (codigoEntrada, idActividad)
+                INSERT INTO Ventas.entradaActividad (codigoEntrada, idActividad)
                 SELECT 
                     codigoEntrada,
                     idActividad
@@ -312,7 +312,7 @@ BEGIN
             END
 
             -- ALTA DEL TICKET FISCAL 
-            EXEC Ventas.ticketFactura_Alta
+            EXEC Ventas.ticketFacturaAlta
                 @idVenta = @idVentaGenerado,
                 @puntoVenta = @puntoVenta,
                 @numeroFactura = @numeroFactura,
@@ -320,7 +320,7 @@ BEGIN
                 @montoTotal = @totalFactura;
 
             -- Registrar el pago final unificado
-            EXEC Ventas.pago_Alta 
+            EXEC Ventas.pagoAlta 
                 @idVenta = @idVentaGenerado,
                 @idFormaPago = @idFormaPago,
                 @fecha = NULL,

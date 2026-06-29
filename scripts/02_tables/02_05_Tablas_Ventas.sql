@@ -46,11 +46,13 @@ BEGIN
         idTipoVisitante INT NOT NULL,
         nombre VARCHAR(50) NOT NULL,
         apellido VARCHAR (50) NOT NULL,
-        fechaNacimiento DATE NOT NULL CHECK (fechaNacimiento <= GETDATE()),
+        fechaNacimiento DATE NOT NULL,
         tipoDocumento VARCHAR (20) NOT NULL,
-        numeroDocumento INT NOT NULL CHECK (numeroDocumento > 0),
+        numeroDocumento INT NOT NULL ,
         CONSTRAINT PK_Visitante PRIMARY KEY (idVisitante),
         CONSTRAINT FK_Visitante_TipoVisitante FOREIGN KEY (idTipoVisitante) REFERENCES Ventas.TipoVisitante (idTipoVisitante),
+        CONSTRAINT CK_Visitante_numeroDocumento CHECK (numeroDocumento > 0),
+        CONSTRAINT CK_Visitante_fechaNacimiento CHECK (fechaNacimiento <= GETDATE()),
         CONSTRAINT UQ_Visitante_TipoDocumento_NumeroDocumento UNIQUE (tipoDocumento, numeroDocumento)
     );
 END
@@ -97,15 +99,15 @@ IF OBJECT_ID('Ventas.itemVenta', 'U') IS NULL
 BEGIN
     CREATE TABLE Ventas.itemVenta(
         idVenta INT NOT NULL,
-        idItemVenta INT NOT NULL CHECK(idItemVenta > 0),
+        nroItem INT NOT NULL CHECK(nroItem > 0),
         idTipoVisitante INT NULL,
         idActividad INT NULL,
         tipoItem VARCHAR(20) NOT NULL,
         cantidad INT NOT NULL CHECK (cantidad > 0),
         precioUnitario DECIMAL (10,2) NOT NULL CHECK(precioUnitario >= 0),
-        CONSTRAINT PK_ItemVenta PRIMARY KEY (idItemVenta, idVenta),
-        CONSTRAINT FK_ItemVenta_Venta FOREIGN KEY (idVenta) REFERENCES Ventas.Venta (idVenta),
-        CONSTRAINT FK_ItemVenta_TipoVisitante FOREIGN KEY (idTipoVisitante) REFERENCES Ventas.TipoVisitante(idTipoVisitante),
+        CONSTRAINT PK_ItemVenta PRIMARY KEY (nroItem, idVenta),
+        CONSTRAINT FK_ItemVenta_Venta FOREIGN KEY (idVenta) REFERENCES Ventas.venta (idVenta),
+        CONSTRAINT FK_ItemVenta_TipoVisitante FOREIGN KEY (idTipoVisitante) REFERENCES Ventas.tipoVisitante(idTipoVisitante),
         CONSTRAINT FK_ItemVenta_Actividad FOREIGN KEY (idActividad) REFERENCES Actividades.actividad (idActividad),
         CONSTRAINT CK_ItemVenta_Actividad_TipoVisitante CHECK ((tipoItem = 'Entrada' AND idTipoVisitante IS NOT NULL AND idActividad IS NULL) OR 
                                                                (tipoItem = 'Actividad' AND idTipoVisitante IS NULL AND idActividad IS NOT NULL)),

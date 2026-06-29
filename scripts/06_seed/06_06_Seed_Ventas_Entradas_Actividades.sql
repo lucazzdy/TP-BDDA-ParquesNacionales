@@ -51,87 +51,87 @@ BEGIN
     WHILE @idParque <= 51
         BEGIN
 
-            EXEC Ventas.preciosParque_Alta 
+            EXEC Ventas.preciosParqueAlta 
                 @idParque = @idParque,
                 @idTipoVisitante = 1,
                 @fechaDesde ='2025-01-01',
                 @precio = 12000
 
-            EXEC Ventas.preciosParque_Alta 
+            EXEC Ventas.preciosParqueAlta 
                 @idParque = @idParque,
                 @idTipoVisitante = 2,
                 @fechaDesde = '2025-01-01',
                 @precio = 9000
 
-            EXEC Ventas.preciosParque_Alta 
+            EXEC Ventas.preciosParqueAlta 
                 @idParque = @idParque,
                 @idTipoVisitante = 3,
                 @fechaDesde = '2025-01-01',
                 @precio = 45000
 
-            EXEC Ventas.preciosParque_Alta 
+            EXEC Ventas.preciosParqueAlta 
                 @idParque = @idParque,
                 @idTipoVisitante = 4,
                 @fechaDesde ='2025-01-01',
                 @precio = 15000
 
 
-            EXEC Ventas.preciosParque_Alta 
+            EXEC Ventas.preciosParqueAlta 
                 @idParque = @idParque,
                 @idTipoVisitante = 5,
                 @fechaDesde ='2025-01-01',
                 @precio = 6000
 
-            EXEC Ventas.preciosParque_Alta 
+            EXEC Ventas.preciosParqueAlta 
                 @idParque = @idParque,
                 @idTipoVisitante = 6,
                 @fechaDesde = '2025-01-01',
                 @precio = 7000
 
-            EXEC Ventas.preciosParque_Alta 
+            EXEC Ventas.preciosParqueAlta 
                 @idParque = @idParque,
                 @idTipoVisitante = 7,
                 @fechaDesde ='2025-01-01',
                 @precio = 0
 
-            EXEC Ventas.preciosParque_Alta 
+            EXEC Ventas.preciosParqueAlta 
                 @idParque = @idParque,
                 @idTipoVisitante = 1,
                 @fechaDesde ='2026-01-01',
                 @precio = 15000
 
-            EXEC Ventas.preciosParque_Alta 
+            EXEC Ventas.preciosParqueAlta 
                 @idParque = @idParque,
                 @idTipoVisitante = 2,
                 @fechaDesde = '2026-01-01',
                 @precio = 12000
 
-            EXEC Ventas.preciosParque_Alta 
+            EXEC Ventas.preciosParqueAlta 
                 @idParque = @idParque,
                 @idTipoVisitante = 3,
                 @fechaDesde = '2026-01-01',
                 @precio = 55000
 
-            EXEC Ventas.preciosParque_Alta 
+            EXEC Ventas.preciosParqueAlta 
                 @idParque = @idParque,
                 @idTipoVisitante = 4,
                 @fechaDesde ='2026-01-01',
                 @precio = 18000
 
 
-            EXEC Ventas.preciosParque_Alta 
+            EXEC Ventas.preciosParqueAlta 
                 @idParque = @idParque,
                 @idTipoVisitante = 5,
                 @fechaDesde ='2026-01-01',
                 @precio = 8000
 
-            EXEC Ventas.preciosParque_Alta 
+            EXEC Ventas.preciosParqueAlta 
                 @idParque = @idParque,
                 @idTipoVisitante = 6,
                 @fechaDesde = '2026-01-01',
                 @precio = 9000
 
-            EXEC Ventas.preciosParque_Alta 
+            EXEC Ventas.preciosParqueAlta 
                 @idParque = @idParque,
                 @idTipoVisitante = 7,
                 @fechaDesde ='2026-01-01',
@@ -265,6 +265,6 @@ SELECT * FROM Ventas.preciosParque;
 SELECT * FROM Ventas.pago;
 SELECT * FROM Ventas.ticketFactura;
 SELECT * FROM Ventas.venta;
-SELECT * FROM Ventas.itemVenta ORDER BY idVenta ASC, idItemVenta ASC;
+SELECT * FROM Ventas.itemVenta ORDER BY idVenta ASC, nroItem ASC;
 SELECT * FROM Ventas.entrada;
 SELECT * FROM Ventas.entradaActividad;

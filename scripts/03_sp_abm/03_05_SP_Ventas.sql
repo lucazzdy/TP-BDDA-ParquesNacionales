@@ -15,7 +15,7 @@ GO
 
 --SP ABM de Ventas.tipoVisitante ALTA
 
-CREATE OR ALTER PROCEDURE  Ventas.tipoVisitante_Alta
+CREATE OR ALTER PROCEDURE  Ventas.tipoVisitanteAlta
     @descripcion VARCHAR(20)
 AS
 BEGIN
@@ -40,7 +40,7 @@ GO
 
 --SP ABM de Ventas.tipoVisitante Modificacion
 
-CREATE OR ALTER PROCEDURE Ventas.tipoVisitante_Modificar
+CREATE OR ALTER PROCEDURE Ventas.tipoVisitanteModificar
     @idTipoVisitante INT,
     @nuevaDescripcion VARCHAR (20)
 AS
@@ -63,7 +63,7 @@ GO
 
 --SP ABM de Ventas.tipoVisitante Baja
 
-CREATE OR ALTER PROCEDURE Ventas.tipoVisitante_Baja
+CREATE OR ALTER PROCEDURE Ventas.tipoVisitanteBaja
     @idTipoVisitante INT
 AS
 BEGIN
@@ -96,7 +96,7 @@ GO
 
 --SP ABM de Ventas.visitante Alta
 
-CREATE OR ALTER PROCEDURE Ventas.visitante_Alta
+CREATE OR ALTER PROCEDURE Ventas.visitanteAlta
     @idTipoVisitante INT,
     @nombre VARCHAR(50),
     @apellido VARCHAR(50),
@@ -142,7 +142,7 @@ END
 GO
 
 --SP ABM de Ventas.visitante Modificar
-CREATE OR ALTER PROCEDURE Ventas.visitante_Modificar
+CREATE OR ALTER PROCEDURE Ventas.visitanteModificar
     @idVisitante INT,
     @idTipoVisitante INT,
     @nombre VARCHAR(50),
@@ -198,7 +198,7 @@ END
 GO
 
 --SP ABM de Ventas.visitante Baja
-CREATE OR ALTER PROCEDURE Ventas.visitante_Baja
+CREATE OR ALTER PROCEDURE Ventas.visitanteBaja
     @idVisitante INT
 AS
 BEGIN  
@@ -226,7 +226,7 @@ GO
 
 
 --SP ABM de Ventas.formaPago Alta
-CREATE OR ALTER PROCEDURE Ventas.formaPago_Alta
+CREATE OR ALTER PROCEDURE Ventas.formaPagoAlta
     @descripcion VARCHAR(30)
 AS
 BEGIN
@@ -251,7 +251,7 @@ END
 GO
 
 --SP ABM de Ventas.formaPago Modificar
-CREATE OR ALTER PROCEDURE Ventas.formaPago_Modificar
+CREATE OR ALTER PROCEDURE Ventas.formaPagoModificar
     @idFormaPago INT,
     @descripcion VARCHAR(30)
 AS
@@ -284,7 +284,7 @@ GO
 
 --SP ABM de Ventas.formaPago Baja
 
-CREATE OR ALTER PROCEDURE Ventas.formaPago_Baja
+CREATE OR ALTER PROCEDURE Ventas.formaPagoBaja
     @idFormaPago INT
 AS
 BEGIN
@@ -314,7 +314,7 @@ GO
 
 --SP ABM de Ventas.preciosParque Alta
 
-CREATE OR ALTER PROCEDURE Ventas.preciosParque_Alta
+CREATE OR ALTER PROCEDURE Ventas.preciosParqueAlta
     @idParque INT,
     @idTipoVisitante INT,
     @fechaDesde DATE,
@@ -352,7 +352,7 @@ GO
 
 --SP ABM de Ventas.preciosParque Modificar
 
-CREATE OR ALTER PROCEDURE Ventas.preciosParque_Modificar
+CREATE OR ALTER PROCEDURE Ventas.preciosParqueModificar
     @idParque INT,
     @idTipoVisitante INT,
     @fechaDesde DATE,
@@ -383,7 +383,7 @@ GO
 
 --SP ABM de Ventas.preciosParque Baja
 
-CREATE OR ALTER PROCEDURE Ventas.preciosParque_Baja
+CREATE OR ALTER PROCEDURE Ventas.preciosParqueBaja
     @idParque INT,
     @idTipoVisitante INT,
     @fechaDesde DATE
@@ -413,9 +413,9 @@ BEGIN
 END
 GO
 
---SP ABM de Ventas.venta_Alta
+--SP ABM de Ventas.ventaAlta
 
-CREATE OR ALTER PROCEDURE Ventas.venta_Alta
+CREATE OR ALTER PROCEDURE Ventas.ventaAlta
     @idParque INT,
     @idVenta INT OUTPUT
 AS
@@ -442,9 +442,9 @@ END
 GO
 GO
 
---SP ABM de Ventas.venta_Modificar
+--SP ABM de Ventas.ventaModificar
 
-CREATE OR ALTER PROCEDURE Ventas.venta_Modificar
+CREATE OR ALTER PROCEDURE Ventas.ventaModificar
     @idVenta INT,
     @idParque INT
 AS
@@ -470,9 +470,9 @@ BEGIN
 END
 GO
 
---SP ABM de Ventas.venta_Baja
+--SP ABM de Ventas.ventaBaja
 
-CREATE OR ALTER PROCEDURE Ventas.venta_Baja
+CREATE OR ALTER PROCEDURE Ventas.ventaBaja
     @idVenta INT
 AS
 BEGIN
@@ -508,11 +508,11 @@ BEGIN
 END
 GO
 
---SP ABM de Ventas.itemVenta_Alta
+--SP ABM de Ventas.itemVentaAlta
 
-CREATE OR ALTER PROCEDURE Ventas.itemVenta_Alta
+CREATE OR ALTER PROCEDURE Ventas.itemVentaAlta
     @idVenta INT,
-    @idItemVenta INT,
+    @nroItem INT,
     @idTipoVisitante INT NULL,
     @idActividad INT NULL,
     @tipoItem VARCHAR(20),
@@ -526,7 +526,7 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM Ventas.venta WHERE idVenta = @idVenta)
         SET @errorMsg = @errorMsg + '- El ID de Venta especificado no existe en las cabeceras.' + @saltoLinea;
 
-    IF @idItemVenta IS NULL OR @idItemVenta <= 0
+    IF @nroItem IS NULL OR @nroItem <= 0
         SET @errorMsg = @errorMsg + '- El ID de Item Venta debe ser mayor a cero.'  + @saltoLinea;
 
     IF @tipoItem IS NULL OR @tipoItem NOT IN ('Entrada', 'Actividad')
@@ -539,7 +539,7 @@ BEGIN
         SET @errorMsg = @errorMsg + '- El precio unitario no puede ser un valor negativo.'  + @saltoLinea;
 
     -- Validar duplicidad de la clave primaria compuesta (Misma venta, misma línea)
-    IF EXISTS (SELECT 1 FROM Ventas.itemVenta WHERE idVenta = @idVenta AND idItemVenta = @idItemVenta)
+    IF EXISTS (SELECT 1 FROM Ventas.itemVenta WHERE idVenta = @idVenta AND nroItem = @nroItem)
         SET @errorMsg = @errorMsg + '- Ya existe una item de venta registrado con ese número para esta venta.'  + @saltoLinea;
 
     IF LEN(@errorMsg) > 0
@@ -549,22 +549,22 @@ BEGIN
 
     IF @tipoItem = 'Entrada'
     BEGIN
-        INSERT INTO Ventas.itemVenta (idVenta, idItemVenta, idTipoVisitante, idActividad, tipoItem, cantidad, precioUnitario)
-        VALUES (@idVenta, @idItemVenta, @idTipoVisitante, NULL, @tipoItem, @cantidad, @precioUnitario);
+        INSERT INTO Ventas.itemVenta (idVenta, nroItem, idTipoVisitante, idActividad, tipoItem, cantidad, precioUnitario)
+        VALUES (@idVenta, @nroItem, @idTipoVisitante, NULL, @tipoItem, @cantidad, @precioUnitario);
     END
     ELSE
     BEGIN
-        INSERT INTO Ventas.itemVenta (idVenta, idItemVenta, idTipoVisitante, idActividad, tipoItem, cantidad, precioUnitario)
-        VALUES (@idVenta, @idItemVenta, NULL, @idActividad, @tipoItem, @cantidad, @precioUnitario);
+        INSERT INTO Ventas.itemVenta (idVenta, nroItem, idTipoVisitante, idActividad, tipoItem, cantidad, precioUnitario)
+        VALUES (@idVenta, @nroItem, NULL, @idActividad, @tipoItem, @cantidad, @precioUnitario);
     END
 END
 GO
 
---SP ABM de Ventas.itemVenta_Modificar
+--SP ABM de Ventas.itemVentaModificar
 
-CREATE OR ALTER PROCEDURE Ventas.itemVenta_Modificar
+CREATE OR ALTER PROCEDURE Ventas.itemVentaModificar
     @idVenta INT,
-    @idItemVenta INT,
+    @nroItem INT,
     @idTipoVisitante INT NULL,
     @idActividad INT NULL,
     @tipoItem VARCHAR(20),
@@ -575,8 +575,8 @@ BEGIN
     DECLARE @errorMsg VARCHAR(300) = '';
     DECLARE @saltoLinea CHAR(2) = CHAR(13) + CHAR(10);
 
-    -- Valdo que exista el idItemVenta de la clave compuesta (idVenta + idItemVenta)
-    IF NOT EXISTS (SELECT 1 FROM Ventas.itemVenta WHERE idVenta = @idVenta AND idItemVenta = @idItemVenta)
+    -- Valdo que exista el nroItem de la clave compuesta (idVenta + nroItem)
+    IF NOT EXISTS (SELECT 1 FROM Ventas.itemVenta WHERE idVenta = @idVenta AND nroItem = @nroItem)
         SET @errorMsg = @errorMsg + '- No existe el item de venta que intenta modificar para la venta ingresada.' + @saltoLinea;
 
     -- Validar el dominio del tipo de ítem
@@ -621,20 +621,20 @@ BEGIN
         tipoItem = ISNULL(@tipoItem,tipoItem),
         cantidad = ISNULL(@cantidad,cantidad),
         precioUnitario = ISNULL(@precioUnitario, precioUnitario)
-    WHERE idVenta = @idVenta AND idItemVenta = @idItemVenta;
+    WHERE idVenta = @idVenta AND nroItem = @nroItem;
 END
 GO
 
---SP ABM de Ventas.itemVenta_Baja
+--SP ABM de Ventas.itemVentaBaja
 
-CREATE OR ALTER PROCEDURE Ventas.itemVenta_Baja
+CREATE OR ALTER PROCEDURE Ventas.itemVentaBaja
     @idVenta INT,
-    @idItemVenta INT
+    @nroItem INT
 AS
 BEGIN
     DECLARE @errorMsg VARCHAR(100) = '';
 
-    IF NOT EXISTS (SELECT 1 FROM Ventas.itemVenta WHERE idVenta = @idVenta AND idItemVenta = @idItemVenta)
+    IF NOT EXISTS (SELECT 1 FROM Ventas.itemVenta WHERE idVenta = @idVenta AND nroItem = @nroItem)
         SET @errorMsg = @errorMsg + '- No se encontró el item de venta que intenta eliminar para esa venta.';
 
     IF LEN(@errorMsg) > 0
@@ -643,13 +643,13 @@ BEGIN
     END
 
     DELETE FROM Ventas.itemVenta
-    WHERE idVenta = @idVenta AND idItemVenta = @idItemVenta;
+    WHERE idVenta = @idVenta AND nroItem = @nroItem;
 END
 GO
 
---SP ABM de Ventas.pago_Alta
+--SP ABM de Ventas.pagoAlta
 
-CREATE OR ALTER PROCEDURE Ventas.pago_Alta
+CREATE OR ALTER PROCEDURE Ventas.pagoAlta
     @idVenta INT,
     @idFormaPago INT,
     @fecha DATETIME,
@@ -685,9 +685,9 @@ BEGIN
 END
 GO
 
---SP ABM de Ventas.pago_Modificar
+--SP ABM de Ventas.pagoModificar
 
-CREATE OR ALTER PROCEDURE Ventas.pago_Modificar
+CREATE OR ALTER PROCEDURE Ventas.pagoModificar
     @idPago INT,
     @idVenta INT,
     @idFormaPago INT,
@@ -732,9 +732,9 @@ BEGIN
 END
 GO
 
---SP ABM de Ventas.pago_Baja
+--SP ABM de Ventas.pagoBaja
 
-CREATE OR ALTER PROCEDURE Ventas.pago_Baja
+CREATE OR ALTER PROCEDURE Ventas.pagoBaja
     @idPago INT
 AS
 BEGIN
@@ -753,9 +753,9 @@ BEGIN
 END
 GO
 
---SP ABM de Ventas.entrada_Alta
+--SP ABM de Ventas.entradaAlta
 
-CREATE OR ALTER PROCEDURE Ventas.entrada_Alta
+CREATE OR ALTER PROCEDURE Ventas.entradaAlta
     @codigoEntrada CHAR(10),
     @idVenta INT,
     @fechaAcceso DATE,
@@ -810,9 +810,9 @@ BEGIN
 END
 GO
 
---SP ABM de Ventas.entrada_Modificar
+--SP ABM de Ventas.entradaModificar
 
-CREATE OR ALTER PROCEDURE Ventas.entrada_Modificar
+CREATE OR ALTER PROCEDURE Ventas.entradaModificar
     @codigoEntrada CHAR(10),
     @fechaAcceso DATE,
     @fechaCompra DATETIME,
@@ -864,9 +864,9 @@ BEGIN
 END
 GO
 
---SP ABM de Ventas.entrada_Baja
+--SP ABM de Ventas.entradaBaja
 
-CREATE OR ALTER PROCEDURE Ventas.entrada_Baja
+CREATE OR ALTER PROCEDURE Ventas.entradaBaja
     @codigoEntrada CHAR(10)
 AS
 BEGIN
@@ -894,9 +894,9 @@ BEGIN
 END
 GO
 
---SP ABM de Ventas.entradaActividad_Alta
+--SP ABM de Ventas.entradaActividadAlta
 
-CREATE OR ALTER PROCEDURE Ventas.entradaActividad_Alta
+CREATE OR ALTER PROCEDURE Ventas.entradaActividadAlta
     @codigoEntrada CHAR(10),
     @idActividad INT
 AS
@@ -925,9 +925,9 @@ BEGIN
 END
 GO
 
---SP ABM de Ventas.entradaActividad_Modificar
+--SP ABM de Ventas.entradaActividadModificar
 
-CREATE OR ALTER PROCEDURE Ventas.entradaActividad_Modificar
+CREATE OR ALTER PROCEDURE Ventas.entradaActividadModificar
     @codigoEntrada CHAR(10),
     @idActividadActual INT,
     @idActividadNueva INT
@@ -959,9 +959,9 @@ BEGIN
 END
 GO
 
---SP ABM de Ventas.entradaActividad_Baja
+--SP ABM de Ventas.entradaActividadBaja
 
-CREATE OR ALTER PROCEDURE Ventas.entradaActividad_Baja
+CREATE OR ALTER PROCEDURE Ventas.entradaActividadBaja
     @codigoEntrada CHAR(10),
     @idActividad INT
 AS
@@ -982,7 +982,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE Ventas.ticketFactura_Alta
+CREATE OR ALTER PROCEDURE Ventas.ticketFacturaAlta
     @idVenta INT,
     @puntoVenta INT,
     @numeroFactura INT,
@@ -1028,7 +1028,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE Ventas.ticketFactura_Modificar
+CREATE OR ALTER PROCEDURE Ventas.ticketFacturaModificar
     @idTicket INT,
     @puntoVenta INT = NULL,
     @numeroFactura INT = NULL,
@@ -1081,7 +1081,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE Ventas.ticketFactura_Baja
+CREATE OR ALTER PROCEDURE Ventas.ticketFacturaBaja
     @idTicket INT
 AS
 BEGIN

@@ -106,14 +106,14 @@ GRANT SELECT ON SCHEMA::Ventas TO rol_operador;
 -- Ventas (operacion principal del operador)
 GRANT EXECUTE ON Ventas.procesarVentaIndividual TO rol_operador;
 GRANT EXECUTE ON Ventas.procesarVentaMasiva TO rol_operador;
-GRANT EXECUTE ON Ventas.visitante_Alta TO rol_operador;
-GRANT EXECUTE ON Ventas.visitante_Modificar TO rol_operador;
-GRANT EXECUTE ON Ventas.entrada_Alta TO rol_operador;
-GRANT EXECUTE ON Ventas.entrada_Modificar TO rol_operador;
-GRANT EXECUTE ON Ventas.ticketFactura_Alta TO rol_operador;
-GRANT EXECUTE ON Ventas.ticketFactura_Modificar TO rol_operador;
-GRANT EXECUTE ON Ventas.entradaActividad_Alta TO rol_operador;
-GRANT EXECUTE ON Ventas.pago_Alta TO rol_operador;
+GRANT EXECUTE ON Ventas.visitanteAlta TO rol_operador;
+GRANT EXECUTE ON Ventas.visitanteModificar TO rol_operador;
+GRANT EXECUTE ON Ventas.entradaAlta TO rol_operador;
+GRANT EXECUTE ON Ventas.entradaModificar TO rol_operador;
+GRANT EXECUTE ON Ventas.ticketFacturaAlta TO rol_operador;
+GRANT EXECUTE ON Ventas.ticketFacturaModificar TO rol_operador;
+GRANT EXECUTE ON Ventas.entradaActividadAlta TO rol_operador;
+GRANT EXECUTE ON Ventas.pagoAlta TO rol_operador;
 
 -- Concesiones (gestion comercial)
 GRANT EXECUTE ON Concesiones.registrarConcesionConPagos TO rol_operador;
