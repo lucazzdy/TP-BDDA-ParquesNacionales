@@ -10,7 +10,24 @@ Integrantes:    - Acuña, Lucas Daniel
 Descripción del Script:  Stored procedures de logica de negocio de venta de entradas
                          del esquema Ventas. Contiene venta individual y masiva, utilizando
                          los SPs ABM para generar lo necesario y un insert to para agregar
-                         varias filas.
+                         varias filas. Tambien contiene los SPs de consulta de precios de parques en dolares 
+                         (utilizan una API).
+
+
+IMPORTANTE: debe ejecutar los siguientes comandos por unica vez para que los scripts funcionen
+
+USE master;
+GO
+
+-- 1. Permitir ver las opciones avanzadas del servidor
+EXEC sp_configure 'show advanced options', 1;
+RECONFIGURE;
+GO
+
+-- 2. Habilitar los procedimientos de automatización OLE
+EXEC sp_configure 'Ole Automation Procedures', 1;
+RECONFIGURE;
+GO
 */
 
 USE GestionParquesNacionales_Com5600_Grupo07
@@ -338,4 +355,110 @@ BEGIN
         ;THROW 60002, @errorMsg, 1;
     END CATCH
 END
+GO
+
+CREATE OR ALTER PROCEDURE Ventas.consultarPrecioParqueEnDolares
+    @idParque INT,
+    @idTipoVisitante INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @precioPesos DECIMAL(10,2);
+    DECLARE @url VARCHAR(255) = 'https://dolarapi.com/v1/dolares/oficial';
+    
+    -- Variables para el manejo del objeto HTTP
+    DECLARE @objHttp INT;
+    DECLARE @respuesta VARCHAR(8000);
+    DECLARE @cotizacionDolar DECIMAL(10,2);
+    DECLARE @precioDolares DECIMAL(10,2);
+
+    SELECT TOP 1 @precioPesos = precio 
+    FROM Ventas.preciosParque 
+    WHERE idParque = @idParque 
+      AND idTipoVisitante = @idTipoVisitante 
+      AND fechaDesde <= GETDATE()
+    ORDER BY fechaDesde DESC;
+
+    IF @precioPesos IS NULL
+    BEGIN
+        PRINT 'No se encontró un precio para los parámetros ingresados.';
+        RETURN;
+    END
+
+    EXEC sp_OACreate 'MSXML2.ServerXMLHTTP', @objHttp OUT;
+    EXEC sp_OAMethod @objHttp, 'open', NULL, 'GET', @url, false;
+    EXEC sp_OAMethod @objHttp, 'send', NULL, NULL;
+    
+    EXEC sp_OAMethod @objHttp, 'responseText', @respuesta OUT;
+    EXEC sp_OADestroy @objHttp;
+
+    DECLARE @posVenta INT = CHARINDEX('"venta":', @respuesta);
+    
+    IF @posVenta > 0
+    BEGIN
+        DECLARE @tempStr VARCHAR(50);
+        SET @tempStr = SUBSTRING(@respuesta, @posVenta + 8, 20);
+        SET @tempStr = SUBSTRING(@tempStr, 1, CHARINDEX(',', @tempStr) - 1);
+        
+        SET @cotizacionDolar = CAST(@tempStr AS DECIMAL(10,2));
+
+        -- Calculo la conversión ($ARS / Cotización)
+        SET @precioDolares = @precioPesos / @cotizacionDolar;
+
+        SELECT 
+            (SELECT TOP 1 nombre FROM Gestion.parque WHERE idParque = @idParque) AS [Parque],
+            (SELECT TOP 1 descripcion FROM Ventas.tipoVisitante WHERE idTipoVisitante = @idTipoVisitante) AS [Tipo de visitante],
+            @precioPesos AS [Precio en Pesos (ARS)],
+            @cotizacionDolar AS [Cotización Dólar Oficial],
+            @precioDolares AS [Precio Final (USD)];
+    END
+    ELSE
+    BEGIN
+        PRINT 'Error al parsear la respuesta de la API.';
+    END
+END;
+GO
+
+
+CREATE OR ALTER PROCEDURE Ventas.listarPreciosParqueEnPesosYDolares
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @url VARCHAR(255) = 'https://dolarapi.com/v1/dolares/oficial';
+    DECLARE @objHttp INT;
+    DECLARE @respuesta VARCHAR(8000);
+    DECLARE @cotizacionDolar DECIMAL(10,2);
+    DECLARE @posVenta INT;
+
+    EXEC sp_OACreate 'MSXML2.ServerXMLHTTP', @objHttp OUT;
+    EXEC sp_OAMethod @objHttp, 'open', NULL, 'GET', @url, false;
+    EXEC sp_OAMethod @objHttp, 'send', NULL, NULL;
+    EXEC sp_OAMethod @objHttp, 'responseText', @respuesta OUT;
+    EXEC sp_OADestroy @objHttp;
+
+    SET @posVenta = CHARINDEX('"venta":', @respuesta);
+    
+    IF @posVenta > 0
+    BEGIN
+        DECLARE @tempStr VARCHAR(50);
+        SET @tempStr = SUBSTRING(@respuesta, @posVenta + 8, 20);
+        SET @tempStr = SUBSTRING(@tempStr, 1, CHARINDEX(',', @tempStr) - 1);
+        SET @cotizacionDolar = CAST(@tempStr AS DECIMAL(10,2));
+    END
+
+    -- control de error por si la API falla o no devuelve datos
+    IF @cotizacionDolar IS NULL OR @cotizacionDolar = 0
+    BEGIN
+        ;THROW  60004, 'No se pudo obtener la cotización del dólar desde la API.', 1;
+    END
+
+    SELECT p.nombre AS [Parque], tv.descripcion AS [Tipo de visitante], pp.fechaDesde, pp.precio AS [Precio en pesos], @cotizacionDolar AS [Cotización Dólar Oficial], CAST((pp.precio / @cotizacionDolar) AS DECIMAL(10,2)) AS [Precio en dolares]
+    FROM Ventas.preciosParque pp
+    INNER JOIN Gestion.parque p ON p.idParque = pp.idParque
+    INNER JOIN Ventas.tipoVisitante tv ON tv.idTipoVisitante = pp.idTipoVisitante
+    WHERE pp.fechaDesde = (
+    SELECT MAX(sub.fechaDesde) FROM Ventas.preciosParque sub WHERE sub.idParque = pp.idParque AND sub.idTipoVisitante = pp.idTipoVisitante AND sub.fechaDesde <= GETDATE());
+END;
 GO
