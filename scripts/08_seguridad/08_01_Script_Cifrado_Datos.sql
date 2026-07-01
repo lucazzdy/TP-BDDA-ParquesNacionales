@@ -145,7 +145,7 @@ GO
 -- ALTERAR LOS SP
 -- dar de alta guardaparques
 
-CREATE OR ALTER PROCEDURE Personal.altaGuardaparques
+CREATE OR ALTER PROCEDURE Personal.guardaparquesAlta
 (
     @documento CHAR(8),
     @nombre VARCHAR(50),
@@ -229,7 +229,7 @@ GO
 
 -- modificacion guardaparques
 
-CREATE OR ALTER PROCEDURE Personal.modificarGuardaparque
+CREATE OR ALTER PROCEDURE Personal.guardaparquesModificar
 (
     @legajo INT,
     @nuevoDocumento CHAR(8) = NULL,
@@ -403,7 +403,7 @@ GO
 
 -- ALTA GUIAS
 
-CREATE OR ALTER PROCEDURE Personal.altaGuia
+CREATE OR ALTER PROCEDURE Personal.guiaAlta
 (
     @documento CHAR(8),
     @nombre VARCHAR(50),
@@ -497,7 +497,7 @@ GO
 
 -- MODIFICACION GUIAS
 
-CREATE OR ALTER PROCEDURE Personal.modificarGuia
+CREATE OR ALTER PROCEDURE Personal.guiaModificar
 (
     @legajo INT,
     @nuevoDocumento CHAR(8) = NULL,
@@ -584,7 +584,7 @@ BEGIN
             CLOSE SYMMETRIC KEY claveDNI;
 
         IF ERROR_NUMBER() IN (2601,2627)
-            THROW 50413,'Ya existe un gu�a con ese documento.',1;
+            THROW 50413,'Ya existe un guia con ese documento.',1;
 
         THROW;
 

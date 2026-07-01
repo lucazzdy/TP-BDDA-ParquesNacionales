@@ -16,21 +16,21 @@ Resultado esperado:
 Se inserta correctamente.
 =======================================================*/
 
-EXEC Personal.altaGuardaparques
+EXEC Personal.guardaparquesAlta
     @documento = '12345678',
     @nombre = 'Juan',
     @apellido = 'Perez',
     @fechaNacimiento = '1990-05-10',
     @estado = 'ACTIVO';
 
-EXEC Personal.altaGuardaparques
+EXEC Personal.guardaparquesAlta
     @documento = '11111111',
     @nombre = 'Matias',
     @apellido = 'Perez',
     @fechaNacimiento = '2000-05-10',
     @estado = 'ACTIVO';
 
-EXEC Personal.altaGuardaparques
+EXEC Personal.guardaparquesAlta
     @documento = '12345679',
     @nombre = 'Juana',
     @apellido = 'Perez',
@@ -47,7 +47,7 @@ Resultado esperado:
 Error - El nombre es obligatorio.
 =======================================================*/
 
-EXEC Personal.altaGuardaparques
+EXEC Personal.guardaparquesAlta
     @documento = '11111111',
     @nombre = '',
     @apellido = 'Perez',
@@ -61,7 +61,7 @@ Resultado esperado:
 Error - El apellido es obligatorio.
 =======================================================*/
 
-EXEC Personal.altaGuardaparques
+EXEC Personal.guardaparquesAlta
     @documento = '22222222',
     @nombre = 'Juan',
     @apellido = '',
@@ -75,7 +75,7 @@ Resultado esperado:
 Error - Ya existe un guardaparque con ese documento.
 =======================================================*/
 
-EXEC Personal.altaGuardaparques
+EXEC Personal.guardaparquesAlta
     @documento = '12345678',
     @nombre = 'Pedro',
     @apellido = 'Gomez',
@@ -89,7 +89,7 @@ Resultado esperado:
 Error - Debe ser mayor de 18 a�os.
 =======================================================*/
 
-EXEC Personal.altaGuardaparques
+EXEC Personal.guardaparquesAlta
     @documento = '33333333',
     @nombre = 'Lucas',
     @apellido = 'Martinez',
@@ -107,7 +107,7 @@ Resultado esperado:
 Se modifica correctamente.
 =======================================================*/
 
-EXEC Personal.modificarGuardaparque
+EXEC Personal.guardaparquesModificar
     @legajo = 1,
     @nuevoNombre = 'Juan Carlos';
 
@@ -122,7 +122,7 @@ Resultado esperado:
 Error - El legajo no existe.
 =======================================================*/
 
-EXEC Personal.modificarGuardaparque
+EXEC Personal.guardaparquesModificar
     @legajo = 999;
 GO
 
@@ -132,7 +132,7 @@ Resultado esperado:
 Error - Ya existe otro guardaparque con ese documento.
 =======================================================*/
 
-EXEC Personal.modificarGuardaparque
+EXEC Personal.guardaparquesModificar
     @legajo = 1,
     @nuevoDocumento = '11111111';
 GO
@@ -147,7 +147,7 @@ Resultado esperado:
 Estado = INACTIVO
 =======================================================*/
 
-EXEC Personal.bajaGuardaparque
+EXEC Personal.guardaparqueBaja
     @Legajo = 1;
 
 SELECT legajo, estado
@@ -161,7 +161,7 @@ Resultado esperado:
 Error - El legajo no existe.
 =======================================================*/
 
-EXEC Personal.bajaGuardaparque
+EXEC Personal.guardaparqueBaja
     @legajo = 999;
 GO
 
@@ -171,7 +171,7 @@ Resultado esperado:
 Error - El guardaparque ya se encuentra inactivo.
 =======================================================*/
 
-EXEC Personal.bajaGuardaparque
+EXEC Personal.guardaparqueBaja
     @legajo = 1;
 GO
 
@@ -191,7 +191,7 @@ Asignaci�n realizada correctamente.
 
 --PUEDE FALLAR SI NO HAY UN PARQUE CREADO
 
-EXEC Personal.asignarGuardaparqueParque
+EXEC Personal.guardaparqueParqueAsignar
     @legajo = 2,
     @idParque = 1,
     @fechaIngreso = '2025-01-01';
@@ -207,7 +207,7 @@ Resultado esperado:
 Error - El guardaparque no existe.
 =======================================================*/
 
-EXEC Personal.asignarGuardaparqueParque
+EXEC Personal.guardaparqueParqueAsignar
     @legajo = 999,
     @idParque = 1,
     @fechaIngreso = '2025-01-01';
@@ -219,7 +219,7 @@ Resultado esperado:
 Error - El parque no existe.
 =======================================================*/
 
-EXEC Personal.asignarGuardaparqueParque
+EXEC Personal.guardaparqueParqueAsignar
     @legajo = 2,
     @idParque = 999,
     @fechaIngreso = '2025-01-01';
@@ -231,7 +231,7 @@ Resultado esperado:
 Error - Ya posee una asignaci�n activa.
 =======================================================*/
 
-EXEC Personal.asignarGuardaparqueParque
+EXEC Personal.guardaparqueParqueAsignar
     @legajo = 2,
     @idParque = 2,
     @fechaIngreso = '2025-01-01';
@@ -249,7 +249,7 @@ Se cierra la asignaci�n actual y se crea una nueva.
 
 --PUEDE FALLAR SI NO HAY MAS PARQUES CREADOS O OTRO GUIA
 
-EXEC Personal.ReasignarGuardaparque
+EXEC Personal.guardaparqueReasignar
     @legajo = 2,
     @nuevoParque = 2,
     @fechaCambio = '2026-12-01',
@@ -267,7 +267,7 @@ Resultado esperado:
 MotivoEgreso queda NULL.
 =======================================================*/
 
-EXEC Personal.reasignarGuardaparque
+EXEC Personal.guardaparqueReasignar
     @legajo = 2,
     @nuevoParque = 3,
     @fechaCambio = '2026-12-01'
@@ -279,7 +279,7 @@ Resultado esperado:
 Error - El guardaparque no existe.
 =======================================================*/
 
-EXEC Personal.reasignarGuardaparque
+EXEC Personal.guardaparqueReasignar
     @legajo = 999,
     @nuevoParque = 1,
     @fechaCambio = '2026-12-01';
@@ -291,7 +291,7 @@ Resultado esperado:
 Error - El parque no existe.
 =======================================================*/
 
-EXEC Personal.reasignarGuardaparque
+EXEC Personal.guardaparqueReasignar
     @legajo = 2,
     @nuevoParque = 999,
     @fechaCambio = '2026-12-01';
@@ -310,15 +310,15 @@ Resultado esperado:
 Se crean correctamente 3 t�tulos.
 =======================================================*/
 
-EXEC Personal.altaTitulo
+EXEC Personal.tituloAlta
     @nombre = 'Licenciado en Turismo',
     @descripcion = 'Titulo universitario';
 
-EXEC Personal.altaTitulo
+EXEC Personal.tituloAlta
     @nombre = 'Biologo',
     @descripcion = 'Especialista en fauna';
 
-EXEC Personal.altaTitulo
+EXEC Personal.tituloAlta
     @nombre = 'Guia de Monta�a',
     @descripcion = 'Especialista en monta�a';
 
@@ -332,7 +332,7 @@ Resultado esperado:
 Error - Ya existe un t�tulo con ese nombre.
 =======================================================*/
 
-EXEC Personal.altaTitulo
+EXEC Personal.tituloAlta
     @nombre = 'Biologo',
     @descripcion = 'Duplicado';
 GO
@@ -346,7 +346,7 @@ Resultado esperado:
 Se modifica correctamente el t�tulo.
 =======================================================*/
 
-EXEC Personal.modificarTitulo
+EXEC Personal.tituloModificar
     @codTitulo = 1,
     @nombre = 'Licenciado en Ecoturismo',
     @descripcion = 'Titulo actualizado';
@@ -362,7 +362,7 @@ Resultado esperado:
 Error - El titulo no existe.
 =======================================================*/
 
-EXEC Personal.modificarTitulo
+EXEC Personal.tituloModificar
     @codTitulo = 999,
     @nombre = 'Prueba',
     @descripcion = 'Prueba';
@@ -377,7 +377,7 @@ Resultado esperado:
 Se elimina correctamente el t�tulo.
 =======================================================*/
 
-EXEC Personal.bajaTitulo
+EXEC Personal.tituloBaja
     @codTitulo = 3;
 
 SELECT *
@@ -390,7 +390,7 @@ Resultado esperado:
 Error - No se puede eliminar el titulo porque est� asignado a uno o m�s guias.
 =======================================================*/
 
-EXEC Personal.bajaTitulo
+EXEC Personal.tituloBaja
     @codTitulo = 1;
 GO
 
@@ -407,15 +407,15 @@ Resultado esperado:
 Se crean correctamente 3 especialidades.
 =======================================================*/
 
-EXEC Personal.altaEspecialidad
+EXEC Personal.especialidadAlta
     @nombre = 'Fauna',
     @descripcion = 'Especialista en animales';
 
-EXEC Personal.altaEspecialidad
+EXEC Personal.especialidadAlta
     @nombre = 'Flora',
     @descripcion = 'Especialista en vegetaci�n';
 
-EXEC Personal.altaEspecialidad
+EXEC Personal.especialidadAlta
     @nombre = 'Geologia',
     @descripcion = 'Especialista en geolog�a';
 
@@ -429,7 +429,7 @@ Resultado esperado:
 Error - La especialidad ya existe.
 =======================================================*/
 
-EXEC Personal.altaEspecialidad
+EXEC Personal.especialidadAlta
     @nombre = 'Fauna',
     @descripcion = 'Duplicada';
 GO
@@ -443,7 +443,7 @@ Resultado esperado:
 Se modifica correctamente la especialidad.
 =======================================================*/
 
-EXEC Personal.modificarEspecialidad
+EXEC Personal.especialidadModificar
     @codEspecialidad = 1,
     @nombre = 'Fauna Silvestre',
     @descripcion = 'Actualizada';
@@ -459,7 +459,7 @@ Resultado esperado:
 Error - La especialidad no existe.
 =======================================================*/
 
-EXEC Personal.modificarEspecialidad
+EXEC Personal.especialidadModificar
     @codEspecialidad = 999,
     @nombre = 'Prueba',
     @descripcion = 'Prueba';
@@ -475,7 +475,7 @@ Resultado esperado:
 Se elimina correctamente la especialidad.
 =======================================================*/
 
-EXEC Personal.bajaEspecialidad
+EXEC Personal.especialidadBaja
     @codEspecialidad = 3;
 
 SELECT *
@@ -495,13 +495,13 @@ Resultado esperado:
 Se crean correctamente 3 gu�as.
 =======================================================*/
 
-EXEC Personal.altaGuia
+EXEC Personal.guiaAlta
     '11111111','Pedro','Lopez','1985-01-01',1,1;
 
-EXEC Personal.altaGuia
+EXEC Personal.guiaAlta
     '22222222','Maria','Perez','1988-02-02',1,2;
 
-EXEC Personal.altaGuia
+EXEC Personal.guiaAlta
     '33333333','Carlos','Gomez','1990-03-03',2,1;
 
 SELECT *
@@ -514,7 +514,7 @@ Resultado esperado:
 Error - El documento ya existe.
 =======================================================*/
 
-EXEC Personal.altaGuia
+EXEC Personal.guiaAlta
     '11111111','Juan','Prueba','1995-01-01',1,1;
 GO
 
@@ -528,7 +528,7 @@ Resultado esperado:
 Se modifica correctamente el gu�a.
 =======================================================*/
 
-EXEC Personal.modificarGuia
+EXEC Personal.guiaModificar
     @legajo = 1,
     @nombre = 'Pedro Modificado',
     @apellido = 'Lopez Modificado',
@@ -550,7 +550,7 @@ Resultado esperado:
 Se elimina correctamente el gu�a.
 =======================================================*/
 
-EXEC Personal.bajaGuia
+EXEC Personal.guiaBaja
     @legajo = 3;
 
 SELECT *
@@ -569,15 +569,15 @@ Resultado esperado:
 Se crean correctamente 3 habilitaciones.
 =======================================================*/
 
-EXEC Personal.altaHabilitacion
+EXEC Personal.habilitacionAlta
     'Senderismo',
     'Recorridos de senderos';
 
-EXEC Personal.altaHabilitacion
+EXEC Personal.habilitacionAlta
     'Monta�ismo',
     'Actividades de monta�a';
 
-EXEC Personal.altaHabilitacion
+EXEC Personal.habilitacionAlta
     'Avistaje',
     'Observaci�n de fauna';
 
@@ -593,7 +593,7 @@ Resultado esperado:
 Se modifica correctamente la habilitaci�n.
 =======================================================*/
 
-EXEC Personal.modificarHabilitacion
+EXEC Personal.habilitacionModificar
     @idHabilitacion = 1,
     @nombre = 'Senderismo Avanzado',
     @descripcion = 'Actualizada';
@@ -609,7 +609,7 @@ Resultado esperado:
 Error - La habilitaci�n no existe.
 =======================================================*/
 
-EXEC Personal.modificarHabilitacion
+EXEC Personal.habilitacionModificar
     @idHabilitacion = 999,
     @nombre = 'Prueba',
     @descripcion = 'Prueba';
@@ -624,7 +624,7 @@ Resultado esperado:
 Se elimina correctamente la habilitaci�n.
 =======================================================*/
 
-EXEC Personal.bajaHabilitacion
+EXEC Personal.habilitacionBaja
     @idHabilitacion = 3;
 
 SELECT *
@@ -637,7 +637,7 @@ Resultado esperado:
 Error - No se puede eliminar la habilitaci�n porque est� asociada a gu�as.
 =======================================================*/
 
-EXEC Personal.bajaHabilitacion
+EXEC Personal.habilitacionBaja
     @idHabilitacion = 1;
 GO
 
@@ -647,7 +647,7 @@ Resultado esperado:
 Error - La habilitaci�n no existe.
 =======================================================*/
 
-EXEC Personal.bajaHabilitacion
+EXEC Personal.habilitacionBaja
     @idHabilitacion = 999;
 GO
 
@@ -663,7 +663,7 @@ Resultado esperado:
 Se crea correctamente la habilitaci�n de gu�a.
 =======================================================*/
 
-EXEC Personal.altaHabilitacionGuia
+EXEC Personal.habilitacionGuiaAlta
     @idHabilitacion = 1,
     @legajoGuia = 1,
     @idParque = 1,
@@ -685,7 +685,7 @@ Resultado esperado:
 Se modifica correctamente la habilitaci�n de gu�a.
 =======================================================*/
 
-EXEC Personal.modificarHabilitacionGuia
+EXEC Personal.habilitacionGuiaModificar
     @idHabilitacionGuia = 1,
     @idHabilitacion = 2,
     @legajoGuia = 1,
@@ -704,7 +704,7 @@ Resultado esperado:
 Error - La habilitaci�n del gu�a no existe.
 =======================================================*/
 
-EXEC Personal.modificarHabilitacionGuia
+EXEC Personal.habilitacionGuiaModificar
     @idHabilitacionGuia = 999,
     @idHabilitacion = 1,
     @legajoGuia = 1,
@@ -723,7 +723,7 @@ Resultado esperado:
 Se elimina correctamente la habilitaci�n del gu�a.
 =======================================================*/
 
-EXEC Personal.bajaHabilitacionGuia
+EXEC Personal.habilitacionGuiaBaja
     @idHabilitacionGuia = 1;
 
 SELECT *
@@ -736,6 +736,6 @@ Resultado esperado:
 Error - La habilitaci�n del gu�a no existe.
 =======================================================*/
 
-EXEC Personal.bajaHabilitacionGuia
+EXEC Personal.habilitacionGuiaBaja
     @idHabilitacionGuia = 999;
 GO

@@ -26,7 +26,7 @@ STORE PROCEDURE TABLA GUARDAPARQUES
 ---------------------------------------------------------
 
 
-CREATE OR ALTER PROCEDURE Personal.altaGuardaparques
+CREATE OR ALTER PROCEDURE Personal.guardaparquesAlta
 (
     @documento CHAR(8),
     @nombre VARCHAR(50),
@@ -96,7 +96,7 @@ GO
 -- MODIFICACION DE GUARDAPARQUES POR LEGAJO
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.modificarGuardaparque
+CREATE OR ALTER PROCEDURE Personal.guardaparquesModificar
 (
     @legajo INT,
     @nuevoDocumento VARCHAR(20) = NULL,
@@ -152,7 +152,7 @@ GO
 
 -- nota: modificado (despues ver los otros)
 
-CREATE OR ALTER PROCEDURE Personal.bajaGuardaparque
+CREATE OR ALTER PROCEDURE Personal.guardaparqueBaja
 (
     @legajo INT
 )
@@ -198,7 +198,7 @@ STORE PROCEDURE TABLA HISTORIAL GUARDAPARQUES
 -- ASIGNACION DE GUARDAPARQUES A UN PARQUE
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.asignarGuardaparqueParque
+CREATE OR ALTER PROCEDURE Personal.guardaparqueParqueAsignar
 (
     @legajo INT,
     @idParque INT,
@@ -263,7 +263,7 @@ GO
 -- REASIGNACION DE GUARDAPARQUES A UN PARQUE
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.reasignarGuardaparque
+CREATE OR ALTER PROCEDURE Personal.guardaparqueReasignar
 (
     @legajo INT,
     @nuevoParque INT,
@@ -345,7 +345,7 @@ STORE PROCEDURE TABLA GUIAS
 -- ALTA GUIA
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.altaGuia
+CREATE OR ALTER PROCEDURE Personal.guiaAlta
 (
     @documento CHAR(8),
     @nombre VARCHAR(50),
@@ -394,7 +394,7 @@ GO
 -- MODIFICACION GUIA
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.modificarGuia
+CREATE OR ALTER PROCEDURE Personal.guiaModificar
 (
     @legajo INT,
     @nombre VARCHAR(50),
@@ -424,7 +424,7 @@ GO
 
 -- nota: ya modificado
 
-CREATE OR ALTER PROCEDURE Personal.bajaGuia
+CREATE OR ALTER PROCEDURE Personal.guiaBaja
 (
     @legajo INT
 )
@@ -459,7 +459,7 @@ STORE PROCEDURE TABLA TITULOS GUIAS
 -- ALTA TITULOS GUIA
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.altaTitulo
+CREATE OR ALTER PROCEDURE Personal.tituloAlta
 (
     @nombre VARCHAR(100),
     @descripcion VARCHAR(200) = NULL
@@ -496,7 +496,7 @@ GO
 -- MODIFICACION TITULOS GUIAS
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.modificarTitulo
+CREATE OR ALTER PROCEDURE Personal.tituloModificar
 (
     @codTitulo INT,
     @nombre VARCHAR(100),
@@ -529,7 +529,7 @@ GO
 -- BAJA TITULOS GUIAS
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.bajaTitulo
+CREATE OR ALTER PROCEDURE Personal.tituloBaja
 (
     @codTitulo INT
 )
@@ -561,7 +561,7 @@ STORE PROCEDURE TABLA ESPECIALIDAD GUIAS
 -- ALTA ESPECIALIDAD GUIAS
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.altaEspecialidad
+CREATE OR ALTER PROCEDURE Personal.especialidadAlta
 (
     @nombre VARCHAR(50),
     @descripcion VARCHAR(200) = NULL
@@ -598,7 +598,7 @@ GO
 -- MODIFICACION ESPECIALIDAD GUIAS
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.modificarEspecialidad
+CREATE OR ALTER PROCEDURE Personal.especialidadModificar
 (
     @codEspecialidad INT,
     @nombre VARCHAR(50),
@@ -631,7 +631,7 @@ GO
 -- BAJA ESPECIALIDAD GUIAS
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.bajaEspecialidad
+CREATE OR ALTER PROCEDURE Personal.especialidadBaja
 (
     @codEspecialidad INT
 )
@@ -662,7 +662,7 @@ STORE PROCEDURE TABLA HABILITACIONES
 -- ALTA HABILITACIONES
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.altaHabilitacion
+CREATE OR ALTER PROCEDURE Personal.habilitacionAlta
 (
     @nombre VARCHAR(50),
     @descripcion VARCHAR(200)=NULL
@@ -688,7 +688,7 @@ GO
 -- MODIFICACION HABILITACIONES
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.modificarHabilitacion
+CREATE OR ALTER PROCEDURE Personal.habilitacionModificar
 (
     @idHabilitacion INT,
     @nombre VARCHAR(50),
@@ -721,7 +721,7 @@ GO
 -- BAJA HABILITACIONES
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.bajaHabilitacion
+CREATE OR ALTER PROCEDURE Personal.habilitacionBaja
 (
     @idHabilitacion INT
 )
@@ -763,7 +763,7 @@ STORE PROCEDURE TABLA HABILITACIONES GUIAS POR PARQUE
 -- ALTA HABILITACIONES GUIAS POR PARQUE
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.altaHabilitacionGuia
+CREATE OR ALTER PROCEDURE Personal.habilitacionGuiaAlta
 (
     @idHabilitacion INT,
     @legajoGuia INT,
@@ -804,7 +804,7 @@ GO
 -- MODIFICACION HABILITACIONES GUIAS POR PARQUE
 ---------------------------------------------------------
 
-CREATE OR ALTER PROCEDURE Personal.modificarHabilitacionGuia
+CREATE OR ALTER PROCEDURE Personal.habilitacionGuiaModificar
 (
     @idHabilitacionGuia INT,
     @idHabilitacion INT,
@@ -848,7 +848,7 @@ GO
 ---------------------------------------------------------
 -- BAJA HABILITACIONES GUIAS POR PARQUE
 ---------------------------------------------------------
-CREATE OR ALTER PROCEDURE Personal.bajaHabilitacionGuia
+CREATE OR ALTER PROCEDURE Personal.habilitacionGuiaBaja
 (
     @idHabilitacionGuia INT
 )
