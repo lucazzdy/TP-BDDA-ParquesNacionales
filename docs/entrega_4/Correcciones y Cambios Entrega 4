@@ -8,5 +8,9 @@ Correcciones Profe
 
 Correcciones Realizadas
 
-.Se agregego el tamaño Asignado que ocuparian cada Tipo de archivo 
+.Se agrego el tamaño Asignado que ocuparian cada Tipo de archivo 
 
+
+Fecha 1/7/2026
+
+.Se agrego la instalacion del proveedor Microsoft.ACE.OLEDB.16.0 para poder procesar archivos externos.

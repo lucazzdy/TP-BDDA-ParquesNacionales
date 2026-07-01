@@ -4,15 +4,16 @@ Fecha 12/06/2026
 
 Correcciones Profe:
 
-.ubicación de parque que sea atributo compuesto o entidad con atributos
-.titulo de los guías que sea entidad débil o multivaluada
-.atributo fecha en compra
+.Ubicación de parque que sea atributo compuesto o entidad con atributos
+.Titulo de los guías que sea entidad débil o multivaluada
+.Debe haber un atributo fecha en compra
 
 Correcciones Realizadas:
 
 .Ubicacion de parque como atributo multivaluado con los atributos Provincia, calle, nro y codigo Postal
-.titulo, especialidad, tipo concesion, tipo parque, tipo visitante como entidad con atributos propios
-.Atributo fecha y estado en l entidd compra
+.Titulo, especialidad, tipo concesion, tipo parque, tipo visitante como entidad con atributos propios
+.Las entidades tipo de parque, especialidad y tipo de visitante se convirtieron en entidades fuertes al ser independientes y contar con identidad propia, por lo que ya no necesitan una entidad propietaria para su identificación.
+.Atributo fecha y estado en l entidad compra
 .Atributos estado en las entidades pago y pago canon
 .Agregado atributo fecha en Pago y en la relacion hace tour
 
@@ -39,11 +40,12 @@ Fecha 26/06/2026
 
 Cambios Realizados:
 
-Eliminacion de atributos en entidad Venta, solo quedaron IDventa y fecha.
-Agregado de atributos montototal, fechaEmision, tipoFactura,PuntoVenta y NumeroFactura en entidad ticket 
+.Eliminacion de atributos en entidad Venta, solo quedaron idVenta y fecha.
+.Agregado de atributos montototal, fechaEmision, tipoFactura,PuntoVenta y NumeroFactura en entidad ticket 
 
 Fecha 29/06/2026
 
-Cambio Realizados:
+Cambios Realizados:
 
-Cambio de nombre de atributo idItem por nroItem, esto con el objetivo de dejar en claro que itemVenta es una entidad debil.
+.Cambio de nombre de atributo idItem por nroItem, esto con el objetivo de dejar en claro que itemVenta es una entidad debil.
+.Agregado de atributos turno y diaDisponible en actividad, con el fin de poder identificar que actividades se estan realizando simultaneamente en un parque
