@@ -606,6 +606,26 @@ EXEC Ventas.entradaActividadAlta
         @codigoEntrada = 'X-000000-X', -- Código de entrada inexistente
         @idActividad = 999;
 
+-- Alta fallida por cupo lleno. Resultado: El tour esta lleno. No hay cupo disponible.
+
+DECLARE @idActDemo INT, @codEntradaLibre CHAR(10);
+
+SELECT @idActDemo = idActividad 
+FROM Actividades.actividad 
+WHERE nombre = 'Tour Demo Cupo Completo';
+
+SELECT TOP 1 @codEntradaLibre = codigoEntrada
+FROM Ventas.entrada e
+WHERE NOT EXISTS (
+    SELECT 1 FROM Ventas.entradaActividad ea
+    WHERE ea.codigoEntrada = e.codigoEntrada AND ea.idActividad = @idActDemo
+);
+
+EXEC Ventas.entradaActividadAlta 
+    @codigoEntrada = @codEntradaLibre,
+    @idActividad = @idActDemo;
+GO
+
 --2. Modificar
 
 -- Modificacion exitosa. Resultado, solo se ven cambios en los campos escritos.
@@ -776,3 +796,20 @@ EXEC Ventas.procesarVentaMasiva
     @puntoVenta = 5,
     @numeroFactura = 200001, -- Provoca colisión fiscal de número
     @jsonCompra = @jsonInvalido;
+
+
+--  ================================    Caso obligatorio: Tour con cupo completo   ================================
+
+-- Verifica que existe al menos un tour cuya cantidad de anotados iguale su cupo maximo.
+-- Resultado esperado: 1 fila con actividad = 'Tour Demo Cupo Completo', anotados = 5, cupoMaximo = 5, estado = 'LLENO'.
+
+SELECT 
+    a.nombre AS actividad,
+    t.cupoMaximo,
+    COUNT(ea.codigoEntrada) AS anotados,
+    CASE WHEN COUNT(ea.codigoEntrada) >= t.cupoMaximo THEN 'LLENO' ELSE 'DISPONIBLE' END AS estado
+FROM Actividades.tour t
+INNER JOIN Actividades.actividad a ON a.idActividad = t.idActividad
+LEFT JOIN Ventas.entradaActividad ea ON ea.idActividad = t.idActividad
+WHERE a.nombre = 'Tour Demo Cupo Completo'
+GROUP BY a.nombre, t.cupoMaximo;

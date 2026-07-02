@@ -60,6 +60,7 @@ GRANT EXECUTE ON Gestion.reporteIngresos TO rol_consultor;
 GRANT EXECUTE ON Gestion.reporteVisitas TO rol_consultor;
 GRANT EXECUTE ON Gestion.reporteVisitasPorPeriodo TO rol_consultor;
 GRANT EXECUTE ON Concesiones.reporteDeudores TO rol_consultor;
+GRANT EXECUTE ON Gestion.reporteActividadesMasDemandadas TO rol_consultor;
 
 -- SPs de consulta (no modifican datos)
 GRANT EXECUTE ON Gestion.consultarParqueConConcesiones TO rol_consultor;

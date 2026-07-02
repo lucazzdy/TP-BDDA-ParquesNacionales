@@ -915,6 +915,11 @@ BEGIN
     IF EXISTS (SELECT 1 FROM Ventas.entradaActividad WHERE codigoEntrada = @codigoEntrada AND idActividad = @idActividad)
         SET @errorMsg = @errorMsg + '- Esta actividad ya se encuentra vinculada a la entrada ingresada.' + @saltoLinea;
 
+    -- Valido que el tour no este lleno (suma de cupos de todos los tours de la actividad)
+    DECLARE @cupoTotal INT = (SELECT SUM(cupoMaximo) FROM Actividades.tour WHERE idActividad = @idActividad);
+    IF @cupoTotal IS NOT NULL AND (SELECT COUNT(*) FROM Ventas.entradaActividad WHERE idActividad = @idActividad) >= @cupoTotal
+        SET @errorMsg = @errorMsg + '- El tour esta lleno. No hay cupo disponible.' + @saltoLinea;
+
     IF LEN(@errorMsg) > 0
     BEGIN
         ;THROW 50424, @errorMsg, 1;

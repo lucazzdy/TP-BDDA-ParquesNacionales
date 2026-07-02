@@ -4,7 +4,7 @@
     Grupo n°7
     Integrantes:    - Acuña, Lucas Daniel
                     - Alesina, Alan
-                    - Gutierrez, Lucas Leone
+                    - Gutierrez, Lucas Leonel
                     - Zambrana, Mijael
 
     Descripción del Script: Seed data del esquema Ventas.
@@ -260,6 +260,62 @@ BEGIN
     END
 END;
 GO
+
+
+-- Caso obligatorio: tour con cupo completo 
+-- Se crea una actividad y un tour dedicados con cupo bajo 5, y se anotan
+-- entradas existentes hasta llenarlo, a actividad no se comparte con otros tours
+
+DECLARE @idActDemo INT, @legajoDemo INT, @cupoDemo TINYINT = 5;
+DECLARE @codigoEntradaDemo CHAR(10), @asignadosDemo INT = 0;
+
+-- 1 Creo actividad dedicada
+EXEC Actividades.actividadAlta
+    @nombre = 'Tour Demo Cupo Completo',
+    @costo = 5000.00,
+    @duracion = 2.0,
+    @turno = 'MANANA',
+    @diaDisponible = 'SAB',
+    @idTipoActividad = 1;
+
+SELECT @idActDemo = idActividad
+FROM Actividades.actividad
+WHERE nombre = 'Tour Demo Cupo Completo';
+
+-- 2 Elejo un guia y creo el tour con cupo bajo
+SELECT TOP 1 @legajoDemo = legajo FROM Personal.guias ORDER BY NEWID();
+
+EXEC Actividades.tourAlta
+    @idActividad = @idActDemo,
+    @legajo = @legajoDemo,
+    @fechaInicio = '2026-07-15',
+    @fechaDesde = '2026-07-01',
+    @cupoMaximo = @cupoDemo;
+
+-- 3 Anoto entradas existentes hasta llenar el cupo
+WHILE @asignadosDemo < @cupoDemo
+BEGIN
+    SET @codigoEntradaDemo = NULL;
+
+    SELECT TOP 1 @codigoEntradaDemo = codigoEntrada
+    FROM Ventas.entrada e
+    WHERE NOT EXISTS (
+        SELECT 1 FROM Ventas.entradaActividad ea
+        WHERE ea.codigoEntrada = e.codigoEntrada
+          AND ea.idActividad = @idActDemo
+    )
+    ORDER BY NEWID();
+
+    IF @codigoEntradaDemo IS NULL BREAK;
+
+    EXEC Ventas.entradaActividadAlta
+        @codigoEntrada = @codigoEntradaDemo,
+        @idActividad = @idActDemo;
+
+    SET @asignadosDemo += 1;
+END
+GO
+
 
 /*
 SELECT * FROM Ventas.preciosParque;

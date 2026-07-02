@@ -10,8 +10,7 @@
     Descripción del Script: Stored procedures de reportes visitas e ingresos
                             de los parques.
                             
-                            Cumple los requisitos de la entrega de 
-                            retornar XML en algunos reportes.
+
 */
 
 USE GestionParquesNacionales_Com5600_Grupo07;
@@ -34,7 +33,6 @@ BEGIN
     FROM 
         Ventas.entrada e
         INNER JOIN Gestion.parque p ON e.idParque = p.idParque
-        WHERE e.fechaAcceso <= DATEADD(DAY, +1, GETDATE())
     GROUP BY p.nombre, e.fechaAcceso
     ORDER BY e.fechaAcceso;
 END
@@ -42,7 +40,7 @@ GO
 
 /*=========================================================
 REPORTE: Ingresos por parque por semana, mes y año.
-Lista los ingresos que tienen cada parque por dia, mes, y año.
+Suma total de entradas, tours y canon de concesiones cobradas.
 =========================================================*/
 
 CREATE OR ALTER PROCEDURE Gestion.reporteIngresos
@@ -52,16 +50,26 @@ BEGIN
 
     SELECT 
         p.nombre AS Parque,
-        SUM(tf.montoTotal) AS TotalIngresos,
-        pg.fecha AS FechaPago
-    FROM 
-        Ventas.venta v
-        INNER JOIN Gestion.parque p ON v.idParque = p.idParque
+        SUM(ingreso) AS TotalIngresos,
+        fecha AS FechaPago
+    FROM (
+        -- Ingresos por ventas (entradas + tours registrados en itemVenta)
+        SELECT v.idParque, v.total AS ingreso, pg.fecha
+        FROM Ventas.venta v
         INNER JOIN Ventas.pago pg ON v.idVenta = pg.idVenta
-        INNER JOIN Ventas.ticketFactura tf ON v.idVenta = tf.idVenta
-        WHERE pg.fecha <= DATEADD(DAY, +1, GETDATE()) AND pg.estado = 'Aprobado'
-    GROUP BY p.nombre, pg.fecha
-    ORDER BY pg.fecha;
+        WHERE pg.estado = 'Aprobado'
+
+        UNION ALL
+
+        -- Ingresos por canon de concesiones cobradas
+        SELECT c.idParque, pc.monto AS ingreso, pc.fecha
+        FROM Concesiones.concesion c
+        INNER JOIN Concesiones.pagoCanon pc ON pc.idConcesion = c.idConcesion
+        WHERE pc.estado = 'Pagado'
+    ) AS todosLosIngresos
+    INNER JOIN Gestion.parque p ON p.idParque = todosLosIngresos.idParque
+    GROUP BY p.nombre, fecha
+    ORDER BY fecha;
 END
 GO
 
@@ -115,9 +123,27 @@ BEGIN
     EXEC sp_executesql @queryDinamica;
 END;
 GO
-/*
-SELECT * FROM Ventas.venta
-EXEC Gestion.reporteVisitas;
-EXEC Gestion.reporteIngresos;
-EXEC Gestion.reporteVisitasPorPeriodo;
-*/
+
+
+/*=========================================================
+REPORTE: Actividades mas demandadas.
+Lista las actividades y tours ordenados por cantidad de veces contratados.
+Cumple con el punto G de la seccion II del enunciado.
+=========================================================*/
+
+CREATE OR ALTER PROCEDURE Gestion.reporteActividadesMasDemandadas
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        a.nombre AS Actividad,
+        ta.descripcion AS Tipo,
+        COUNT(ea.codigoEntrada) AS VecesContratada
+    FROM Actividades.actividad a
+    INNER JOIN Actividades.tipoActividad ta ON ta.idTipoActividad = a.idTipoActividad
+    LEFT JOIN Ventas.entradaActividad ea ON ea.idActividad = a.idActividad
+    GROUP BY a.nombre, ta.descripcion
+    ORDER BY VecesContratada DESC;
+END
+GO
