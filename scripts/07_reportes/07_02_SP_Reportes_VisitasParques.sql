@@ -50,19 +50,44 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT 
-        p.nombre AS Parque,
-        SUM(tf.montoTotal) AS TotalIngresos,
-        pg.fecha AS FechaPago
-    FROM 
-        Ventas.venta v
-        INNER JOIN Gestion.parque p ON v.idParque = p.idParque
-        INNER JOIN Ventas.pago pg ON v.idVenta = pg.idVenta
-        INNER JOIN Ventas.ticketFactura tf ON v.idVenta = tf.idVenta
-        WHERE pg.fecha <= DATEADD(DAY, +1, GETDATE()) AND pg.estado = 'Aprobado'
-    GROUP BY p.nombre, pg.fecha
-    ORDER BY pg.fecha;
-END
+    ;WITH Ventas AS
+    (
+        SELECT
+            p.idParque,
+            p.nombre AS Parque,
+            CAST(pg.fecha AS DATE) AS Fecha,
+            SUM(tf.montoTotal) AS TotalVentas
+        FROM Ventas.venta v
+        INNER JOIN Gestion.parque p ON p.idParque = v.idParque
+        INNER JOIN Ventas.pago pg ON pg.idVenta = v.idVenta
+        INNER JOIN Ventas.ticketFactura tf ON tf.idVenta = v.idVenta
+        WHERE pg.estado = 'Aprobado'
+        GROUP BY p.idParque, p.nombre, CAST(pg.fecha AS DATE)
+    ),
+    Canones AS
+    (
+        SELECT
+            c.idParque,
+            p.nombre AS Parque,
+            CAST(pc.fecha AS DATE) AS Fecha,
+            SUM(pc.monto) AS TotalCanon
+        FROM Concesiones.pagoCanon pc
+        INNER JOIN Concesiones.concesion c ON c.idConcesion = pc.idConcesion
+        INNER JOIN Gestion.parque p ON p.idParque = c.idParque
+        WHERE pc.estado IN  ('Pagado', 'Atrasado')
+        GROUP BY c.idParque, p.nombre, CAST(pc.fecha AS DATE)
+    )
+
+    SELECT
+        COALESCE(v.parque, c.parque) AS Parque,
+        COALESCE(v.fecha, c.fecha) AS Fecha,
+        ISNULL(v.TotalVentas, 0) AS TotalVentas,
+        ISNULL(c.TotalCanon, 0) AS TotalCanon,
+        ISNULL(v.TotalVentas, 0) + ISNULL(c.TotalCanon, 0) AS TotalIngresos
+    FROM Ventas v
+    FULL OUTER JOIN Canones c ON v.idParque = c.idParque AND v.Fecha = c.Fecha
+    ORDER BY fecha, parque;
+END;
 GO
 
 
