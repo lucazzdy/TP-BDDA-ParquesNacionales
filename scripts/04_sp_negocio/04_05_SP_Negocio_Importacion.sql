@@ -218,7 +218,7 @@ BEGIN
     END
 
     -- Resumen del proceso
-    SELECT @ok AS importadosOk, @err AS importadosConError, (@ok + @err) AS total;
+    -- SELECT @ok AS importadosOk, @err AS importadosConError, (@ok + @err) AS total;
 END
 GO
 
@@ -301,8 +301,7 @@ BEGIN
     END
 
     -- Resumen
-    SELECT @ok AS actualizadosOk, @err AS conError, @saltados AS saltados, 
-           (@ok + @err + @saltados) AS total;
+    -- SELECT @ok AS actualizadosOk, @err AS conError, @saltados AS saltados, (@ok + @err + @saltados) AS total;
 END
 GO
 
@@ -319,7 +318,7 @@ BEGIN
 
     IF @codEspecialidadDefault IS NULL
     BEGIN
-        EXEC Personal.altaEspecialidad @nombre = 'General', @descripcion = 'Especialidad por defecto';
+        EXEC Personal.especialidadAlta @nombre = 'General', @descripcion = 'Especialidad por defecto';
         SELECT @codEspecialidadDefault = codEspecialidad 
         FROM Personal.especialidad WHERE nombre = 'General';
     END
@@ -385,12 +384,12 @@ BEGIN
             IF @vCodTitulo IS NOT NULL
             BEGIN
                 -- Si ya existe, lo modificamos
-                EXEC Personal.modificarTitulo @codTitulo = @vCodTitulo, @nombre = @tituloNombre, @descripcion = 'Actualizado vía SP';
+                EXEC Personal.tituloModificar @codTitulo = @vCodTitulo, @nombre = @tituloNombre, @descripcion = 'Actualizado vía SP';
             END
             ELSE
             BEGIN
                 -- Si no existe, lo damos de alta
-                EXEC Personal.altaTitulo @nombre = @tituloNombre, @descripcion = 'Alta vía SP';
+                EXEC Personal.tituloAlta @nombre = @tituloNombre, @descripcion = 'Alta vía SP';
             END
         END TRY
         BEGIN CATCH
@@ -445,7 +444,7 @@ BEGIN
                 IF @vLegajo IS NOT NULL
                 BEGIN
                     -- UPDATE usando tu SP modificarGuia
-                    EXEC Personal.modificarGuia 
+                    EXEC Personal.guiaModificar 
                         @legajo = @vLegajo, 
                         @nombre = @guiaNombre, 
                         @apellido = @guiaApellido, 
@@ -459,7 +458,7 @@ BEGIN
                 ELSE
                 BEGIN
                     -- INSERT usando tu SP altaGuia
-                    EXEC Personal.altaGuia 
+                    EXEC Personal.guiaAlta 
                         @documento = @guiaDocumento, 
                         @nombre = @guiaNombre, 
                         @apellido = @guiaApellido, 

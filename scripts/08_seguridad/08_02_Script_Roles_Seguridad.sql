@@ -126,10 +126,10 @@ GRANT EXECUTE ON Concesiones.empresaAlta TO rol_operador;
 GRANT EXECUTE ON Concesiones.empresaModificar TO rol_operador;
 
 -- Personal (asignacion de guardaparques y guias)
-GRANT EXECUTE ON Personal.asignarGuardaparqueParque TO rol_operador;
-GRANT EXECUTE ON Personal.reasignarGuardaparque TO rol_operador;
-GRANT EXECUTE ON Personal.altaHabilitacionGuia TO rol_operador;
-GRANT EXECUTE ON Personal.modificarHabilitacionGuia TO rol_operador;
+GRANT EXECUTE ON Personal.guardaparqueParqueAsignar TO rol_operador;
+GRANT EXECUTE ON Personal.guardaparqueReasignar TO rol_operador;
+GRANT EXECUTE ON Personal.habilitacionGuiaAlta TO rol_operador;
+GRANT EXECUTE ON Personal.habilitacionGuiaModificar TO rol_operador;
 
 -- Reportes basicos
 GRANT EXECUTE ON Gestion.consultarParqueConConcesiones TO rol_operador;

@@ -230,8 +230,11 @@ EXEC Concesiones.pagoCanonAlta @idConcesion=10, @fecha='2025-05-07', @monto=1300
 -- ====================================================================
 -- VERIFICACION RAPIDA
 -- ====================================================================
+
+/*
 SELECT 'Parques (vienen del SIB)' AS tabla, COUNT(*) AS cantidad FROM Gestion.parque
 UNION ALL SELECT 'Tipos de concesion', COUNT(*) FROM Concesiones.tipoConcesion
 UNION ALL SELECT 'Empresas', COUNT(*) FROM Concesiones.empresa
 UNION ALL SELECT 'Concesiones', COUNT(*) FROM Concesiones.concesion
 UNION ALL SELECT 'Pagos de canon', COUNT(*) FROM Concesiones.pagoCanon;
+*/

@@ -46,9 +46,9 @@ GO
 
 IF NOT EXISTS (SELECT 1 FROM Ventas.preciosParque)
 BEGIN
-    DECLARE @idParque INT = 1;
+    DECLARE @idParque INT = 1, @max INT = (SELECT COUNT(*) FROM Gestion.parque);
 
-    WHILE @idParque <= 51
+    WHILE @idParque <= @max
         BEGIN
 
             EXEC Ventas.preciosParqueAlta 
@@ -261,6 +261,7 @@ BEGIN
 END;
 GO
 
+/*
 SELECT * FROM Ventas.preciosParque;
 SELECT * FROM Ventas.pago;
 SELECT * FROM Ventas.ticketFactura;
@@ -268,3 +269,4 @@ SELECT * FROM Ventas.venta;
 SELECT * FROM Ventas.itemVenta ORDER BY idVenta ASC, nroItem ASC;
 SELECT * FROM Ventas.entrada;
 SELECT * FROM Ventas.entradaActividad;
+*/

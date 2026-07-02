@@ -81,8 +81,9 @@ FROM OPENROWSET(
 ) AS xlsx;';
 EXEC sp_executesql @sql;
 
+/*
 SELECT TOP 5 * FROM Gestion.stagingSib;
-
+*/
 
 -- ===========================================================
 -- PASO 2: cargar el CSV del CIAM en su staging
@@ -99,7 +100,9 @@ WITH (
 );';
 EXEC sp_executesql @sql;
 
+/*
 SELECT TOP 5 * FROM Gestion.stagingCiam;
+*/
 
 -- ===========================================================
 -- PASO 3: cargar el CSV de guias en su staging
@@ -116,7 +119,9 @@ WITH (
 );';
 EXEC sp_executesql @sql;
 
+/*
 SELECT TOP 5 * FROM Personal.stagingCsvGuias;
+*/
 
 -- ===========================================================
 -- PASO 4: procesar la importacion del SIB
@@ -140,7 +145,7 @@ EXEC Personal.procesarImportacionGuiasCsv;
 -- ===========================================================
 -- VERIFICACION
 -- ===========================================================
-
+/*
 -- Cantidad de parques cargados
 SELECT COUNT(*) AS totalParques FROM Gestion.parque;
 
@@ -165,3 +170,4 @@ ORDER BY p.idParque;
 
 SELECT g.legajo, g.nombre, g.apellido, t.Nombre  FROM Personal.guias g
 INNER JOIN Personal.titulos t ON t.codTitulo = g.codTitulo
+*/

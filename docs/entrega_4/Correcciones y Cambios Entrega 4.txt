@@ -1,0 +1,24 @@
+Primeras Correcciones Entrega 4
+
+FECHA 12/06/2026
+
+Correcciones Profe
+
+.comentar el tamaño de los archivos
+
+Correcciones Realizadas
+
+.Se agrego el tamaño Asignado que ocuparian cada Tipo de archivo 
+
+
+Fecha 1/7/2026
+
+.Se agrego la instalacion del proveedor Microsoft.ACE.OLEDB.16.0 para poder procesar archivos externos.
+
+Fecha 2/7/2026
+.Se agrego seccion de edicion y version del motor (SQL Server Developer 2022) con justificacion frente a Express.
+.Se agrego seccion de cuenta de servicio (gMSA) y su relacion con permisos de lectura para BULK INSERT y OPENROWSET.
+.Se renombro la seccion "Configuracion de memoria" a "Ubicacion de archivos" ya que su contenido corresponde al layout de almacenamiento.
+.Se agrego seccion de componentes del motor a habilitar (Ad Hoc Distributed Queries y xp_cmdshell) requeridos por los SPs de importacion y consulta climatica.
+.Se agrego seccion de configuracion de rutas para importacion, indicando el ajuste de la variable @rutaBase previo a ejecutar el script de importacion.
+.Se reordenaron las secciones para seguir un flujo logico: edicion -> instalacion -> cuenta -> archivos -> rendimiento -> red -> seguridad -> integracion.

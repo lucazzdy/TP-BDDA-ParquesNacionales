@@ -31,7 +31,9 @@ BEGIN
     EXEC Ventas.tipoVisitanteAlta @descripcion = 'Menor';
 END
 
+/*
 SELECT * FROM Ventas.tipoVisitante
+*/
 
 -- ====================================================================
 -- FORMAS DE PAGO
@@ -46,7 +48,9 @@ BEGIN
     EXEC Ventas.formaPagoAlta @descripcion = 'Mercado Pago';
 END
 
+/*
 SELECT * FROM Ventas.formaPago
+*/
 
 -- ====================================================================
 -- VISITANTES
@@ -198,4 +202,6 @@ BEGIN
 END
 GO
 
+/*
 SELECT * FROM ventas.visitante
+*/

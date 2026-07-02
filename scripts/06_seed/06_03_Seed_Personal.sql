@@ -201,7 +201,7 @@ GO
 /*=======================================================
 VERIFICACION RAPIDA
 =======================================================*/
-
+/*
 SELECT 'Guardaparques' AS concepto, COUNT(*) AS cantidad
 FROM Personal.guardaparques
 
@@ -259,6 +259,8 @@ UNION ALL
 SELECT 'HabilitacionesGuia', COUNT(*)
 FROM Personal.HabilitacionesGuias;
 GO
+*/
+
 
 /*
 

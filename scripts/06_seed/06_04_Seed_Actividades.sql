@@ -140,7 +140,8 @@ BEGIN
     SET @cantidadTours -= 1;
 END
 
-
+/*
 SELECT * FROM Actividades.tipoActividad;
 SELECT * FROM Actividades.actividad;
 SELECT * FROM Actividades.tour;
+*/
